@@ -1,0 +1,11 @@
+<div class="jumbotron">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6 offset-sm-3">
+        <ul *ngFor="let user of users">
+          <li>{{ user.id }} {{ user.firstName }} {{ user.lastName }} ({{ user.username }})</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

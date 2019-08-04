@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { User } from '../account/user';
-import { Subscription, Observable } from 'rxjs';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { map } from 'rxjs/operators';
+import { User } from '../_models/user';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../account/services/authentication.service';
 
@@ -12,22 +10,17 @@ import { AuthenticationService } from '../account/services/authentication.servic
   styleUrls: ['./nav-bar.component.css'],
 })
 export class NavBarComponent implements OnDestroy {
-  isShow: boolean;
-  currentUser: User;
+  isAuthorised: boolean;
+  currentUser: User | null;
   currentUserSubscription: Subscription;
 
   constructor(
-    private breakpointObserver: BreakpointObserver,
     private router: Router,
     private authenticationService: AuthenticationService
   ) {
     this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
-      if (user) {
-        this.isShow = true;
-      } else {
-        this.isShow = false;
-      }
-      this.currentUser = user;
+      this.isAuthorised = user ? true : false;
+      this.currentUser = user ? user : null;
     });
   }
 
@@ -35,7 +28,15 @@ export class NavBarComponent implements OnDestroy {
     this.currentUserSubscription.unsubscribe();
   }
 
-  logout() {
+  clickAccount() {
+    if (this.currentUser) {
+      this.router.navigate(['/account']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private _logout() {
     this.authenticationService.logout();
     this.router.navigate(['/login']);
   }

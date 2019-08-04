@@ -26,7 +26,7 @@ export class RegisterComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private userService: UserService,
+    private authneticateService: AuthenticationService,
     private snackbar: MatSnackBar
   ) {
     if (this.authenticationService.currentUserValue) {
@@ -55,18 +55,18 @@ export class RegisterComponent implements OnInit {
 
     this.loading = true;
     // setTimeout(() => {
-    this.userService
+    this.authneticateService
       .register(this.registerForm.value)
       .pipe(first())
       .subscribe(
         data => {
           this.router.navigate(['/login']);
-          this.showMessage('Регистрация успешна');
+          this.showMessage('Sign up success!');
           this.loading = false;
         },
         error => {
           this.loading = false;
-          this.showErrorMessage(error);
+          this.showMessage(error);
         }
       );
     // }, 1500);

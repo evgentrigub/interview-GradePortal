@@ -1,0 +1,23 @@
+.container {
+  max-width: 80%;
+  margin-top: 5%;
+  background-color: E8E3E3
+}
+
+.avatar {
+  background-size: contain;
+}
+
+mat-card-content {
+  display: flex;
+  justify-content: space-around;
+}
+
+mat-card-header {
+  text-align: center;
+  margin-top: 100px
+}
+
+.mat-card-title {
+  font-size: 24pt;
+}

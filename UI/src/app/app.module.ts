@@ -1,9 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import 'hammerjs';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
+
 import { LoginComponent } from './account/login/login.component';
 import { RegisterComponent } from './account/register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -13,11 +14,12 @@ import { JwtInterceptor } from './account/jwt.interceptor';
 import { ErrorInterceptor } from './account/error.interceptor';
 import { MaterialModule } from './material-module';
 import { appRoutingModule } from './app.routing';
-import 'hammerjs';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
+import { TableComponent } from './table/table.component';
+import { PersonalPageComponent } from './account/personal-page/personal-page.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, LoginComponent, RegisterComponent, NavBarComponent],
+  declarations: [AppComponent, TableComponent, LoginComponent, RegisterComponent, NavBarComponent, PersonalPageComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -33,4 +35,4 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

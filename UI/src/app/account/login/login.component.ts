@@ -69,18 +69,14 @@ export class LoginComponent implements OnInit {
         data => {
           this.loading = false;
           this.router.navigate([this.returnUrl]);
-          this.showMessage('Вход успешно выполнен');
+          this.showMessage('Log in success!');
         },
         error => {
-          this.showErrorMessage(error);
           this.loading = false;
+          this.showMessage(error);
         }
       );
     // }, 1500);
-  }
-
-  forgetPassword() {
-    this.showMessage('Функция пока не доступна');
   }
 
   private showErrorMessage(message: HttpErrorResponse) {

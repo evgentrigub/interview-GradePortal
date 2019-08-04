@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using API.Helpers;
-using API.Models;
-using API.Models.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
+using GradePortalAPI.Helpers;
+using GradePortalAPI.Models;
+using GradePortalAPI.Models.Interfaces;
 
-namespace API.Services
+namespace GradePortalAPI.Services
 {
     public class UserService : IUserService
     {
-        private DataContext _context;
+        private readonly DataContext _context;
 
         public UserService(DataContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public User Authenticate(string username, string password)
@@ -22,7 +24,7 @@ namespace API.Services
                 throw new AppException("Username or password is empty");
 
             var user = _context.Users.SingleOrDefault(x => x.Username == username);
-            if (user == null) 
+            if (user == null)
                 throw new AppException("User not found. Username or password is incorrect");
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) return null;
@@ -31,13 +33,13 @@ namespace API.Services
 
         public User Create(User user, string password)
         {
-            if(string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is incorrect");
 
             if (_context.Users.Any(x => x.Username == user.Username))
                 throw new AppException("Username has already existed. Username: " + user.Username);
 
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt );
+            CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
 
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
@@ -66,10 +68,8 @@ namespace API.Services
                 throw new AppException("User not found");
 
             if (newUser.Username != user.Username)
-            {
                 if (_context.Users.Any(x => x.Username == newUser.Username))
                     throw new AppException("Username has already existed. Username:" + newUser.Username);
-            }
 
             user.FirstName = newUser.FirstName;
             user.LastName = newUser.LastName;
@@ -100,30 +100,30 @@ namespace API.Services
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            if(password == null) throw new ArgumentNullException("password");
-            if(string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value is empty", "password");
+            if (password == null) throw new ArgumentNullException("password");
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value is empty", "password");
 
-            var hmac = new System.Security.Cryptography.HMACSHA512();
+            var hmac = new HMACSHA512();
             passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
         private static bool VerifyPasswordHash(string password, byte[] localHash, byte[] localSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
             if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value is empty", "password");
-            if (localHash.Length != 64) throw new ArgumentException("Invalid length. Password hash expected 64 bytes.", "passwordHash");
-            if (localSalt.Length != 128) throw new ArgumentException("Invalid length. Password salt expected 128 bytes.", "passwordHash");
+            if (localHash.Length != 64)
+                throw new ArgumentException("Invalid length. Password hash expected 64 bytes.", "passwordHash");
+            if (localSalt.Length != 128)
+                throw new ArgumentException("Invalid length. Password salt expected 128 bytes.", "passwordHash");
 
-            var hmac = new System.Security.Cryptography.HMACSHA512(localSalt);
-            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != localHash[i]) return false;
-            }
+            var hmac = new HMACSHA512(localSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            for (var i = 0; i < computedHash.Length; i++)
+                if (computedHash[i] != localHash[i])
+                    return false;
 
             return true;
         }
-
     }
 }

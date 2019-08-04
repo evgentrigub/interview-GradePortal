@@ -1,39 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using AutoMapper;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using API.Dtos;
-using API.Helpers;
-using API.Models;
-using API.Models.Interfaces;
-using API.Models.ViewModels;
+using AutoMapper;
+using GradePortalAPI.Dtos;
+using GradePortalAPI.Helpers;
+using GradePortalAPI.Models;
+using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace API.Controllers
+namespace GradePortalAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly AppSettings _appSettings;
+        private readonly IMapper _mapper;
 
-        private IUserService _userService;
-        private IMapper _mapper;
-        private AppSettings _appSettings;
+        private readonly IUserService _userService;
 
         public UsersController(
             IUserService userService,
             IMapper mapper,
             IOptions<AppSettings> appSettings
-            )
+        )
         {
             _userService = userService;
             _mapper = mapper;
@@ -51,17 +48,18 @@ namespace API.Controllers
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
+                    Subject = new ClaimsIdentity(new[]
                     {
                         new Claim(ClaimTypes.Name, user.Id.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddDays(1),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenToSend = tokenHandler.WriteToken(token);
 
-                return Ok(new UserAuthenticateModel()
+                return Ok(new UserAuthenticateModel
                 {
                     Id = user.Id,
                     Username = user.Username,
@@ -72,7 +70,7 @@ namespace API.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 
@@ -89,7 +87,7 @@ namespace API.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 
@@ -110,7 +108,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update([FromBody]UserDto userDto)
+        public IActionResult Update([FromBody] UserDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
 
@@ -121,7 +119,7 @@ namespace API.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API.Dtos;
-using API.Models;
-using API.Models.ViewModels;
 using AutoMapper;
+using GradePortalAPI.Dtos;
+using GradePortalAPI.Models;
+using GradePortalAPI.Models.ViewModels;
 
-namespace API.Helpers
+namespace GradePortalAPI.Helpers
 {
     public class AppSettings
     {
@@ -16,7 +13,9 @@ namespace API.Helpers
 
     public class AppException : Exception
     {
-        public AppException(string message) : base(message) { }
+        public AppException(string message) : base(message)
+        {
+        }
     }
 
     public class AutoMapperProfile : Profile

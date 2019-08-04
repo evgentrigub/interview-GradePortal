@@ -1,21 +1,20 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using API.Helpers;
-using API.Models.Interfaces;
-using API.Services;
+using AutoMapper;
+using GradePortalAPI.Helpers;
+using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AutoMapper;
-using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace API
+namespace GradePortalAPI
 {
     public class Startup
     {
@@ -33,7 +32,7 @@ namespace API
             //    x => x.UseSqlServer(Configuration.GetConnectionString("DefaultString")));
             services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            
+
             services.AddAutoMapper();
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -53,10 +52,7 @@ namespace API
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                         var userId = int.Parse(context.Principal.Identity.Name);
                         var user = userService.GetById(userId);
-                        if (user == null)
-                        {
-                            context.Fail("Unauthorized");
-                        }
+                        if (user == null) context.Fail("Unauthorized");
 
                         return Task.CompletedTask;
                     }
@@ -76,7 +72,8 @@ namespace API
             services.AddScoped<IUserService, UserService>();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Description = "Universal Web Project", Version = "v1" });
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo {Title = "GradePortal API", Description = "Grade Portal is website for assessing users' skills", Version = "v1"});
             });
         }
 
@@ -105,6 +102,7 @@ namespace API
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
             app.UseMvc();
         }
     }

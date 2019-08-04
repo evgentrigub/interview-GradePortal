@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace API.Models.Interfaces
+namespace GradePortalAPI.Models.Interfaces
 {
     public interface IUserService
     {

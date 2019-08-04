@@ -63,8 +63,6 @@ namespace GradePortalAPI.Controllers
                 {
                     Id = user.Id,
                     Username = user.Username,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
                     Token = tokenToSend
                 });
             }
@@ -100,7 +98,7 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(string id)
         {
             var user = _userService.GetById(id);
             var userViewModel = _mapper.Map<UserViewModel>(user);

@@ -8,9 +8,9 @@ namespace GradePortalAPI.Models
 {
     public class Evaluation: ModelBase, IEvaluation
     {
-        public string UserId { get; set; }
-        public string SkillId { get; set; }
-        public string ExpertId { get; set; }
+        public virtual User User { get; set; }
+        public virtual Skill Skill { get; set; }
+        public virtual User Expert { get; set; }
         public int Value { get; set; }
     }
 }

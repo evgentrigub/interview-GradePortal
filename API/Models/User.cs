@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using GradePortalAPI.Models.Interfaces;
 
 namespace GradePortalAPI.Models
@@ -10,6 +11,6 @@ namespace GradePortalAPI.Models
         public string Username { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public virtual ICollection<UserSkill> UserSkills { get; set; }
+        public ICollection<UserSkill> UserSkills{ get; set; }
     }
 }

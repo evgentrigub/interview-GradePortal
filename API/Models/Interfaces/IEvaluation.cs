@@ -7,9 +7,9 @@ namespace GradePortalAPI.Models.Interfaces
 {
     interface IEvaluation: IModelBase
     {
-        string UserId { get; set; }
-        string SkillId { get; set; }
-        string ExpertId { get; set; }
+        User User { get; set; }
+        Skill Skill { get; set; }
+        User Expert { get; set; }
         int Value { get; set; }
 
     }

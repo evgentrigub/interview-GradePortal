@@ -15,7 +15,10 @@ namespace GradePortalAPI.Helpers
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserSkill>().HasKey(us => new {us.UserId, us.SkillId});
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserSkill>()
+                .HasKey(us => new {us.UserId, us.SkillId});
         }
     }
 }

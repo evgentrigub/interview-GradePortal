@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GradePortalAPI.Models.Interfaces
 {
-    interface IEvaluation
+    interface IEvaluation: IModelBase
     {
         string UserId { get; set; }
         string SkillId { get; set; }

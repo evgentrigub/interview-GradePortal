@@ -5,14 +5,11 @@ using System.Threading.Tasks;
 
 namespace GradePortalAPI.Models.Interfaces
 {
-    interface IUser
+    interface IUser: IModelBase
     {
         string FirstName { get; set; }
         string LastName { get; set; }
         string Username { get; set; }
-        byte[] PasswordHash { get; set; }
-        byte[] PasswordSalt { get; set; }
-        ICollection<UserSkill> UserSkills { get; set; }
 
     }
 }

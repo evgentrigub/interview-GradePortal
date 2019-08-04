@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage;
+using GradePortalAPI.Models.Interfaces;
 
-namespace GradePortalAPI.Models.Interfaces
+namespace GradePortalAPI.Models.ViewModels
 {
-    interface ISkill: IModelBase
+    public class SkillViewModel
     {
         string Name { get; set; }
         string Description { get; set; }

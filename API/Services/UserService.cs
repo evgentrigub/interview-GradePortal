@@ -75,14 +75,14 @@ namespace GradePortalAPI.Services
             user.LastName = newUser.LastName;
             user.Username = newUser.Username;
 
-            //if (!string.IsNullOrWhiteSpace(password))
-            //{
-            //    byte[] passwordHash, passwordSalt;
-            //    CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-            //    user.PasswordHash = passwordHash;
-            //    user.PasswordSalt = passwordSalt;
-            //}
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+            }
 
             _context.Users.Update(user);
             _context.SaveChanges();

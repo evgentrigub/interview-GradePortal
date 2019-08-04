@@ -1,6 +1,6 @@
 ﻿namespace GradePortalAPI.Models.ViewModels
 {
-    public class UserViewModel: ModelBase
+    public class UserViewModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

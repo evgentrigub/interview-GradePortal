@@ -1,8 +1,9 @@
-﻿namespace GradePortalAPI.Dtos
+﻿using GradePortalAPI.Models;
+
+namespace GradePortalAPI.Dtos
 {
-    public class UserDto
+    public class UserDto: ModelBase
     {
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }

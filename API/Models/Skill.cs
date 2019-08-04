@@ -10,7 +10,6 @@ namespace GradePortalAPI.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public virtual int AverageAssessment { get; set; }
         public virtual ICollection<UserSkill> UserSkills { get; set; }
     }
 }

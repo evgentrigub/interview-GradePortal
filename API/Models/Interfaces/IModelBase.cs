@@ -12,7 +12,5 @@ namespace GradePortalAPI.Models.Interfaces
         bool IsActive { get; set; }
 
         DateTime CreatedDate { get; set; }
-
-        string QuickSearch { get; set; }
     }
 }

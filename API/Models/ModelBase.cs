@@ -14,7 +14,5 @@ namespace GradePortalAPI.Models
         public bool IsActive { get; set; }
         /// <inheritdoc/>
         public DateTime CreatedDate { get; set; }
-        /// <inheritdoc/>
-        public string QuickSearch { get; set; }
     }
 }

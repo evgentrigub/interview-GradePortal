@@ -127,5 +127,13 @@ namespace GradePortalAPI.Controllers
             _userService.Delete(id);
             return Ok();
         }
+
+        [HttpPost]
+        public IActionResult AddUserSkill(string id, Skill skill)
+        {
+            var user = _userService.GetById(id);
+            var isExisted = _userService.IsExisted(skill);
+            return Ok();
+        }
     }
 }

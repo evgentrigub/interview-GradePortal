@@ -98,6 +98,12 @@ namespace GradePortalAPI.Services
             }
         }
 
+        public bool IsExisted(Skill skill)
+        {
+            var res = _context.Skills.SingleOrDefault(r => r.Id == skill.Id);
+            return res != null;
+        }
+
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");

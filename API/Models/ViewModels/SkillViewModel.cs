@@ -8,7 +8,7 @@ namespace GradePortalAPI.Models.ViewModels
 {
     public class SkillViewModel
     {
-        string Name { get; set; }
-        string Description { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

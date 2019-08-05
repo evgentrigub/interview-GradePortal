@@ -70,6 +70,7 @@ namespace GradePortalAPI
             });
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISkillService, SkillService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",

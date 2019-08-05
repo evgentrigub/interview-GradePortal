@@ -11,5 +11,67 @@
     <mat-card-header style="text-align: center; margin-top: 100px">
       <mat-card-title>Список компетенций</mat-card-title>
     </mat-card-header>
+    <form [formGroup]="dataForm">
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource" formArrayName="skills" matSort style="width: 100%">
+
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let skill; let idx = index" [formGroup]="skill">
+            </td>
+            <td mat-cell *matFooterCellDef="let scenario">
+              <button *ngIf="!readOnly" mat-icon-button (click)="addSkill()" matTooltip="Добавить навык"
+                matTooltipPosition="right" class="plus" color="primary">
+                <mat-icon [class.btn-add]="!editMode">add_box</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+            <td mat-cell *matCellDef="let skill" [formGroup]="skill">
+              <mat-form-field>
+                <input matInput placeholder="Skill" formControlName="name" [matAutocomplete]="auto" />
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="positionDisplay">
+                  <mat-option *ngFor="let position of getAutocompletePositions(positionExpenseControl) | async"
+                    [value]="position" style="height: auto;">
+                    <strong>{{ position?.name }}</strong>
+                    <p class="option">({{ position?.path }})</p>
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="positionExpenseControl.get('position')?.hasError('positionNotFound')">Должность не
+                  обнаружена</mat-error>
+                <mat-error *ngIf="positionExpenseControl.get('position')?.hasError('positionReqiured')">Должность должна
+                  быть задана</mat-error>
+              </mat-form-field>
+              <div class="option">({{ positionExpenseControl.get('position')?.value?.path }})</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+            <td mat-cell *matCellDef="let skill" [formGroup]="skill">
+              <mat-form-field style="min-width: 40em;">
+                <input matInput type="text" formControlName="name" />
+                <mat-error *ngIf="skill.hasError('required', 'name')">No name</mat-error>
+                <mat-error *ngIf="skill.hasError('minlength', 'name')">Min length:
+                  {{ skill.getError('minlength', 'name').requiredLength }}</mat-error>
+                <mat-error *ngIf="skill.hasError('maxlength', 'name')">Max length:
+                  {{ skill.getError('maxlength', 'name').requiredLength }}</mat-error>
+                <mat-hint align="start"><strong>Length from 3 to 255</strong> </mat-hint>
+                <mat-hint align="end">{{ skill.value.length }} / 255</mat-hint>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let user; columns: displayedColumns;" (click)="clickUser(user)">
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
+      </div>
+    </form>
   </mat-card-content>
+  <!-- <button mat-button (click)="addSkill()">Add skill</button> -->
 </mat-card>

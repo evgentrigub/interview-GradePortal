@@ -1,7 +1,8 @@
 import { User } from './user';
 
-export class UserViewModel {
+export interface UserViewModel {
   id: string;
+  username: string;
   num: number;
   name: string;
   city: string;

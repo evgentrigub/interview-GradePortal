@@ -19,7 +19,7 @@ export class NavBarComponent implements OnDestroy {
     private authenticationService: AuthenticationService
   ) {
     this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
-      this.isAuthorised = user ? true : false;
+      // this.isAuthorised = user ? true : false;
       this.currentUser = user ? user : null;
     });
   }
@@ -28,15 +28,15 @@ export class NavBarComponent implements OnDestroy {
     this.currentUserSubscription.unsubscribe();
   }
 
-  clickAccount() {
+  clickAccount(): void {
     if (this.currentUser) {
-      this.router.navigate(['/account']);
+      this.router.navigate([`/${this.currentUser.username}`]);
     } else {
       this.router.navigate(['/login']);
     }
   }
 
-  private _logout() {
+  private _logout(): void {
     this.authenticationService.logout();
     this.router.navigate(['/login']);
   }

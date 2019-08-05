@@ -9,7 +9,8 @@ const routes: Routes = [
   { path: 'table', component: TableComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'account', component: PersonalPageComponent },
+  // { path: 'account', component: PersonalPageComponent },
+  { path: ':username', component: PersonalPageComponent },
 
   { path: '**', redirectTo: 'table' },
 ];

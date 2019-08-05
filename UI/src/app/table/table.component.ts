@@ -27,17 +27,25 @@ export class TableComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
-    this._getUsers();
+    this._loadUsers();
   }
 
-  private _getUsers() {
+  clickUser(user: UserViewModel) {
+    this.router.navigate([`/${user.username}`], { state: { user: user } })
+  }
+
+  private _loadUsers(): void {
     this.userService.getAll()
       .pipe(first())
       .subscribe(users => {
-        this.users = users;
-        this.dataSource = new MatTableDataSource(this.users);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+        this._updateUsers(users);
       });
+  }
+
+  private _updateUsers(users: UserViewModel[]): void {
+    this.users = users;
+    this.dataSource = new MatTableDataSource(this.users);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 }

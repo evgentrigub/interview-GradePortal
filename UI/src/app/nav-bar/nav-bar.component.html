@@ -3,7 +3,7 @@
   <button mat-button routerLink="/table">Table</button>
   <button mat-button (click)="clickAccount()">Account</button>
   <span style="flex: 1 1 auto"></span>
-  <ng-container *ngIf="isAuthorised">
+  <ng-container *ngIf="currentUser">
     <button mat-button (click)="_logout()">Log out</button>
   </ng-container>
 </mat-toolbar>

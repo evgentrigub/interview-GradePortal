@@ -1,5 +1,5 @@
-export class Skill {
-  num: number;
+export interface Skill {
+  // num: number;
   name: string;
   description: string;
   averageAssessment: number;

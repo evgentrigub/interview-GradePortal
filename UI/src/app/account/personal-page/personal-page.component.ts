@@ -8,8 +8,9 @@ import { UserService } from '../services/user.service';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
 import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent } from '@angular/material';
-import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith } from 'rxjs/operators';
+import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith, tap } from 'rxjs/operators';
 import { Skill } from 'src/app/_models/skill';
+import { SkillService } from '../services/skill.service';
 
 const emptySkills: Observable<string[]> = of([]);
 
@@ -29,8 +30,8 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   //   new WeakMap<FormGroup, Observable<Skill[]>>();
 
   nameSkillOptions: Observable<Skill[]>;
-  skillNameControl = new FormControl();
-  skillDescControl = new FormControl();
+  skillNameControl: FormControl = new FormControl();
+  skillDescControl: FormControl = new FormControl();
 
   private readonly _destroyed$ = new Subject<void>();
   displayedColumns = ['action', 'name', 'description']
@@ -50,7 +51,8 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     private authenticate: AuthenticationService,
     private route: Router,
     private acivatedRoute: ActivatedRoute,
-    private service: UserService,
+    private userService: UserService,
+    private skillService: SkillService,
     private formBuilder: FormBuilder,
     private detector: ChangeDetectorRef,
     private snackBar: MatSnackBar
@@ -65,13 +67,14 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.inputUser = navigation.extras.state ? navigation.extras.state.user : null;
 
     this.currentUserSubscription = this.authenticate.currentUser
-      .pipe(switchMap(user => {
-        if (user) {
-          this.currentUser = user ? user : null;
-          return this.service.getUserSkills(user.id);
-        }
-        return of(null);
-      }),
+      .pipe(
+        switchMap(user => {
+          if (user) {
+            this.currentUser = user ? user : null;
+            return this.skillService.getUserSkills(user.id);
+          }
+          return of(null);
+        }),
         takeUntil(this._destroyed$)
       )
       .subscribe((skills: Skill[]) => {
@@ -102,7 +105,11 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.nameSkillOptions = this.skillNameControl.valueChanges.pipe(
+    this.nameSkillOptions = this.getAutocompleteSkills();
+  }
+
+  getAutocompleteSkills(): Observable<Skill[]> {
+    const a = this.skillNameControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
       distinctUntilChanged(),
@@ -111,6 +118,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         return options;
       })
     );
+    return a;
   }
 
   ngOnDestroy(): void {
@@ -129,8 +137,25 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   saveSkill(): void {
-    this.skillFormGroup.value;
-    console.log("TCL: PersonalPageComponent -> this.skillFormGroup.value", this.skillFormGroup.value)
+    const group = this.skillFormGroup;
+    if (!group) {
+      return;
+    }
+    const skillToSend = group.value as SkillToSend;
+
+    this.skillService.saveUserSkill(this.currentUser.id, skillToSend)
+      .pipe(
+        tap(skill => {
+          this.showMessage(`New skill ${skill.name} saved successfully!`);
+          this.isCreateMode = false;
+          this.skillFormGroup.reset();
+          this.dataSource.data.push(skill);
+          this.detector.markForCheck();
+        },
+          err => this.showMessage(err)
+        )
+      ).subscribe();
+
   }
 
   canSave(): boolean {
@@ -169,37 +194,6 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     }
     return skill.name;
   }
-  // private updateDataSource(): void {
-  //   this.dataSource.data = this.skillsFormArray.controls.slice() as FormGroup[];
-  //   console.log("TCL: PersonalPageComponent -> this.skillsFormArray.controls", this.dataSource.data)
-  // }
-
-  // getAutocompleteSkills(): Observable<string[]> {
-
-  // if (!skillGroup) {
-  //   return emptySkills;
-  // }
-
-  // const autoComplete = scheduled([[positionControl.value], positionControl.valueChanges], queueScheduler).pipe(
-  //   concatAll(),
-  //   distinctUntilChanged(this.positionOrTextComparer),
-  //   debounceTime(250),
-  //   map(value => {
-  //     if (typeof value === 'string') {
-  //       return this.service.getAutocompleteSkills(value);
-  //     }
-
-  //     if (value === this.emptySkill) {
-  //       return emptySkills;
-  //     }
-
-  //     return of(<Skill[]>[value as Skill]);
-  //   }),
-  //   exhaustMap(x => x)
-  // );
-
-  //   return autoComplete;
-  // }
 
   private filterData(value: any): Observable<Skill[]> {
     if (!value) {
@@ -207,8 +201,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       return of(a);
     }
 
-    const skills = [{ name: 'Front-end', description: 'aaaaaaaaaaaaaaa' }, { name: 'Office', description: 'dddddddddddd' }] as Skill[];
-    const b = of(skills)
+    const b = this.skillService.getAutocompleteSkills(value)
       .pipe(
         map((response) => response.filter((option: Skill) => {
           const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0

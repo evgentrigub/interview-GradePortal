@@ -1,0 +1,71 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { Skill } from 'src/app/_models/skill';
+import { SkillToSend } from 'src/app/_models/skill-to-send';
+import { environment } from 'src/environments/environment';
+import { catchError, map } from 'rxjs/operators';
+
+const emptySkills: Observable<Skill[]> = of([]);
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillService {
+
+  constructor(private http: HttpClient) { }
+
+  getUserSkills(id: string): Observable<Skill[]> {
+    // return this.http.get<Skill[]>(`${environment.apiUrl}/users/getSkills/${id}`);
+    const skills = [{ name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' }, { name: 'Print', description: 'cccccccccccc' }] as Skill[];
+    return of(skills);
+  }
+
+  saveUserSkill(userId: string, skill: SkillToSend): Observable<Skill> {
+    return this.http.put<null>(`${environment.apiUrl}/users/addUserSkill/${userId}`, skill)
+      .pipe(
+        catchError(this.handleError),
+        map(_ => null)
+      )
+  }
+
+  /**
+   * Получить список должностей подходящих под запрос
+   * @param skillQuery запрос автоподстановки должности
+   */
+  getAutocompleteSkills(skillQuery: string): Observable<Skill[]> {
+    if (!skillQuery) {
+      return emptySkills;
+    }
+
+    const query = skillQuery.trim();
+
+    if (query.length < 3) {
+      return emptySkills;
+    }
+
+    const skills = [{ name: 'Front-end', description: 'aaaaaaaaaaaaaaa' }, { name: 'Front-end 2', description: 'dddddddddddd' }] as Skill[];
+    return of(skills);
+
+    // const params: HttpParams = new HttpParams({ fromObject: { query: query, limit: '10' } });
+
+    // return this.http.get<Skill[]>(positionsSearchUrl, { params: params }).pipe(
+    //   catchError(this.handleError)
+    //   //, tap(x => console.log('autocomplePosition result:', x))
+    // );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let msg: string;
+
+    if (error.error instanceof ErrorEvent) {
+      msg = 'Произошла ошибка:' + error.error.message;
+    } else {
+      msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
+    }
+
+    console.error('PositionService::handleError() ' + msg);
+
+    return throwError(msg);
+  }
+}

@@ -33,19 +33,15 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   skillNameControl: FormControl = new FormControl();
   skillDescControl: FormControl = new FormControl();
 
+  lastAutoCompleteValue = '';
+
   private readonly _destroyed$ = new Subject<void>();
-  displayedColumns = ['action', 'name', 'description']
+  displayedColumns = ['action', 'name', 'description'];
   // readonly dataSource: MatTableDataSource<FormGroup> = new MatTableDataSource([]);
   dataSource: MatTableDataSource<Skill>;
   skillFormGroup: FormGroup;
   isLoading = true;
   sub: Subscription;
-
-  private readonly emptySkill: Skill = {
-    name: '',
-    description: '',
-    averageAssessment: 0
-  };
 
   constructor(
     private authenticate: AuthenticationService,
@@ -84,7 +80,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.dataSource = new MatTableDataSource(skills)
+        this.dataSource = new MatTableDataSource(skills);
         // const currentUserSkills = true;
         // skills
         //   .map(skill => this.createFormGroupSkill(skill))
@@ -114,7 +110,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(value => {
-        const options = this.filterData(value || '')
+        const options = this.filterData(value || '');
         return options;
       })
     );
@@ -143,18 +139,18 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     }
     const skillToSend = group.value as SkillToSend;
 
-    this.skillService.saveUserSkill(this.currentUser.id, skillToSend)
-      .pipe(
-        tap(skill => {
-          this.showMessage(`New skill ${skill.name} saved successfully!`);
-          this.isCreateMode = false;
-          this.skillFormGroup.reset();
-          this.dataSource.data.push(skill);
-          this.detector.markForCheck();
-        },
-          err => this.showMessage(err)
-        )
-      ).subscribe();
+    // this.skillService.addSkillToUser(this.currentUser.id, skillToSend)
+    //   .pipe(
+    //     tap(skill => {
+    //       this.showMessage(`New skill ${skill.name} saved successfully!`);
+    //       this.isCreateMode = false;
+    //       this.skillFormGroup.reset();
+    //       this.dataSource.data.push(skill);
+    //       this.detector.markForCheck();
+    //     },
+    //       err => this.showMessage(err)
+    //     )
+    //   ).subscribe();
 
   }
 
@@ -166,12 +162,21 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     return this.formBuilder.group({
       name: this.formBuilder.control(skill.name, [Validators.required, Validators.minLength(1)]),
       description: this.formBuilder.control(skill.description, [Validators.required, Validators.minLength(5)]),
-      average: this.formBuilder.control(skill.averageAssessment)
     });
+  }
+
+  get descriptionDisabled(): boolean {
+    if (!this.skillNameControl) {
+      return false;
+    }
+    const skillName = this.skillNameControl.value;
+    return this.lastAutoCompleteValue === skillName ? true : false;
   }
 
   getEvent(event: MatAutocompleteSelectedEvent): void {
     const skill = event.option.value as Skill;
+    this.lastAutoCompleteValue = skill.name;
+    console.log('TCL: PersonalPageComponent -> skill', skill);
     if (!skill) {
       return;
     }
@@ -189,22 +194,19 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     if (!skill) {
       return null;
     }
-    if (skill === this.emptySkill) {
-      return null;
-    }
     return skill.name;
   }
 
   private filterData(value: any): Observable<Skill[]> {
     if (!value) {
-      const a: Skill[] = []
+      const a: Skill[] = [];
       return of(a);
     }
 
     const b = this.skillService.getAutocompleteSkills(value)
       .pipe(
         map((response) => response.filter((option: Skill) => {
-          const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0
+          const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
           return c;
         })),
       );

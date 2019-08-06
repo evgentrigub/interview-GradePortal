@@ -16,17 +16,18 @@ export class SkillService {
   constructor(private http: HttpClient) { }
 
   getUserSkills(id: string): Observable<Skill[]> {
-    // return this.http.get<Skill[]>(`${environment.apiUrl}/users/getSkills/${id}`);
-    const skills = [{ name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' }, { name: 'Print', description: 'cccccccccccc' }] as Skill[];
+    // return this.http.get<Skill[]>(`${environment.apiUrl}/skills/getSkills/${id}`);
+    const skills = [{ id: 'aaaaa', name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' },
+    { id: 'aaaaa', name: 'Print', description: 'cccccccccccc' }] as Skill[];
     return of(skills);
   }
 
-  saveUserSkill(userId: string, skill: SkillToSend): Observable<Skill> {
-    return this.http.put<null>(`${environment.apiUrl}/users/addUserSkill/${userId}`, skill)
+  addSkillToUser(userId: string, skill: Skill): Observable<Skill> {
+    return this.http.put<null>(`${environment.apiUrl}/skills/addSkillToUser/${userId}`, skill)
       .pipe(
         catchError(this.handleError),
         map(_ => null)
-      )
+      );
   }
 
   /**
@@ -44,7 +45,8 @@ export class SkillService {
       return emptySkills;
     }
 
-    const skills = [{ name: 'Front-end', description: 'aaaaaaaaaaaaaaa' }, { name: 'Front-end 2', description: 'dddddddddddd' }] as Skill[];
+    const skills = [{ id: 'dddddddd', name: 'Front-end', description: 'aaaaaaaaaaaaaaa' },
+    { id: 'cccccccc', name: 'Front-end 2', description: 'dddddddddddd' }] as Skill[];
     return of(skills);
 
     // const params: HttpParams = new HttpParams({ fromObject: { query: query, limit: '10' } });

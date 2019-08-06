@@ -67,7 +67,8 @@
               </td>
               <td mat-cell *matFooterCellDef>
                 <mat-form-field *ngIf="isCreateMode">
-                  <input matInput placeholder="Description" formControlName="description" />
+                  <input matInput placeholder="Description" formControlName="description"
+                    [attr.disabled]="descriptionDisabled || null " />
                 </mat-form-field>
               </td>
             </ng-container>

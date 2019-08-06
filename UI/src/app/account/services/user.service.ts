@@ -44,7 +44,9 @@ export class UserService {
   }
 
   getUserSkills(id: string): Observable<Skill[]> {
-    return this.http.get<Skill[]>(`${environment.apiUrl}`);
+    // return this.http.get<Skill[]>(`${environment.apiUrl}`);
+    const skill = <Skill>{ name: 'Front-end', description: 'aaaaaaaaaaaaaaaaaaaaaaaa', averageAssessment: 4 }
+    return of([skill])
   }
 
   addUserSkill(userId: number, skill: SkillToSend): Observable<null> {
@@ -55,7 +57,7 @@ export class UserService {
    * Получить список должностей подходящих под запрос
    * @param skillQuery запрос автоподстановки должности
    */
-  autocompleSkill(skillQuery: string): Observable<Skill[]> {
+  getAutocompleteSkills(skillQuery: string): Observable<Skill[]> {
     if (!skillQuery) {
       return emptySkills;
     }

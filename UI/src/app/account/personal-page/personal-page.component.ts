@@ -7,11 +7,11 @@ import { ActivatedRoute, Route, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
-import { MatTableDataSource, MatSnackBar } from '@angular/material';
-import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap } from 'rxjs/operators';
+import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent } from '@angular/material';
+import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith } from 'rxjs/operators';
 import { Skill } from 'src/app/_models/skill';
 
-const emptySkills: Observable<Skill[]> = of([]);
+const emptySkills: Observable<string[]> = of([]);
 
 @Component({
   selector: 'app-personal-page',
@@ -24,19 +24,26 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   currentUser: User | null;
   currentUserSubscription: Subscription;
 
+  // private readonly positionExpenseAutocomplete: WeakMap<FormGroup, Observable<Skill[]>> =
+  //   new WeakMap<FormGroup, Observable<Skill[]>>();
 
-  private readonly positionExpenseAutocomplete: WeakMap<FormGroup, Observable<Skill[]>> =
-    new WeakMap<FormGroup, Observable<Skill[]>>();
-
-  private readonly emptySkill = {
-    name: '',
-  };
+  nameSkillOptions: Observable<Skill[]>;
+  skillNameControl = new FormControl();
+  skillDescControl = new FormControl();
 
   private readonly _destroyed$ = new Subject<void>();
-  readonly dataSource: MatTableDataSource<FormGroup> = new MatTableDataSource([]);
-  skillsFormArray: FormArray;
-  dataForm: FormGroup;
+  displayedColumns = ['action', 'name', 'description']
+  // readonly dataSource: MatTableDataSource<FormGroup> = new MatTableDataSource([]);
+  dataSource: MatTableDataSource<Skill>;
+  skillGroupForm: FormGroup;
   isLoading = true;
+  sub: Subscription;
+
+  private readonly emptySkill: Skill = {
+    name: '',
+    description: '',
+    averageAssessment: 0
+  };
 
   constructor(
     private authenticate: AuthenticationService,
@@ -47,9 +54,10 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     private detector: ChangeDetectorRef,
     private snackBar: MatSnackBar
   ) {
-    this.skillsFormArray = this.formBuilder.array([]);
-    this.dataForm = this.formBuilder.group({
-      skills: this.skillsFormArray
+
+    this.skillGroupForm = this.formBuilder.group({
+      name: this.skillNameControl,
+      description: this.skillDescControl
     });
 
     const navigation = this.route.getCurrentNavigation();
@@ -66,24 +74,25 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         takeUntil(this._destroyed$)
       )
       .subscribe((skills: Skill[]) => {
-        this.skillsFormArray.clear();
 
         if (!skills) {
           this.dataSource.data = [];
           return;
         }
-        const currentUserSkills = false;
-        skills
-          .map(skill => this.createFormGroupSkill(skill))
-          .forEach(el => {
-            this.skillsFormArray.push(el);
-            if (currentUserSkills) {
-              el.enable();
-            } else {
-              el.disable();
-            }
-          });
-        this.updateDataSource();
+
+        this.dataSource = new MatTableDataSource(skills)
+        // const currentUserSkills = true;
+        // skills
+        //   .map(skill => this.createFormGroupSkill(skill))
+        //   .forEach(el => {
+        //     this.skillsFormArray.push(el);
+        //     if (currentUserSkills) {
+        //       el.enable();
+        //     } else {
+        //       el.disable();
+        //     }
+        //   });
+        // this.updateDataSource()
         this.detector.markForCheck();
       },
         err => this.showMessage(err),
@@ -91,7 +100,13 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       );
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.nameSkillOptions = this.skillNameControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => this.filterData(value))
+    )
+  }
 
   ngOnDestroy(): void {
     this._destroyed$.next();
@@ -106,69 +121,78 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     return this.formBuilder.group({
       name: this.formBuilder.control(skill.name, [Validators.required, Validators.minLength(1)]),
       description: this.formBuilder.control(skill.description, [Validators.required, Validators.minLength(5)]),
-      skill: this.formBuilder.control(skill.averageAssessment)
+      average: this.formBuilder.control(skill.averageAssessment)
     });
   }
 
-  private updateDataSource(): void {
-    this.dataSource.data = this.skillsFormArray.controls.slice() as FormGroup[];
+  getEvent(event: MatAutocompleteSelectedEvent): void {
+    console.log(event.option.value);
+    const skill = event.option.value as Skill;
+    if (!skill) {
+      return;
+    }
+    this.skillDescControl.setValue(skill.description);
+    this.detector.markForCheck();
+    console.log(this.skillGroupForm.value);
   }
 
-  private showMessage(msg: any): void {
-    this.snackBar.open(msg, undefined, { duration: 2000 });
+  skillDisplay(skill?: Skill): string | null {
+
+    if (!skill) {
+      return null;
+    }
+    if (skill === this.emptySkill) {
+      return null;
+    }
+    return skill.name;
+  }
+  // private updateDataSource(): void {
+  //   this.dataSource.data = this.skillsFormArray.controls.slice() as FormGroup[];
+  //   console.log("TCL: PersonalPageComponent -> this.skillsFormArray.controls", this.dataSource.data)
+  // }
+
+  // getAutocompleteSkills(): Observable<string[]> {
+
+  // if (!skillGroup) {
+  //   return emptySkills;
+  // }
+
+  // const autoComplete = scheduled([[positionControl.value], positionControl.valueChanges], queueScheduler).pipe(
+  //   concatAll(),
+  //   distinctUntilChanged(this.positionOrTextComparer),
+  //   debounceTime(250),
+  //   map(value => {
+  //     if (typeof value === 'string') {
+  //       return this.service.getAutocompleteSkills(value);
+  //     }
+
+  //     if (value === this.emptySkill) {
+  //       return emptySkills;
+  //     }
+
+  //     return of(<Skill[]>[value as Skill]);
+  //   }),
+  //   exhaustMap(x => x)
+  // );
+
+  //   return autoComplete;
+  // }
+
+  private filterData(value: string) {
+    const obj = { name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' } as Skill;
+    const optionsObservable = of([obj]);
+    const b = optionsObservable
+      .pipe(
+        map((response) => response.filter(option => {
+          const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
+          return c;
+        })),
+      );
+    return b;
   }
 
-  /**
-   * Последовательность автоподстановки для контрола затрат по должности
-   * @param skillControl FrormGroup затрат по одной должности
-   */
-  getAutocompletePositions(skillControl: FormGroup): Observable<Skill[]> {
-    // console.log('getAutocompletePositions called. positionExpenseControl:', positionExpenseControl);
-
-    if (!skillControl) {
-      return emptySkills;
-    }
-
-    const positionControl = skillControl.get('name') as FormControl;
-
-    if (!positionControl) {
-      return emptySkills;
-    }
-
-    const exist = this.positionExpenseAutocomplete.get(skillControl);
-
-    if (exist) {
-      return exist;
-    }
-
-    const autoComplete = scheduled([[positionControl.value], positionControl.valueChanges], queueScheduler).pipe(
-      concatAll(),
-      distinctUntilChanged(this.positionOrTextComparer),
-      debounceTime(250),
-      map(value => {
-        if (typeof value === 'string') {
-          return this.service.autocompleSkill(value);
-        }
-
-        if (value === this.emptySkill) {
-          return emptySkills;
-        }
-
-        return of(<Skill[]>[value as Skill]);
-      }),
-      exhaustMap(x => x)
-    );
-
-    // console.log('getAutocompletePositions autoComplete created');
-    this.positionExpenseAutocomplete.set(skillControl, autoComplete);
-
-    return autoComplete;
-  }
-
-  private positionOrTextComparer(x: string, y: string): boolean {
-    // console.log('positionOrTextComparer x ', x, '; y:', y);
+  private textComparer(x: string, y: string): boolean {
     if (x === y) {
-      // console.log('positionOrTextComparer return 1 true');
       return true;
     }
 
@@ -176,8 +200,13 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     const yIsString = typeof y === 'string';
 
     if (xIsString && yIsString) {
-      // console.log('positionOrTextComparer (xIsString && yIsString)');
       return x === y;
     }
   }
+
+
+  private showMessage(msg: any): void {
+    this.snackBar.open(msg, undefined, { duration: 2000 });
+  }
+
 }

@@ -8,10 +8,10 @@
   background-size: contain;
 }
 
-mat-card-content {
+/* mat-card-content {
   display: flex;
   justify-content: space-around;
-}
+} */
 
 mat-card-header {
   text-align: center;

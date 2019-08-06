@@ -1,4 +1,4 @@
-<form [formGroup]="skillGroupForm">
+<form [formGroup]="skillFormGroup">
   <!-- <form> -->
   <mat-card class="container">
     <div style="display: flex; justify-content: space-around;">
@@ -7,6 +7,7 @@
       <mat-card-header style="text-align: center; margin-top: 100px">
         <mat-card-title>Имя фамилия</mat-card-title>
         <mat-card-subtitle>Город</mat-card-subtitle>
+        <mat-card-subtitle>Должность</mat-card-subtitle>
       </mat-card-header>
     </div>
     <div style="display: flex; align-items: center; flex-direction: column;">
@@ -19,11 +20,25 @@
 
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef></th>
-              <td mat-cell *matCellDef="let skill; let idx = index">
+              <td mat-cell *matCellDef="let skill">
               </td>
               <td mat-cell *matFooterCellDef="let skill">
-                <button mat-raised-button color="primary">
-                  Add skill
+                <div *ngIf="isCreateMode">
+                  <button mat-icon-button color="primary" (click)=undoAdd()>
+                    <mat-icon>
+                      undo
+                    </mat-icon>
+                  </button>
+                  <button mat-icon-button color="primary" (click)="saveSkill()" [disabled]="!canSave()">
+                    <mat-icon>
+                      check
+                    </mat-icon>
+                  </button>
+                </div>
+                <button *ngIf="!isCreateMode" mat-icon-button color="primary" (click)="addSkill()">
+                  <mat-icon>
+                    add_box
+                  </mat-icon>
                 </button>
               </td>
             </ng-container>
@@ -34,10 +49,9 @@
                 {{skill.name}}
               </td>
               <td mat-cell *matFooterCellDef>
-                <mat-form-field>
-                  <input matInput placeholder="Name" formControlNamwe="name" [matAutocomplete]="auto" />
-                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getEvent($event)"
-                    [displayWith]="skillDisplay">
+                <mat-form-field *ngIf="isCreateMode">
+                  <input matInput placeholder="Name" formControlName="name" [matAutocomplete]="auto" />
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getEvent($event)">
                     <mat-option *ngFor="let skill of nameSkillOptions | async" [value]="skill" style="height: auto;">
                       {{skill.name}}
                     </mat-option>
@@ -52,7 +66,7 @@
                 {{skill.description}}
               </td>
               <td mat-cell *matFooterCellDef>
-                <mat-form-field>
+                <mat-form-field *ngIf="isCreateMode">
                   <input matInput placeholder="Description" formControlName="description" />
                 </mat-form-field>
               </td>

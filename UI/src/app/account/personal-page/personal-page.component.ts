@@ -24,6 +24,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   currentUser: User | null;
   currentUserSubscription: Subscription;
 
+  isCreateMode = false;
   // private readonly positionExpenseAutocomplete: WeakMap<FormGroup, Observable<Skill[]>> =
   //   new WeakMap<FormGroup, Observable<Skill[]>>();
 
@@ -35,7 +36,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   displayedColumns = ['action', 'name', 'description']
   // readonly dataSource: MatTableDataSource<FormGroup> = new MatTableDataSource([]);
   dataSource: MatTableDataSource<Skill>;
-  skillGroupForm: FormGroup;
+  skillFormGroup: FormGroup;
   isLoading = true;
   sub: Subscription;
 
@@ -55,7 +56,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar
   ) {
 
-    this.skillGroupForm = this.formBuilder.group({
+    this.skillFormGroup = this.formBuilder.group({
       name: this.skillNameControl,
       description: this.skillDescControl
     });
@@ -104,8 +105,12 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.nameSkillOptions = this.skillNameControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
-      switchMap(value => this.filterData(value))
-    )
+      distinctUntilChanged(),
+      switchMap(value => {
+        const options = this.filterData(value || '')
+        return options;
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -114,7 +119,22 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   addSkill(): void {
-    this.createFormGroupSkill({ name: '', description: '', averageAssessment: 0 } as Skill);
+    this.isCreateMode = true;
+    this.createFormGroupSkill({ name: 'aaaa', description: '', averageAssessment: 0 } as Skill);
+  }
+
+  undoAdd(): void {
+    this.isCreateMode = false;
+    this.skillFormGroup.reset();
+  }
+
+  saveSkill(): void {
+    this.skillFormGroup.value;
+    console.log("TCL: PersonalPageComponent -> this.skillFormGroup.value", this.skillFormGroup.value)
+  }
+
+  canSave(): boolean {
+    return this.skillFormGroup.dirty && this.skillFormGroup.valid;
   }
 
   createFormGroupSkill(skill: Skill) {
@@ -126,14 +146,17 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   getEvent(event: MatAutocompleteSelectedEvent): void {
-    console.log(event.option.value);
     const skill = event.option.value as Skill;
     if (!skill) {
       return;
     }
     this.skillDescControl.setValue(skill.description);
+    this.skillDescControl.markAsDirty();
+
+    this.skillNameControl.setValue(skill.name);
+    this.skillNameControl.markAsDirty();
+
     this.detector.markForCheck();
-    console.log(this.skillGroupForm.value);
   }
 
   skillDisplay(skill?: Skill): string | null {
@@ -178,30 +201,26 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   //   return autoComplete;
   // }
 
-  private filterData(value: string) {
-    const obj = { name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' } as Skill;
-    const optionsObservable = of([obj]);
-    const b = optionsObservable
+  private filterData(value: any): Observable<Skill[]> {
+    if (!value) {
+      const a: Skill[] = []
+      return of(a);
+    }
+
+    const skills = [{ name: 'Front-end', description: 'aaaaaaaaaaaaaaa' }, { name: 'Office', description: 'dddddddddddd' }] as Skill[];
+    const b = of(skills)
       .pipe(
-        map((response) => response.filter(option => {
-          const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
+        map((response) => response.filter((option: Skill) => {
+          const c = option.name.toLowerCase().indexOf(value.toLowerCase()) === 0
           return c;
         })),
       );
     return b;
+
   }
 
-  private textComparer(x: string, y: string): boolean {
-    if (x === y) {
-      return true;
-    }
-
-    const xIsString = typeof x === 'string';
-    const yIsString = typeof y === 'string';
-
-    if (xIsString && yIsString) {
-      return x === y;
-    }
+  private textComparer(x: Skill, y: Skill): boolean {
+    return x.name === y.name && x.description === y.description;
   }
 
 

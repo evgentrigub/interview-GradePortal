@@ -45,8 +45,8 @@ export class UserService {
 
   getUserSkills(id: string): Observable<Skill[]> {
     // return this.http.get<Skill[]>(`${environment.apiUrl}`);
-    const skill = <Skill>{ name: 'Front-end', description: 'aaaaaaaaaaaaaaaaaaaaaaaa', averageAssessment: 4 }
-    return of([skill])
+    const skills = [{ name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' }, { name: 'Print', description: 'cccccccccccc' }] as Skill[];
+    return of(skills)
   }
 
   addUserSkill(userId: number, skill: SkillToSend): Observable<null> {
@@ -57,23 +57,28 @@ export class UserService {
    * Получить список должностей подходящих под запрос
    * @param skillQuery запрос автоподстановки должности
    */
-  getAutocompleteSkills(skillQuery: string): Observable<Skill[]> {
-    if (!skillQuery) {
-      return emptySkills;
-    }
+  getAutocompleteSkills(): Observable<Skill[]> {
+    // console.log("TCL: UserService -> constructor -> skillQuery", skillQuery)
+    // if (!skillQuery) {
+    //   return emptySkills;
+    // }
 
-    const query = skillQuery.trim();
+    // const query = skillQuery.trim();
+    // console.log(query);
 
-    if (query.length < 3) {
-      return emptySkills;
-    }
+    // if (query.length < 3) {
+    //   return emptySkills;
+    // }
 
-    const params: HttpParams = new HttpParams({ fromObject: { query: query, limit: '10' } });
+    const skills = [{ name: 'Front-end', description: 'aaaaaaaaaaaaaaa' }, { name: 'Office', description: 'dddddddddddd' }] as Skill[];
+    return of(skills);
 
-    return this.http.get<Skill[]>(positionsSearchUrl, { params: params }).pipe(
-      catchError(this.handleError)
-      //, tap(x => console.log('autocomplePosition result:', x))
-    );
+    // const params: HttpParams = new HttpParams({ fromObject: { query: query, limit: '10' } });
+
+    // return this.http.get<Skill[]>(positionsSearchUrl, { params: params }).pipe(
+    //   catchError(this.handleError)
+    //   //, tap(x => console.log('autocomplePosition result:', x))
+    // );
   }
 
   private handleError(error: HttpErrorResponse) {

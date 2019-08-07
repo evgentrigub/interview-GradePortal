@@ -15,19 +15,21 @@
           <!-- <mat-error *ngIf="password.invalid">{{getErrorPassword()}}</mat-error> -->
         </mat-form-field>
         <div *ngIf="!loading" style="text-align:center">
-          <button mat-raised-button type="submit" color="accent"
-            style="width:40%; height: 40px; margin-bottom:10px; border-radius: 5px">
+          <button mat-raised-button type="submit" color="accent" style="width:40%; height: 40px; margin-bottom:10px; border-radius: 5px">
             Sign in
           </button>
           <br />
-          <button mat-raised-button routerLink="/register" color="primary"
-            style="width:40%; height: 40px; margin-bottom:10p x; border-radius: 5px">
+          <button
+            mat-raised-button
+            routerLink="/register"
+            color="primary"
+            style="width:40%; height: 40px; margin-bottom:10p x; border-radius: 5px"
+          >
             Sign up
           </button>
         </div>
         <div *ngIf="loading">
-          <mat-progress-spinner style="margin: 0 auto" mode="indeterminate" diameter="80" strokeWidth="9">
-          </mat-progress-spinner>
+          <mat-progress-spinner style="margin: 0 auto" mode="indeterminate" diameter="80" strokeWidth="9"> </mat-progress-spinner>
         </div>
       </form>
     </div>

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { User } from '../../_models/user';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +29,8 @@ export class AuthenticationService {
           this.currentUserSubject.next(user);
         }
         return user;
-      })
+      }),
+      catchError(this.handleError)
     );
   }
 
@@ -41,5 +42,19 @@ export class AuthenticationService {
     // remove user from local storage to log user out
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let msg: string;
+
+    if (error.error instanceof ErrorEvent) {
+      msg = 'Произошла ошибка:' + error.error.message;
+    } else {
+      msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
+    }
+
+    console.error('PositionService::handleError() ' + msg);
+
+    return throwError(msg);
   }
 }

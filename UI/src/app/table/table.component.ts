@@ -21,21 +21,19 @@ export class TableComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  constructor(
-    private authenticationService: AuthenticationService,
-    private userService: UserService,
-    private router: Router) { }
+  constructor(private authenticationService: AuthenticationService, private userService: UserService, private router: Router) {}
 
   ngOnInit() {
     this._loadUsers();
   }
 
   clickUser(user: UserViewModel) {
-    this.router.navigate([`/${user.username}`], { state: { user: user } })
+    this.router.navigate([`/${user.username}`], { state: { user } });
   }
 
   private _loadUsers(): void {
-    this.userService.getAll()
+    this.userService
+      .getAll()
       .pipe(first())
       .subscribe(users => {
         this._updateUsers(users);

@@ -2,8 +2,12 @@
   <!-- <form> -->
   <mat-card class="container">
     <div style="display: flex; justify-content: space-around;">
-      <img style="min-width: 300px; min-height: 300px;" mat-card-avatar
-        src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg" class="avatar">
+      <img
+        style="min-width: 300px; min-height: 300px;"
+        mat-card-avatar
+        src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg"
+        class="avatar"
+      />
       <mat-card-header style="text-align: center; margin-top: 100px">
         <mat-card-title>Имя фамилия</mat-card-title>
         <mat-card-subtitle>Город</mat-card-subtitle>
@@ -17,19 +21,17 @@
       <mat-card-content>
         <div class="mat-elevation-z8" style="width: 70rem">
           <table mat-table [dataSource]="dataSource" matSort>
-
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef></th>
-              <td mat-cell *matCellDef="let skill">
-              </td>
+              <td mat-cell *matCellDef="let skill"></td>
               <td mat-cell *matFooterCellDef="let skill">
                 <div *ngIf="isCreateMode">
-                  <button mat-icon-button color="primary" (click)=undoAdd()>
+                  <button mat-icon-button color="primary" (click)="undoAdd()">
                     <mat-icon>
                       undo
                     </mat-icon>
                   </button>
-                  <button mat-icon-button color="primary" (click)="saveSkill()" [disabled]="!canSave()">
+                  <button mat-icon-button color="primary" (click)="saveOrCreateSkill()" [disabled]="!canSave()">
                     <mat-icon>
                       check
                     </mat-icon>
@@ -44,16 +46,16 @@
             </ng-container>
 
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
               <td mat-cell *matCellDef="let skill">
-                {{skill.name}}
+                {{ skill.name }}
               </td>
               <td mat-cell *matFooterCellDef>
                 <mat-form-field *ngIf="isCreateMode">
                   <input matInput placeholder="Name" formControlName="name" [matAutocomplete]="auto" />
-                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getEvent($event)">
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setAutocompleteEvent($event)">
                     <mat-option *ngFor="let skill of nameSkillOptions | async" [value]="skill" style="height: auto;">
-                      {{skill.name}}
+                      {{ skill.name }}
                     </mat-option>
                   </mat-autocomplete>
                 </mat-form-field>
@@ -61,27 +63,24 @@
             </ng-container>
 
             <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
               <td mat-cell *matCellDef="let skill">
-                {{skill.description}}
+                {{ skill.description }}
               </td>
               <td mat-cell *matFooterCellDef>
                 <mat-form-field *ngIf="isCreateMode">
-                  <input matInput placeholder="Description" formControlName="description"
-                    [attr.disabled]="descriptionDisabled || null " />
+                  <input matInput placeholder="Description" formControlName="description" [attr.disabled]="isSkillExisted || null" />
                 </mat-form-field>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let skill; columns: displayedColumns;">
-            <tr mat-footer-row *matFooterRowDef="displayedColumns">
-            </tr>
+            <tr mat-row *matRowDef="let skill; columns: displayedColumns"></tr>
+            <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
           </table>
 
           <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
         </div>
-
       </mat-card-content>
     </div>
   </mat-card>

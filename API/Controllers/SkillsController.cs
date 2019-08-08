@@ -55,9 +55,9 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var addedSkill = _skillService.AddOrCreateSkill(userId, skill);
-                //var sk = _mapper.Map<SkillDto>(addedSkill);
+                var sk = _mapper.Map<SkillDto>(addedSkill);
 
-                return Ok(addedSkill);
+                return Ok(sk);
             }
             catch (AppException e)
             {

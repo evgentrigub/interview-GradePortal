@@ -26,6 +26,8 @@ namespace GradePortalAPI.Helpers
             CreateMap<UserDto, User>();
             CreateMap<User, UserViewModel>();
             CreateMap<UserViewModel, User>();
+            CreateMap<SkillDto, Skill>();
+            CreateMap<Skill, SkillDto>();
         }
     }
 }

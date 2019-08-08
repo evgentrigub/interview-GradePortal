@@ -10,6 +10,5 @@ namespace GradePortalAPI.Models.Interfaces
         User Create(User user, string password);
         void Update(User user, string password = null);
         void Delete(int id);
-        bool IsExisted(Skill skill);
     }
 }

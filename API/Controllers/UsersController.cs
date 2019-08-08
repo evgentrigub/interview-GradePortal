@@ -32,9 +32,9 @@ namespace GradePortalAPI.Controllers
             IOptions<AppSettings> appSettings
         )
         {
-            _userService = userService;
-            _mapper = mapper;
-            _appSettings = appSettings.Value;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService)); ;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings)); ;
         }
 
         [AllowAnonymous]
@@ -128,12 +128,12 @@ namespace GradePortalAPI.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        public IActionResult AddUserSkill(string id, Skill skill)
-        {
-            var user = _userService.GetById(id);
-            var isExisted = _userService.IsExisted(skill);
-            return Ok();
-        }
+        //[HttpPost]
+        //public IActionResult AddUserSkill(string id, Skill skill)
+        //{
+        //    var user = _userService.GetById(id);
+        //    var isExisted = _userService.IsExisted(skill);
+        //    return Ok();
+        //}
     }
 }

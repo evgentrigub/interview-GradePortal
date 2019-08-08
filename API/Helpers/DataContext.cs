@@ -15,10 +15,21 @@ namespace GradePortalAPI.Helpers
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserSkill>()
                 .HasKey(us => new {us.UserId, us.SkillId});
+
+            modelBuilder.Entity<UserSkill>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.UserSkills)
+                .HasForeignKey(x => x.UserId);
+
+            modelBuilder.Entity<UserSkill>()
+                .HasOne(x => x.Skill)
+                .WithMany(x => x.UserSkills)
+                .HasForeignKey(x => x.SkillId);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

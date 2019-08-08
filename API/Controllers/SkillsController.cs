@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
-using GradePortalAPI.Models.ViewModels;
-using GradePortalAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GradePortalAPI.Controllers
 {
@@ -18,21 +18,46 @@ namespace GradePortalAPI.Controllers
     public class SkillsController : ControllerBase
     {
         private readonly ISkillService _skillService;
+        private readonly ISkillSearchService _searchService;
+        private readonly IMapper _mapper;
 
         public SkillsController(
-            ISkillService skillService
+            ISkillService skillService,
+            ISkillSearchService searchService,
+            IMapper mapper
             )
         {
-            _skillService = skillService;
+            _skillService = skillService ?? throw new ArgumentNullException(nameof(skillService));
+            _searchService = searchService ?? throw new ArgumentNullException(nameof(skillService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpPost]
-        public IActionResult AddSkill([FromBody] SkillViewModel skill)
+        [HttpGet]
+        public IActionResult GetUserSkills(string userId)
         {
             try
             {
-                _skillService.Create(skill);
-                return Ok();
+                var skills = _skillService.GetUserSkills(userId);
+                var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
+                return Ok(skillsDto);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        //[HttpPost("/{userId:string}")]
+        [HttpPost]
+        public IActionResult CreateOrAddSkill(string userId, [FromBody] SkillDto skillDto)
+        {
+            var skill = _mapper.Map<Skill>(skillDto);
+            try
+            {
+                var addedSkill = _skillService.AddOrCreateSkill(userId, skill);
+                //var sk = _mapper.Map<SkillDto>(addedSkill);
+
+                return Ok(addedSkill);
             }
             catch (AppException e)
             {
@@ -40,10 +65,25 @@ namespace GradePortalAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateSkill(int id, [FromBody]Skill skill)
+        [HttpGet]
+        public IActionResult Search(string query, CancellationToken cancellationToken, int limit = 10)
         {
-            return Ok();
+            try
+            {
+                if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3)
+                {
+                    return Ok(new List<Skill>());
+                }
+
+                var list = _searchService.Search(query).Take(limit);
+
+                return Ok(list.ToList());
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+
         }
     }
 }

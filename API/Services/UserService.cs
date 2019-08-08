@@ -15,7 +15,7 @@ namespace GradePortalAPI.Services
 
         public UserService(DataContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public User Authenticate(string username, string password)
@@ -60,31 +60,31 @@ namespace GradePortalAPI.Services
             return _context.Users.Find(id);
         }
 
-        public void Update(User newUser, string password = null)
+        public void Update(User user, string password = null)
         {
-            var user = _context.Users.Find(newUser.Id);
+            var currentUser = _context.Users.Find(user.Id);
 
-            if (user == null)
+            if (currentUser == null)
                 throw new AppException("User not found");
 
-            if (newUser.Username != user.Username)
-                if (_context.Users.Any(x => x.Username == newUser.Username))
-                    throw new AppException("Username has already existed. Username:" + newUser.Username);
+            if (user.Username != currentUser.Username)
+                if (_context.Users.Any(x => x.Username == user.Username))
+                    throw new AppException("Username has already existed. Username:" + user.Username);
 
-            user.FirstName = newUser.FirstName;
-            user.LastName = newUser.LastName;
-            user.Username = newUser.Username;
+            currentUser.FirstName = user.FirstName;
+            currentUser.LastName = user.LastName;
+            currentUser.Username = user.Username;
 
             if (!string.IsNullOrWhiteSpace(password))
             {
                 byte[] passwordHash, passwordSalt;
                 CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                currentUser.PasswordHash = passwordHash;
+                currentUser.PasswordSalt = passwordSalt;
             }
 
-            _context.Users.Update(user);
+            _context.Users.Update(currentUser);
             _context.SaveChanges();
         }
 
@@ -96,12 +96,6 @@ namespace GradePortalAPI.Services
                 _context.Users.Remove(user);
                 _context.SaveChanges();
             }
-        }
-
-        public bool IsExisted(Skill skill)
-        {
-            var res = _context.Skills.SingleOrDefault(r => r.Id == skill.Id);
-            return res != null;
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

@@ -11,6 +11,6 @@ namespace GradePortalAPI.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public ICollection<UserSkill> UserSkills{ get; set; }
+        public ICollection<UserSkill> UserSkills{ get; set; } = new List<UserSkill>();
     }
 }

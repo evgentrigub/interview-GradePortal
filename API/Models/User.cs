@@ -13,6 +13,6 @@ namespace GradePortalAPI.Models
         public string Position { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public ICollection<UserSkill> UserSkills{ get; set; }
+        public ICollection<UserSkill> UserSkills{ get; set; } = new List<UserSkill>();
     }
 }

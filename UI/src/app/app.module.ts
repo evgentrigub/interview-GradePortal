@@ -16,7 +16,7 @@ import { MaterialModule } from './material-module';
 import { appRoutingModule } from './app.routing';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { TableComponent } from './table/table.component';
-import { PersonalPageComponent } from './account/personal-page/personal-page.component';
+import { PersonalPageComponent } from './personal-page/personal-page.component';
 
 @NgModule({
   declarations: [AppComponent, TableComponent, LoginComponent, RegisterComponent, NavBarComponent, PersonalPageComponent],
@@ -35,4 +35,4 @@ import { PersonalPageComponent } from './account/personal-page/personal-page.com
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

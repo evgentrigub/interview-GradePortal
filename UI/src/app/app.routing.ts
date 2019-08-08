@@ -3,7 +3,7 @@ import { AuthGuard } from './account/auth.guard';
 import { LoginComponent } from './account/login/login.component';
 import { RegisterComponent } from './account/register/register.component';
 import { TableComponent } from './table/table.component';
-import { PersonalPageComponent } from './account/personal-page/personal-page.component';
+import { PersonalPageComponent } from './personal-page/personal-page.component';
 
 const routes: Routes = [
   { path: 'table', component: TableComponent },

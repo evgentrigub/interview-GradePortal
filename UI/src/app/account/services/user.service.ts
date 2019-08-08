@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { User } from 'src/app/_models/user';
 import { environment } from 'src/environments/environment';
-import { throwError } from 'rxjs';
+import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { UserViewModel } from 'src/app/_models/user-view-model';
 
@@ -25,8 +25,8 @@ export class UserService {
     );
   }
 
-  getById(id: number) {
-    return this.http.get(`${environment.apiUrl}/users/get/${id}`).pipe(catchError(this.handleError));
+  getById(username: string): Observable<UserViewModel> {
+    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/get/${username}`).pipe(catchError(this.handleError));
   }
 
   update(user: User) {

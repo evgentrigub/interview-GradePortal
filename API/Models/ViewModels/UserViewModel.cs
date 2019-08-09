@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GradePortalAPI.Dtos;
 
 namespace GradePortalAPI.Models.ViewModels
 {
@@ -10,6 +11,6 @@ namespace GradePortalAPI.Models.ViewModels
         public string Username { get; set; }
         public string City { get; set; }
         public string Position { get; set; }
-        public ICollection<UserSkill> UserSkills { get; set; }
+        public ICollection<SkillDto> Skills { get; set; }
     }
 }

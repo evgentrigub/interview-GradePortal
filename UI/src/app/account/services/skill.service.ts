@@ -4,6 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { environment } from 'src/environments/environment';
 import { catchError, map, tap } from 'rxjs/operators';
+import { SkillToSend } from 'src/app/_models/skill-to-send';
 
 const emptySkills: Observable<SkillViewModel[]> = of([]);
 
@@ -29,7 +30,7 @@ export class SkillService {
     // return of(skills);
   }
 
-  addOrCreateSkill(userId: string, skill: SkillViewModel): Observable<SkillViewModel> {
+  addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
     // return of({ id: '1234', name: skill.name, description: skill.description } as Skill);
     return this.http.post<SkillViewModel>(`${environment.apiUrl}/skills/CreateOrAddSkill?userId=${userId}`, skill)
       .pipe(

@@ -24,7 +24,10 @@ namespace GradePortalAPI.Services
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             if (user == null)
                 throw new AppException("User not found");
-            var skills = user.UserSkills.Select(c => c.Skill).ToList();
+            var skills = _context.Users
+                .Where(u => u.Id == userId)
+                .SelectMany(u => u.UserSkills)
+                .Select(us => us.Skill).ToList();
             return skills;
         }
 

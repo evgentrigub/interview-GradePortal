@@ -25,8 +25,12 @@ export class UserService {
     );
   }
 
-  getById(username: string): Observable<UserViewModel> {
-    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/get/${username}`).pipe(catchError(this.handleError));
+  // getById(username: string): Observable<UserViewModel> {
+  //   return this.http.get<UserViewModel>(`${environment.apiUrl}/users/get/${username}`).pipe(catchError(this.handleError));
+  // }
+
+  getByUsername(username: string): Observable<UserViewModel> {
+    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/GetByUsername/${username}`).pipe(catchError(this.handleError));
   }
 
   update(user: User) {

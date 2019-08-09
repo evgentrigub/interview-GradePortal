@@ -60,6 +60,11 @@ namespace GradePortalAPI.Services
             return _context.Users.Find(id);
         }
 
+        public User GetByUserName(string username)
+        {
+            return _context.Users.SingleOrDefault(r => r.Username == username);
+        }
+
         public void Update(User user, string password = null)
         {
             var currentUser = _context.Users.Find(user.Id);

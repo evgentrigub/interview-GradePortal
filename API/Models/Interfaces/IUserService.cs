@@ -7,6 +7,7 @@ namespace GradePortalAPI.Models.Interfaces
         User Authenticate(string username, string password);
         IEnumerable<User> GetAll();
         User GetById(string id);
+        User GetByUserName(string username);
         User Create(User user, string password);
         void Update(User user, string password = null);
         void Delete(int id);

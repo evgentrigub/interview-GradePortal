@@ -1,15 +1,17 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { User } from 'src/app/_models/user';
-import { Subscription, Subject, of, Observable, scheduled, queueScheduler } from 'rxjs';
+import { Subscription, Subject, of, Observable, scheduled, queueScheduler, combineLatest, concat } from 'rxjs';
 import { AuthenticationService } from '../account/services/authentication.service';
 import { UserViewModel } from 'src/app/_models/user-view-model';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 import { UserService } from '../account/services/user.service';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent, MatPaginator, MatSort } from '@angular/material';
-import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith, tap } from 'rxjs/operators';
+import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith, tap, concatMap, mergeMap, retryWhen } from 'rxjs/operators';
 import { SkillService } from '../account/services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
+import { ok } from 'assert';
+import { SkillToSend } from '../_models/skill-to-send';
 
 const emptySkills: Observable<string[]> = of([]);
 
@@ -46,7 +48,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   readonly skillFormGroup: FormGroup;
   newSkillNameControl: FormControl = new FormControl();
   isLoading = true;
-  isOwnew = false;
+  pageOwner: UserViewModel;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -64,7 +66,6 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       id: this.formBuilder.control(null),
       name: this.newSkillNameControl,
       description: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
-      averageAssessment: this.formBuilder.control(null)
     });
 
     // const navigation = this.route.getCurrentNavigation();
@@ -75,12 +76,19 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.currentUserSubscription = this.authenticate.currentUser
       .pipe(
         switchMap(user => {
+          console.log(user);
           this.currentUser = user ? user : null;
-          if (user) {
+          if (!this.currentUser || this.currentUser.username !== routeUsername) {
+            const otherUser$ = this.userService.getByUsername(routeUsername);
+            return otherUser$.pipe(
+              switchMap(us => {
+                this.pageOwner = us;
+                return this.skillService.getUserSkills(us.id);
+              }));
+          } else {
             return this.skillService.getUserSkills(this.currentUser.id);
           }
         }),
-        takeUntil(this.destroyed$)
       )
       .subscribe(
         (skills: SkillViewModel[]) => {
@@ -88,7 +96,6 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
             this.dataSource.data = [];
             return;
           }
-
           this.dataSource = new MatTableDataSource(skills);
           this.dataSource.sort = this.sort;
           this.dataSource.paginator = this.paginator;
@@ -126,7 +133,8 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     if (!group) {
       return;
     }
-    const skillToSave = group.value as SkillViewModel;
+    const skillToSave = group.value as SkillToSend;
+    console.log('TCL: PersonalPageComponent -> skillToSave', skillToSave);
 
     this.skillService.addOrCreateSkill(this.currentUser.id, skillToSave)
       .pipe(
@@ -188,7 +196,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   private showMessage(msg: any): void {
-    this.snackBar.open(msg, undefined, { duration: 2000 });
+    this.snackBar.open(msg, 'ok');
   }
 
   // private textComparer(x: Skill, y: Skill): boolean {

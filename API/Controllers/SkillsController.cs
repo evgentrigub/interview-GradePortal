@@ -32,7 +32,7 @@ namespace GradePortalAPI.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet]
+        [HttpGet("{userId}")]
         public IActionResult GetUserSkills(string userId)
         {
             try

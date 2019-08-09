@@ -23,18 +23,20 @@ namespace GradePortalAPI.Controllers
     {
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
-
         private readonly IUserService _userService;
+        private readonly ISkillService _skillService;
 
         public UsersController(
             IUserService userService,
             IMapper mapper,
-            IOptions<AppSettings> appSettings
+            IOptions<AppSettings> appSettings,
+            ISkillService skillService
         )
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService)); ;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService)); 
+            _skillService = skillService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings)); ;
+            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings)); 
         }
 
         [AllowAnonymous]
@@ -95,6 +97,18 @@ namespace GradePortalAPI.Controllers
             var users = _userService.GetAll();
             var userViewModels = _mapper.Map<IList<UserViewModel>>(users);
             return Ok(userViewModels);
+        }
+
+        [HttpGet("{username}")]
+        public IActionResult GetByUsername(string username)
+        {
+            var user = _userService.GetByUserName(username);
+            var skills = _skillService.GetUserSkills(user.Id);
+
+            var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            userViewModel.Skills = skillsDto;
+            return Ok(userViewModel);
         }
 
         [HttpGet("{id}")]

@@ -1,10 +1,27 @@
-import { User } from './user';
+import { SkillViewModel } from './skill-view-model';
+
+// export interface UserViewModel {
+//   num: number;
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   username: string;
+//   city: string;
+//   position: string;
+//   skills: SkillViewModel[];
+// }
 
 export interface UserViewModel {
-  id: string;
-  username: string;
+  userData: UserData;
+  skills: SkillViewModel[];
+}
+
+export interface UserData {
   num: number;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   city: string;
   position: string;
 }

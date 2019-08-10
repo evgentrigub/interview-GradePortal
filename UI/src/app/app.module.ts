@@ -35,4 +35,4 @@ import { PersonalPageComponent } from './personal-page/personal-page.component';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

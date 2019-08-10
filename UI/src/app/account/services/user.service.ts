@@ -4,22 +4,22 @@ import { User } from 'src/app/_models/user';
 import { environment } from 'src/environments/environment';
 import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { UserViewModel } from 'src/app/_models/user-view-model';
+import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAll() {
     return this.http.get<UserViewModel[]>(`${environment.apiUrl}/users/getall`).pipe(
       tap(users => {
         for (let i = 0; i < users.length; i++) {
           const user = users[i];
-          user.num = i + 1;
-          user.city = user.city ? user.city : 'Not Filled';
-          user.position = user.position ? user.position : 'Not Filled';
+          user.userData.num = i + 1;
+          user.userData.city = user.userData.city ? user.userData.city : 'Not Filled';
+          user.userData.position = user.userData.position ? user.userData.position : 'Not Filled';
         }
       })
     );
@@ -33,8 +33,8 @@ export class UserService {
     return this.http.get<UserViewModel>(`${environment.apiUrl}/users/GetByUsername/${username}`).pipe(catchError(this.handleError));
   }
 
-  update(user: User) {
-    return this.http.put(`${environment.apiUrl}/users/update/${user.id}`, user).pipe(catchError(this.handleError));
+  update(user: UserData): Observable<null> {
+    return this.http.put<null>(`${environment.apiUrl}/users/update/${user.id}`, user).pipe(catchError(this.handleError));
   }
 
   delete(id: number) {

@@ -1,17 +1,19 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { User } from 'src/app/_models/user';
-import { Subscription, Subject, of, Observable, scheduled, queueScheduler, combineLatest, concat } from 'rxjs';
+import { Subscription, Subject, of, Observable } from 'rxjs';
 import { AuthenticationService } from '../account/services/authentication.service';
-import { UserViewModel } from 'src/app/_models/user-view-model';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../account/services/user.service';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent, MatPaginator, MatSort } from '@angular/material';
-import { takeUntil, switchMap, concatAll, distinctUntilChanged, debounceTime, map, exhaustMap, startWith, tap, concatMap, mergeMap, retryWhen } from 'rxjs/operators';
+import { switchMap, distinctUntilChanged, debounceTime, map, startWith, tap } from 'rxjs/operators';
 import { SkillService } from '../account/services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { ok } from 'assert';
 import { SkillToSend } from '../_models/skill-to-send';
+import { ThrowStmt } from '@angular/compiler';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 const emptySkills: Observable<string[]> = of([]);
 
@@ -21,7 +23,6 @@ const emptySkills: Observable<string[]> = of([]);
   styleUrls: ['./personal-page.component.css'],
 })
 export class PersonalPageComponent implements OnInit, OnDestroy {
-
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -38,31 +39,34 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   private currentUser: User | null;
   private currentUserSubscription: Subscription;
 
-  private lastAutoCompleteValue = '';
-
-  isCreateMode = false;
+  private userFormGroup: FormGroup;
+  private previosUserDataState: UserData;
   nameSkillOptions: Observable<SkillViewModel[]>;
   displayedColumns = ['action', 'name', 'description'];
   dataSource: MatTableDataSource<SkillViewModel> = new MatTableDataSource<SkillViewModel>();
 
-  readonly skillFormGroup: FormGroup;
-  newSkillNameControl: FormControl = new FormControl();
+  readonly newSkillFormGroup: FormGroup;
+  private newSkillNameControl: FormControl = new FormControl();
+  private lastAutoCompleteValue = '';
+
+  isShowChangeMode = false;
+  isCreateMode = false;
   isLoading = true;
-  pageOwner: UserViewModel;
+  isPageOwner = false;
 
   constructor(
     private authenticate: AuthenticationService,
-    private route: Router,
-    private acivatedRoute: ActivatedRoute,
+    private router: Router,
+    private route: ActivatedRoute,
     private userService: UserService,
     private skillService: SkillService,
     private formBuilder: FormBuilder,
     private detector: ChangeDetectorRef,
     private snackBar: MatSnackBar
   ) {
-
+    this.userFormGroup = this.formBuilder.group({});
     this.newSkillNameControl = this.formBuilder.control('', [Validators.required, Validators.minLength(1)]);
-    this.skillFormGroup = this.formBuilder.group({
+    this.newSkillFormGroup = this.formBuilder.group({
       id: this.formBuilder.control(null),
       name: this.newSkillNameControl,
       description: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
@@ -71,32 +75,32 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     // const navigation = this.route.getCurrentNavigation();
     // this.routeUser = navigation.extras.state ? navigation.extras.state.user : null;
 
-    const routeUsername = this.acivatedRoute.snapshot.paramMap.get('username') as string;
-
+    const routeUsername = this.route.snapshot.paramMap.get('username') as string;
     this.currentUserSubscription = this.authenticate.currentUser
       .pipe(
         switchMap(user => {
-          console.log(user);
           this.currentUser = user ? user : null;
-          if (!this.currentUser || this.currentUser.username !== routeUsername) {
-            const otherUser$ = this.userService.getByUsername(routeUsername);
-            return otherUser$.pipe(
-              switchMap(us => {
-                this.pageOwner = us;
-                return this.skillService.getUserSkills(us.id);
-              }));
+          if (routeUsername) {
+            if (user) {
+              this.isPageOwner = routeUsername === user.username ? true : false;
+            } else {
+              this.isPageOwner = false;
+            }
+            const userByRoute$ = routeUsername ? this.userService.getByUsername(routeUsername) : of(null);
+            return userByRoute$;
           } else {
-            return this.skillService.getUserSkills(this.currentUser.id);
+            return of(null);
           }
-        }),
+        })
       )
       .subscribe(
-        (skills: SkillViewModel[]) => {
-          if (!skills) {
+        (user: UserViewModel) => {
+          if (!user && !user.skills) {
             this.dataSource.data = [];
             return;
           }
-          this.dataSource = new MatTableDataSource(skills);
+          this.userFormGroup = this.createUserFormGroup(user.userData);
+          this.dataSource = new MatTableDataSource(user.skills);
           this.dataSource.sort = this.sort;
           this.dataSource.paginator = this.paginator;
           this.detector.markForCheck();
@@ -115,34 +119,69 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  showChangeMode(): void {
+    this.isShowChangeMode = true;
+    this.previosUserDataState = this.userFormGroup.value;
+  }
+
+  cancelChangeMode(): void {
+    this.userFormGroup.setValue(this.previosUserDataState);
+    this.isShowChangeMode = false;
+  }
+
+  canSaveUserData(): boolean {
+    return this.userFormGroup.dirty && this.userFormGroup.valid;
+  }
+
+  saveUserData(): void {
+    const group = this.userFormGroup;
+    if (!group) {
+      return;
+    }
+    const data = group.value as UserData;
+    this.userService
+      .update(data)
+      .pipe(
+        tap(
+          () => {
+            this.showMessage(`Account updated successfully! Username: ${data.username}`);
+            this.isShowChangeMode = false;
+            this.detector.markForCheck();
+          },
+          err => this.showMessage(err)
+        )
+      )
+      .subscribe();
+  }
+
   addSkill(): void {
     this.isCreateMode = true;
   }
 
   undoAdd(): void {
     this.isCreateMode = false;
-    this.skillFormGroup.reset();
+    this.newSkillFormGroup.reset();
   }
 
-  canSave(): boolean {
-    return this.skillFormGroup.dirty && this.skillFormGroup.valid;
+  canSaveSkill(): boolean {
+    return this.newSkillFormGroup.dirty && this.newSkillFormGroup.valid;
   }
 
   saveOrCreateSkill(): void {
-    const group = this.skillFormGroup;
+    const group = this.newSkillFormGroup;
     if (!group) {
       return;
     }
     const skillToSave = group.value as SkillToSend;
-    console.log('TCL: PersonalPageComponent -> skillToSave', skillToSave);
 
-    this.skillService.addOrCreateSkill(this.currentUser.id, skillToSave)
+    this.skillService
+      .addOrCreateSkill(this.currentUser.id, skillToSave)
       .pipe(
         tap(
           skill => {
             this.showMessage(`New skill ${skill.name} saved successfully!`);
             this.isCreateMode = false;
-            this.skillFormGroup.reset();
+            this.newSkillFormGroup.reset();
 
             this.dataSource.data.push(skill);
             this.dataSource = new MatTableDataSource(this.dataSource.data);
@@ -162,10 +201,21 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     }
     this.lastAutoCompleteValue = skill.name;
 
-    this.skillFormGroup.setValue(skill);
-    this.skillFormGroup.markAsDirty();
+    this.newSkillFormGroup.setValue(skill);
+    this.newSkillFormGroup.markAsDirty();
 
     this.detector.markForCheck();
+  }
+
+  private createUserFormGroup(data: UserData): FormGroup {
+    return this.formBuilder.group({
+      id: this.formBuilder.control(data.id),
+      firstName: this.formBuilder.control(data.firstName, [Validators.required, Validators.minLength(1)]),
+      lastName: this.formBuilder.control(data.lastName, [Validators.required, Validators.minLength(1)]),
+      username: this.formBuilder.control(data.username, [Validators.required, Validators.minLength(1)]),
+      city: this.formBuilder.control(data.city, [Validators.required, Validators.minLength(1)]),
+      position: this.formBuilder.control(data.position, [Validators.required, Validators.minLength(1)]),
+    });
   }
 
   private getAutocompleteSkills(): Observable<SkillViewModel[]> {

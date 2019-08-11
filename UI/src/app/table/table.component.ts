@@ -21,36 +21,26 @@ export class TableComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  constructor(private authenticationService: AuthenticationService, private userService: UserService, private router: Router) {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private userService: UserService,
+    private router: Router) { }
 
   ngOnInit() {
     this._loadUsers();
   }
 
-  clickUser(user: UserViewModel) {
-    this.router.navigate([`/${user.userData.username}`], { state: { user } });
+  clickUser(user: UserData) {
+    this.router.navigate([`/${user.username}`], { state: { user } });
   }
 
   private _loadUsers(): void {
-    this.userService.getAll().pipe(
-      tap(res => {
-        const data = res.map(user => this.createUserData(user));
+    this.userService.getAll()
+      .subscribe(data => {
+        console.log(data);
         this.dataSource = new MatTableDataSource(data);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
-      })
-    );
-  }
-
-  private createUserData(user: UserViewModel): UserData {
-    return {
-      num: user.userData.num,
-      id: user.userData.id,
-      firstName: user.userData.firstName,
-      lastName: user.userData.lastName,
-      username: user.userData.username,
-      city: user.userData.city,
-      position: user.userData.position,
-    } as UserData;
+      });
   }
 }

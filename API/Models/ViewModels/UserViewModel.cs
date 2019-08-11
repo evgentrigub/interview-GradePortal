@@ -11,6 +11,5 @@ namespace GradePortalAPI.Models.ViewModels
         public string Username { get; set; }
         public string City { get; set; }
         public string Position { get; set; }
-        public ICollection<SkillDto> Skills { get; set; }
     }
 }

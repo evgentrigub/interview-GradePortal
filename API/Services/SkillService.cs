@@ -68,7 +68,7 @@ namespace GradePortalAPI.Services
                     User = user,
                     Skill = skill
                 };
-                //user.UserSkills.Add(userSkills);
+                //user.Skills.Add(userSkills);
                 //_context.Users.Update(user);
                 skill.UserSkills.Add(userSkills);
                 _context.Skills.Update(skill);

@@ -37,6 +37,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatFormFieldModule } from '@angular/material';
 
 @NgModule({
   exports: [
@@ -55,6 +56,7 @@ import { MatTreeModule } from '@angular/material/tree';
     MatDatepickerModule,
     MatDialogModule,
     MatDividerModule,
+    MatFormFieldModule,
     MatExpansionModule,
     MatGridListModule,
     MatIconModule,
@@ -81,4 +83,4 @@ import { MatTreeModule } from '@angular/material/tree';
     ScrollingModule,
   ],
 })
-export class MaterialModule {}
+export class MaterialModule { }

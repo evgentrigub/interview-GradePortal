@@ -34,6 +34,10 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     return this.lastAutoCompleteValue === skillName ? true : false;
   }
 
+  get userDataValue(): UserData {
+    return this.userFormGroup.value;
+  }
+
   private readonly destroyed$ = new Subject<void>();
   private readonly routeUser: UserViewModel;
   private currentUser: User | null;
@@ -139,19 +143,19 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       return;
     }
     const data = group.value as UserData;
-    this.userService
-      .update(data)
-      .pipe(
-        tap(
-          () => {
-            this.showMessage(`Account updated successfully! Username: ${data.username}`);
-            this.isShowChangeMode = false;
-            this.detector.markForCheck();
-          },
-          err => this.showMessage(err)
-        )
-      )
-      .subscribe();
+    //  TO-DO
+    // this.userService.update(data)
+    //   .pipe(
+    //     tap(
+    //       () => {
+    //         this.showMessage(`Account updated successfully! Username: ${data.username}`);
+    //         this.isShowChangeMode = false;
+    //         this.detector.markForCheck();
+    //       },
+    //       err => this.showMessage(err)
+    //     )
+    //   )
+    //   .subscribe();
   }
 
   addSkill(): void {
@@ -208,6 +212,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   private createUserFormGroup(data: UserData): FormGroup {
+    console.log(data);
     return this.formBuilder.group({
       id: this.formBuilder.control(data.id),
       firstName: this.formBuilder.control(data.firstName, [Validators.required, Validators.minLength(1)]),

@@ -41,11 +41,11 @@ namespace GradePortalAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Authenticate([FromBody] UserDto userDto)
+        public IActionResult Authenticate([FromBody] UserAuthDto userAuthDto)
         {
             try
             {
-                var user = _userService.Authenticate(userDto.Username, userDto.Password);
+                var user = _userService.Authenticate(userAuthDto.Username, userAuthDto.Password);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -76,13 +76,13 @@ namespace GradePortalAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Register([FromBody] UserDto userDto)
+        public IActionResult Register([FromBody] UserAuthDto userAuthDto)
         {
-            var user = _mapper.Map<User>(userDto);
+            var user = _mapper.Map<User>(userAuthDto);
 
             try
             {
-                _userService.Create(user, userDto.Password);
+                _userService.Create(user, userAuthDto.Password);
                 return Ok();
             }
             catch (AppException e)
@@ -103,12 +103,18 @@ namespace GradePortalAPI.Controllers
         public IActionResult GetByUsername(string username)
         {
             var user = _userService.GetByUserName(username);
-            var skills = _skillService.GetUserSkills(user.Id);
-
-            var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
             var userViewModel = _mapper.Map<UserViewModel>(user);
-            userViewModel.Skills = skillsDto;
-            return Ok(userViewModel);
+
+            var skills = _skillService.GetUserSkills(user.Id);
+            var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
+
+            var userInfo = new UserSkillsDto()
+            {
+                UserData = userViewModel,
+                Skills = skillsDto
+            };
+
+            return Ok(userInfo);
         }
 
         [HttpGet("{id}")]
@@ -119,14 +125,14 @@ namespace GradePortalAPI.Controllers
             return Ok(userViewModel);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update([FromBody] UserDto userDto)
+        [HttpPut]
+        public IActionResult Update([FromBody] UserAuthDto userAuthDto)
         {
-            var user = _mapper.Map<User>(userDto);
+            var user = _mapper.Map<User>(userAuthDto);
 
             try
             {
-                _userService.Update(user, userDto.Password);
+                _userService.Update(user, userAuthDto.Password);
                 return Ok();
             }
             catch (AppException e)

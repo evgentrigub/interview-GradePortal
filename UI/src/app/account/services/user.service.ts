@@ -10,16 +10,16 @@ import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll() {
-    return this.http.get<UserViewModel[]>(`${environment.apiUrl}/users/getall`).pipe(
+    return this.http.get<UserData[]>(`${environment.apiUrl}/users/getall`).pipe(
       tap(users => {
         for (let i = 0; i < users.length; i++) {
           const user = users[i];
-          user.userData.num = i + 1;
-          user.userData.city = user.userData.city ? user.userData.city : 'Not Filled';
-          user.userData.position = user.userData.position ? user.userData.position : 'Not Filled';
+          user.num = i + 1;
+          user.city = user.city ? user.city : 'Not Filled';
+          user.position = user.position ? user.position : 'Not Filled';
         }
       })
     );
@@ -30,15 +30,24 @@ export class UserService {
   // }
 
   getByUsername(username: string): Observable<UserViewModel> {
-    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/GetByUsername/${username}`).pipe(catchError(this.handleError));
+    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/GetByUsername/${username}`)
+      .pipe(
+        tap(user => {
+          user.userData.city = user.userData.city ? user.userData.city : 'Not Filled';
+          user.userData.position = user.userData.position ? user.userData.position : 'Not Filled';
+        }),
+        catchError(this.handleError)
+      );
   }
 
   update(user: UserData): Observable<null> {
-    return this.http.put<null>(`${environment.apiUrl}/users/update/${user.id}`, user).pipe(catchError(this.handleError));
+    return this.http.put<null>(`${environment.apiUrl}/users/update/${user.id}`, user)
+      .pipe(catchError(this.handleError));
   }
 
   delete(id: number) {
-    return this.http.delete(`${environment.apiUrl}/users/delete/${id}`).pipe(catchError(this.handleError));
+    return this.http.delete(`${environment.apiUrl}/users/delete/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

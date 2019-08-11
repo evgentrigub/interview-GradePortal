@@ -1,35 +1,35 @@
 <mat-card class="container">
   <div style="display: flex; justify-content: space-around;">
-    <img
-      style="min-width: 300px; min-height: 300px;"
-      mat-card-avatar
-      src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg"
-      class="avatar"
-    />
+    <img style="min-width: 300px; min-height: 300px;" mat-card-avatar
+      src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg" class="avatar" />
     <form [formGroup]="userFormGroup">
-      <button *ngIf="isPageOwner" (click)="showChangeMode()">Изменить данные</button>
-      <mat-card-header *ngIf="!isShowChangeMode" style="text-align: center; margin-top: 100px">
-        <mat-card-title>Name</mat-card-title>
-        <mat-card-subtitle>Username</mat-card-subtitle>
-        <mat-card-subtitle>City</mat-card-subtitle>
-        <mat-card-subtitle>Position</mat-card-subtitle>
-      </mat-card-header>
-      <div *ngIf="isShowChangeMode">
-        <mar-form-field>
-          <input placeholder="First Name" formControlName="firstName" />
-        </mar-form-field>
-        <mar-form-field>
-          <input placeholder="Last Name" formControlName="lastName" />
-        </mar-form-field>
-        <mar-form-field>
-          <input placeholder="Username" formControlName="username" />
-        </mar-form-field>
-        <mar-form-field>
-          <input placeholder="City" formControlName="city" />
-        </mar-form-field>
-        <mar-form-field>
-          <input placeholder="Position" formControlName="position" />
-        </mar-form-field>
+      <button mat-button *ngIf="isPageOwner && !isShowChangeMode" (click)="showChangeMode()">Edit</button>
+      <button mat-button *ngIf="isShowChangeMode" (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
+      <button mat-button *ngIf="isShowChangeMode" (click)="cancelChangeMode()">Cancel</button>
+      <div>
+        <mat-card-header *ngIf="!isShowChangeMode" style="text-align: center; margin-top: 100px">
+          <mat-card-title>{{userDataValue.firstName}} {{userDataValue.lastName}}</mat-card-title>
+          <mat-card-subtitle>{{userDataValue.username}}</mat-card-subtitle>
+          <mat-card-subtitle>{{userDataValue.city}}</mat-card-subtitle>
+          <mat-card-subtitle>{{userDataValue.position}}</mat-card-subtitle>
+        </mat-card-header>
+      </div>
+      <div *ngIf="isShowChangeMode" style="display: flex; flex-direction: column">
+        <mat-form-field>
+          <input matInput placeholder="First Name" formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Last Name" formControlName="lastName" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Username" formControlName="username" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="City" formControlName="city" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Position" formControlName="position" />
+        </mat-form-field>
       </div>
     </form>
   </div>
@@ -41,6 +41,7 @@
       <mat-card-content>
         <div class="mat-elevation-z8" style="width: 70rem">
           <table *ngIf="dataSource; else loading" mat-table [dataSource]="dataSource" matSort>
+
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let skill"></td>
@@ -53,7 +54,7 @@
                     <mat-icon>check</mat-icon>
                   </button>
                 </div>
-                <button *ngIf="!isCreateMode" mat-icon-button color="primary" (click)="addSkill()">
+                <button *ngIf="!isCreateMode && isPageOwner" mat-icon-button color="primary" (click)="addSkill()">
                   <mat-icon>add_box</mat-icon>
                 </button>
               </td>
@@ -83,7 +84,8 @@
               </td>
               <td mat-cell *matFooterCellDef>
                 <mat-form-field *ngIf="isCreateMode">
-                  <input matInput placeholder="Description" formControlName="description" [attr.disabled]="isSkillExisted || null" />
+                  <input matInput placeholder="Description" formControlName="description"
+                    [attr.disabled]="isSkillExisted || null" />
                 </mat-form-field>
               </td>
             </ng-container>

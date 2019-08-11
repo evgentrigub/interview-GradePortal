@@ -32,23 +32,7 @@ namespace GradePortalAPI.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("{userId}")]
-        public IActionResult GetUserSkills(string userId)
-        {
-            try
-            {
-                var skills = _skillService.GetUserSkills(userId);
-                var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
-                return Ok(skillsDto);
-            }
-            catch (AppException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-        //[HttpPost("/{userId:string}")]
-        [HttpPost]
+        [HttpPost("{userId}")]
         public IActionResult CreateOrAddSkill(string userId, [FromBody] SkillDto skillDto)
         {
             var skill = _mapper.Map<Skill>(skillDto);
@@ -85,5 +69,20 @@ namespace GradePortalAPI.Controllers
             }
 
         }
+
+        //[HttpGet("{userId}")]
+        //public IActionResult GetUserSkills(string userId)
+        //{
+        //    try
+        //    {
+        //        var skills = _skillService.GetUserSkills(userId);
+        //        var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
+        //        return Ok(skillsDto);
+        //    }
+        //    catch (AppException e)
+        //    {
+        //        return BadRequest(new { message = e.Message });
+        //    }
+        //}
     }
 }

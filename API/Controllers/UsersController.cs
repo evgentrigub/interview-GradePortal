@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -25,16 +26,19 @@ namespace GradePortalAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly ISkillService _skillService;
+        private readonly IEvaluateService _evaluateService;
 
         public UsersController(
             IUserService userService,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
-            ISkillService skillService
+            ISkillService skillService,
+            IEvaluateService evaluateService
         )
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService)); 
             _skillService = skillService ?? throw new ArgumentNullException(nameof(userService));
+            _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings)); 
         }
@@ -107,6 +111,12 @@ namespace GradePortalAPI.Controllers
 
             var skills = _skillService.GetUserSkills(user.Id);
             var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
+
+            foreach (var skill in skillsDto)
+            {
+                var avEval = _evaluateService.GetAverageEvaluate(skill.Id, user.Id);
+                skill.AverageEvaluate = avEval;
+            }
 
             var userInfo = new UserSkillsDto()
             {

@@ -3,18 +3,18 @@
     <img style="min-width: 300px; min-height: 300px;" mat-card-avatar
       src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg" class="avatar" />
     <form [formGroup]="userFormGroup">
-      <button mat-button *ngIf="isPageOwner && !isShowChangeMode" (click)="showChangeMode()">Edit</button>
-      <button mat-button *ngIf="isShowChangeMode" (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
-      <button mat-button *ngIf="isShowChangeMode" (click)="cancelChangeMode()">Cancel</button>
+      <button mat-button *ngIf="pageOwner && !editUserMode" (click)="showChangeMode()">Edit</button>
+      <button mat-button *ngIf="editUserMode" (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
+      <button mat-button *ngIf="editUserMode" (click)="cancelChangeMode()">Cancel</button>
       <div>
-        <mat-card-header *ngIf="!isShowChangeMode" style="text-align: center; margin-top: 100px">
+        <mat-card-header *ngIf="!editUserMode" style="text-align: center; margin-top: 100px">
           <mat-card-title>{{userDataValue.firstName}} {{userDataValue.lastName}}</mat-card-title>
           <mat-card-subtitle>{{userDataValue.username}}</mat-card-subtitle>
           <mat-card-subtitle>{{userDataValue.city}}</mat-card-subtitle>
           <mat-card-subtitle>{{userDataValue.position}}</mat-card-subtitle>
         </mat-card-header>
       </div>
-      <div *ngIf="isShowChangeMode" style="display: flex; flex-direction: column">
+      <div *ngIf="editUserMode" style="display: flex; flex-direction: column">
         <mat-form-field>
           <input matInput placeholder="First Name" formControlName="firstName" />
         </mat-form-field>
@@ -46,7 +46,7 @@
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let skill"></td>
               <td mat-cell *matFooterCellDef="let skill">
-                <div *ngIf="isCreateMode">
+                <div *ngIf="newSkillMode">
                   <button mat-icon-button color="primary" (click)="undoAdd()">
                     <mat-icon>undo</mat-icon>
                   </button>
@@ -54,7 +54,7 @@
                     <mat-icon>check</mat-icon>
                   </button>
                 </div>
-                <button *ngIf="!isCreateMode && isPageOwner" mat-icon-button color="primary" (click)="addSkill()">
+                <button *ngIf="!newSkillMode && isPageOwner" mat-icon-button color="primary" (click)="addSkill()">
                   <mat-icon>add_box</mat-icon>
                 </button>
               </td>
@@ -66,7 +66,7 @@
                 {{ skill.name }}
               </td>
               <td mat-cell *matFooterCellDef>
-                <mat-form-field *ngIf="isCreateMode">
+                <mat-form-field *ngIf="newSkillMode">
                   <input matInput placeholder="Name" formControlName="name" [matAutocomplete]="auto" />
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setAutocompleteEvent($event)">
                     <mat-option *ngFor="let skill of nameSkillOptions | async" [value]="skill" style="height: auto;">
@@ -83,10 +83,36 @@
                 {{ skill.description }}
               </td>
               <td mat-cell *matFooterCellDef>
-                <mat-form-field *ngIf="isCreateMode">
+                <mat-form-field *ngIf="newSkillMode">
                   <input matInput placeholder="Description" formControlName="description"
                     [attr.disabled]="isSkillExisted || null" />
                 </mat-form-field>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="evaluate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Rating</th>
+              <td mat-cell *matCellDef="let skill">
+                <div *ngIf="evaluateSkill!=skill.id">
+                  {{ skill.averageEvaluate }}
+                  <button mat-icon-button color="accent" (click)="addEvaluation(skill)">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+                <div *ngIf="evaluateSkill==skill.id">
+                  <mat-form-field>
+                    <input matInput placeholder="Value" [formControl]="evaluationControl" type="number" />
+                  </mat-form-field>
+                  <button mat-icon-button color="primary" (click)="cancelEvaluation()">
+                    <mat-icon>undo</mat-icon>
+                  </button>
+                  <button mat-icon-button color="primary" (click)="saveEvaluate()" [disabled]="!canSaveEvaluation()">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                </div>
+
+              </td>
+              <td mat-cell *matFooterCellDef>
               </td>
             </ng-container>
 

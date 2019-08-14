@@ -5,15 +5,12 @@ import { AuthenticationService } from '../account/services/authentication.servic
 import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../account/services/user.service';
-import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent, MatPaginator, MatSort } from '@angular/material';
 import { switchMap, distinctUntilChanged, debounceTime, map, startWith, tap } from 'rxjs/operators';
 import { SkillService } from '../account/services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
-import { ok } from 'assert';
 import { SkillToSend } from '../_models/skill-to-send';
-import { ThrowStmt } from '@angular/compiler';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 const emptySkills: Observable<string[]> = of([]);
 
@@ -23,8 +20,41 @@ const emptySkills: Observable<string[]> = of([]);
   styleUrls: ['./personal-page.component.css'],
 })
 export class PersonalPageComponent implements OnInit, OnDestroy {
+
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+
+  get pageOwner(): boolean {
+    return this._isPageOwner;
+  }
+
+  set pageOwner(isOwner: boolean) {
+    this._isPageOwner = isOwner;
+  }
+
+  get editUserMode(): boolean {
+    return this._isEditMode;
+  }
+
+  set editUserMode(isEdit: boolean) {
+    this._isEditMode = isEdit;
+  }
+
+  get evaluateSkill(): string {
+    return this._evaluateSkillId;
+  }
+
+  set evaluateSkill(skillId: string) {
+    this._evaluateSkillId = skillId;
+  }
+
+  get newSkillMode(): boolean {
+    return this._isCreateNewSkill;
+  }
+
+  set newSkillMode(isMode: boolean) {
+    this._isCreateNewSkill = isMode;
+  }
 
   get isSkillExisted(): boolean {
     if (!this.newSkillNameControl) {
@@ -46,17 +76,21 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   private userFormGroup: FormGroup;
   private previosUserDataState: UserData;
   nameSkillOptions: Observable<SkillViewModel[]>;
-  displayedColumns = ['action', 'name', 'description'];
-  dataSource: MatTableDataSource<SkillViewModel> = new MatTableDataSource<SkillViewModel>();
+  displayedColumns = ['action', 'name', 'description', 'evaluate'];
+  dataSource: MatTableDataSource<SkillViewModel>;
 
   readonly newSkillFormGroup: FormGroup;
   private newSkillNameControl: FormControl = new FormControl();
   private lastAutoCompleteValue = '';
 
-  isShowChangeMode = false;
-  isCreateMode = false;
+  private _isEditMode = false;
+  private _isCreateNewSkill = false;
+  private _evaluateSkillId = '';
+  private _isPageOwner = false;
+
+  evaluationControl: FormControl;
+
   isLoading = true;
-  isPageOwner = false;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -86,9 +120,9 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
           this.currentUser = user ? user : null;
           if (routeUsername) {
             if (user) {
-              this.isPageOwner = routeUsername === user.username ? true : false;
+              this.pageOwner = routeUsername === user.username ? true : false;
             } else {
-              this.isPageOwner = false;
+              this.pageOwner = false;
             }
             const userByRoute$ = routeUsername ? this.userService.getByUsername(routeUsername) : of(null);
             return userByRoute$;
@@ -123,14 +157,16 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  // USER DATA
+
   showChangeMode(): void {
-    this.isShowChangeMode = true;
+    this.editUserMode = true;
     this.previosUserDataState = this.userFormGroup.value;
   }
 
   cancelChangeMode(): void {
     this.userFormGroup.setValue(this.previosUserDataState);
-    this.isShowChangeMode = false;
+    this.editUserMode = false;
   }
 
   canSaveUserData(): boolean {
@@ -143,27 +179,47 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       return;
     }
     const data = group.value as UserData;
-    //  TO-DO
-    // this.userService.update(data)
-    //   .pipe(
-    //     tap(
-    //       () => {
-    //         this.showMessage(`Account updated successfully! Username: ${data.username}`);
-    //         this.isShowChangeMode = false;
-    //         this.detector.markForCheck();
-    //       },
-    //       err => this.showMessage(err)
-    //     )
-    //   )
-    //   .subscribe();
+    this.userService.update(data)
+      .pipe(
+        tap(
+          () => {
+            this.showMessage(`Account updated successfully! Username: ${data.username}`);
+            this._isEditMode = false;
+            this.detector.markForCheck();
+          },
+          err => this.showMessage(err)
+        )
+      )
+      .subscribe();
   }
 
+  // EVALUATION
+
+  addEvaluation(skill: SkillViewModel): void {
+    this.evaluateSkill = skill.id;
+    this.evaluationControl = new FormControl(skill.averageEvaluate, [Validators.required, Validators.min(0), Validators.max(5)]);
+  }
+
+  cancelEvaluation(): void {
+    this.evaluateSkill = '';
+  }
+
+  canSaveEvaluation(): boolean {
+    return this.evaluationControl.dirty && this.evaluationControl.valid;
+  }
+
+  saveEvaluate(): void {
+
+  }
+
+  // SKILLS
+
   addSkill(): void {
-    this.isCreateMode = true;
+    this.newSkillMode = true;
   }
 
   undoAdd(): void {
-    this.isCreateMode = false;
+    this.newSkillMode = false;
     this.newSkillFormGroup.reset();
   }
 
@@ -184,7 +240,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         tap(
           skill => {
             this.showMessage(`New skill ${skill.name} saved successfully!`);
-            this.isCreateMode = false;
+            this._isCreateNewSkill = false;
             this.newSkillFormGroup.reset();
 
             this.dataSource.data.push(skill);
@@ -196,6 +252,8 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       )
       .subscribe();
   }
+
+  //AUTOCOMPLETE
 
   setAutocompleteEvent(event: MatAutocompleteSelectedEvent): void {
     const skill = event.option.value as SkillViewModel;
@@ -212,7 +270,6 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   private createUserFormGroup(data: UserData): FormGroup {
-    console.log(data);
     return this.formBuilder.group({
       id: this.formBuilder.control(data.id),
       firstName: this.formBuilder.control(data.firstName, [Validators.required, Validators.minLength(1)]),
@@ -243,8 +300,9 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     return this.skillService.getAutocompleteSkills(value).pipe(
       map(response =>
         response.filter((option: SkillViewModel) => {
+          return option.name.toLowerCase().includes(value.toLowerCase());
           // return option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
-          return option.name;
+          // return option.name;
         })
       )
     );

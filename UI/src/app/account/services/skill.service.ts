@@ -14,24 +14,24 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
 export class SkillService {
   constructor(private http: HttpClient) { }
 
-  getUserSkills(id: string): Observable<SkillViewModel[]> {
-    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/GetUserSkills/?userId=${id}`).pipe(
-      tap(res => {
-        for (const element of res) {
-          element.averageAssessment = 0;
-        }
-      })
-    );
-    // const skills = [
-    //   { id: 'aaaaa', name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' },
-    //   { id: 'aaaaa', name: 'Print', description: 'cccccccccccc' },
-    // ] as SkillViewModel[];
-    // return of(skills);
-  }
+  // getUserSkills(id: string): Observable<SkillViewModel[]> {
+  //   return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/GetUserSkills/?userId=${id}`).pipe(
+  //     tap(res => {
+  //       for (const element of res) {
+  //         element.averageAssessment = 0;
+  //       }
+  //     })
+  //   );
+  // const skills = [
+  //   { id: 'aaaaa', name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' },
+  //   { id: 'aaaaa', name: 'Print', description: 'cccccccccccc' },
+  // ] as SkillViewModel[];
+  // return of(skills);
+  // }
 
   addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
     // return of({ id: '1234', name: skill.name, description: skill.description } as Skill);
-    return this.http.post<SkillViewModel>(`${environment.apiUrl}/skills/CreateOrAddSkill?userId=${userId}`, skill)
+    return this.http.post<SkillViewModel>(`${environment.apiUrl}/skills/CreateOrAddSkill/${userId}`, skill)
       .pipe(catchError(this.handleError));
   }
 

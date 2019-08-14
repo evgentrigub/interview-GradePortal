@@ -8,131 +8,125 @@ namespace GradePortalAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Skills",
-                columns: table => new
+                "Skills",
+                table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: false),
-                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    Id = table.Column<string>(),
+                    IsActive = table.Column<bool>(),
+                    CreatedDate = table.Column<DateTime>(),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Skills", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Skills", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
+                "Users",
+                table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: false),
-                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    Id = table.Column<string>(),
+                    IsActive = table.Column<bool>(),
+                    CreatedDate = table.Column<DateTime>(),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
                     Username = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Users", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "Evaluations",
-                columns: table => new
+                "Evaluations",
+                table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: false),
-                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    Id = table.Column<string>(),
+                    IsActive = table.Column<bool>(),
+                    CreatedDate = table.Column<DateTime>(),
                     UserId = table.Column<string>(nullable: true),
                     SkillId = table.Column<string>(nullable: true),
                     ExpertId = table.Column<string>(nullable: true),
-                    Value = table.Column<int>(nullable: false)
+                    Value = table.Column<int>()
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Evaluations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Evaluations_Users_ExpertId",
-                        column: x => x.ExpertId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
+                        "FK_Evaluations_Users_ExpertId",
+                        x => x.ExpertId,
+                        "Users",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Evaluations_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
-                        principalColumn: "Id",
+                        "FK_Evaluations_Skills_SkillId",
+                        x => x.SkillId,
+                        "Skills",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Evaluations_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
+                        "FK_Evaluations_Users_UserId",
+                        x => x.UserId,
+                        "Users",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserSkill",
-                columns: table => new
+                "UserSkill",
+                table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    SkillId = table.Column<string>(nullable: false)
+                    UserId = table.Column<string>(),
+                    SkillId = table.Column<string>()
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserSkill", x => new { x.UserId, x.SkillId });
+                    table.PrimaryKey("PK_UserSkill", x => new {x.UserId, x.SkillId});
                     table.ForeignKey(
-                        name: "FK_UserSkill_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
-                        principalColumn: "Id",
+                        "FK_UserSkill_Skills_SkillId",
+                        x => x.SkillId,
+                        "Skills",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserSkill_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
+                        "FK_UserSkill_Users_UserId",
+                        x => x.UserId,
+                        "Users",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Evaluations_ExpertId",
-                table: "Evaluations",
-                column: "ExpertId");
+                "IX_Evaluations_ExpertId",
+                "Evaluations",
+                "ExpertId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Evaluations_SkillId",
-                table: "Evaluations",
-                column: "SkillId");
+                "IX_Evaluations_SkillId",
+                "Evaluations",
+                "SkillId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Evaluations_UserId",
-                table: "Evaluations",
-                column: "UserId");
+                "IX_Evaluations_UserId",
+                "Evaluations",
+                "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserSkill_SkillId",
-                table: "UserSkill",
-                column: "SkillId");
+                "IX_UserSkill_SkillId",
+                "UserSkill",
+                "SkillId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Evaluations");
+                "Evaluations");
 
             migrationBuilder.DropTable(
-                name: "UserSkill");
+                "UserSkill");
 
             migrationBuilder.DropTable(
-                name: "Skills");
+                "Skills");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                "Users");
         }
     }
 }

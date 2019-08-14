@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
@@ -17,19 +15,50 @@ namespace GradePortalAPI.Controllers
     [ApiController]
     public class SkillsController : ControllerBase
     {
-        private readonly ISkillService _skillService;
-        private readonly ISkillSearchService _searchService;
+        private readonly IEvaluateService _evaluateService;
         private readonly IMapper _mapper;
+        private readonly ISkillSearchService _searchService;
+        private readonly ISkillService _skillService;
+        private readonly IUserService _userService;
 
         public SkillsController(
             ISkillService skillService,
+            IUserService userService,
+            IEvaluateService evaluateService,
             ISkillSearchService searchService,
             IMapper mapper
-            )
+        )
         {
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _skillService = skillService ?? throw new ArgumentNullException(nameof(skillService));
             _searchService = searchService ?? throw new ArgumentNullException(nameof(skillService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        [HttpGet("{username}")]
+        public IActionResult GetSkills(string username, string expertId)
+        {
+            try
+            {
+                var user = _userService.GetByUserName(username);
+                var skills = _skillService.GetUserSkills(user.Id);
+
+                var skillsDto = skills.Select(skill => new SkillDto
+                {
+                    Id = skill.Id,
+                    Name = skill.Name,
+                    Description = skill.Description,
+                    AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, user.Id),
+                    ExpertEvaluate = _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId)
+                });
+
+                return Ok(skillsDto);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new {message = e.Message});
+            }
         }
 
         [HttpPost("{userId}")]
@@ -54,10 +83,7 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3)
-                {
-                    return Ok(new List<Skill>());
-                }
+                if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3) return Ok(new List<Skill>());
 
                 var list = _searchService.Search(query).Take(limit);
 
@@ -65,24 +91,8 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
-
         }
-
-        //[HttpGet("{userId}")]
-        //public IActionResult GetUserSkills(string userId)
-        //{
-        //    try
-        //    {
-        //        var skills = _skillService.GetUserSkills(userId);
-        //        var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
-        //        return Ok(skillsDto);
-        //    }
-        //    catch (AppException e)
-        //    {
-        //        return BadRequest(new { message = e.Message });
-        //    }
-        //}
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -23,10 +22,10 @@ namespace GradePortalAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppSettings _appSettings;
-        private readonly IMapper _mapper;
-        private readonly IUserService _userService;
-        private readonly ISkillService _skillService;
         private readonly IEvaluateService _evaluateService;
+        private readonly IMapper _mapper;
+        private readonly ISkillService _skillService;
+        private readonly IUserService _userService;
 
         public UsersController(
             IUserService userService,
@@ -36,11 +35,11 @@ namespace GradePortalAPI.Controllers
             IEvaluateService evaluateService
         )
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService)); 
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _skillService = skillService ?? throw new ArgumentNullException(nameof(userService));
             _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings)); 
+            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
         [AllowAnonymous]
@@ -56,7 +55,7 @@ namespace GradePortalAPI.Controllers
                 {
                     Subject = new ClaimsIdentity(new[]
                     {
-                        new Claim(ClaimTypes.Name, user.Id.ToString())
+                        new Claim(ClaimTypes.Name, user.Id)
                     }),
                     Expires = DateTime.UtcNow.AddDays(1),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -104,28 +103,13 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpGet("{username}")]
-        public IActionResult GetByUsername(string username)
+        public IActionResult GetUser(string username)
         {
             var user = _userService.GetByUserName(username);
             var userViewModel = _mapper.Map<UserViewModel>(user);
-
-            var skills = _skillService.GetUserSkills(user.Id);
-            var skillsDto = _mapper.Map<IList<SkillDto>>(skills);
-
-            foreach (var skill in skillsDto)
-            {
-                var avEval = _evaluateService.GetAverageEvaluate(skill.Id, user.Id);
-                skill.AverageEvaluate = avEval;
-            }
-
-            var userInfo = new UserSkillsDto()
-            {
-                UserData = userViewModel,
-                Skills = skillsDto
-            };
-
-            return Ok(userInfo);
+            return Ok(userViewModel);
         }
+
 
         [HttpGet("{id}")]
         public IActionResult Get(string id)
@@ -135,14 +119,14 @@ namespace GradePortalAPI.Controllers
             return Ok(userViewModel);
         }
 
-        [HttpPut]
-        public IActionResult Update([FromBody] UserAuthDto userAuthDto)
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, [FromBody] UserAuthDto userAuthDto)
         {
             var user = _mapper.Map<User>(userAuthDto);
 
             try
             {
-                _userService.Update(user, userAuthDto.Password);
+                _userService.Update(id, user, userAuthDto.Password);
                 return Ok();
             }
             catch (AppException e)

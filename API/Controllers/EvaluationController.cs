@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
-using GradePortalAPI.Helpers;
-using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,14 +12,14 @@ namespace GradePortalAPI.Controllers
     [ApiController]
     public class EvaluationController : ControllerBase
     {
+        private readonly IEvaluateService _evaluateService;
 
         private readonly IMapper _mapper;
-        private readonly IEvaluateService _evaluateService;
 
         public EvaluationController(
             IMapper mapper,
             IEvaluateService evaluateService
-            )
+        )
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(evaluateService));
@@ -32,7 +27,7 @@ namespace GradePortalAPI.Controllers
 
         [HttpPost]
         public bool Create([FromBody] EvaluateDto evaluation)
-        { 
+        {
             var res = _evaluateService.Create(evaluation);
             return res;
         }

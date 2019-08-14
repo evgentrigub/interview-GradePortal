@@ -76,7 +76,11 @@ namespace GradePortalAPI
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
-                    new OpenApiInfo {Title = "GradePortal API", Description = "Grade Portal is website for assessing users' skills", Version = "v1"});
+                    new OpenApiInfo
+                    {
+                        Title = "GradePortal API", Description = "Grade Portal is website for assessing users' skills",
+                        Version = "v1"
+                    });
             });
         }
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace GradePortalAPI.Dtos
+﻿namespace GradePortalAPI.Dtos
 {
     public class SkillDto
     {
@@ -11,5 +6,6 @@ namespace GradePortalAPI.Dtos
         public string Name { get; set; }
         public string Description { get; set; }
         public double AverageEvaluate { get; set; }
+        public int ExpertEvaluate { get; set; }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using GradePortalAPI.Dtos;
-
-namespace GradePortalAPI.Models.ViewModels
+﻿namespace GradePortalAPI.Models.ViewModels
 {
     public class UserViewModel
     {

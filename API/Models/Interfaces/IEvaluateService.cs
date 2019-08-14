@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GradePortalAPI.Dtos;
+﻿using GradePortalAPI.Dtos;
 
 namespace GradePortalAPI.Models.Interfaces
 {
@@ -12,5 +8,6 @@ namespace GradePortalAPI.Models.Interfaces
         bool Create(EvaluateDto evaluateDto);
         bool Delete(string evaluateId);
         double GetAverageEvaluate(string skillId, string userId);
+        int GetSkillValueByExpert(string userId, string skillId, string expertId);
     }
 }

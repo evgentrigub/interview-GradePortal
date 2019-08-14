@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GradePortalAPI.Dtos;
-using GradePortalAPI.Models.ViewModels;
+﻿using System.Collections.Generic;
 
 namespace GradePortalAPI.Models.Interfaces
 {

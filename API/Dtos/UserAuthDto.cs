@@ -1,6 +1,4 @@
-﻿using GradePortalAPI.Models;
-
-namespace GradePortalAPI.Dtos
+﻿namespace GradePortalAPI.Dtos
 {
     public class UserAuthDto
     {

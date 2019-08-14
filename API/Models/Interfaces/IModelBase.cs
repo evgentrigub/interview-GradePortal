@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GradePortalAPI.Models.Interfaces
 {
-    interface IModelBase
+    internal interface IModelBase
     {
         string Id { get; set; }
 

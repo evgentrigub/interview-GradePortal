@@ -65,8 +65,11 @@ namespace GradePortalAPI.Services
             return _context.Users.SingleOrDefault(r => r.Username == username);
         }
 
-        public void Update(User user, string password = null)
+        public void Update(string id, User user, string password = null)
         {
+            if (id != user.Id)
+                throw new AppException("User try update another profile!");
+
             var currentUser = _context.Users.Find(user.Id);
 
             if (currentUser == null)
@@ -79,6 +82,8 @@ namespace GradePortalAPI.Services
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
             currentUser.Username = user.Username;
+            currentUser.City = user.City;
+            currentUser.Position = user.Position;
 
             if (!string.IsNullOrWhiteSpace(password))
             {

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GradePortalAPI.Models.Interfaces;
 
 namespace GradePortalAPI.Models
 {
-    public abstract class ModelBase: IModelBase
+    public abstract class ModelBase : IModelBase
     {
         public ModelBase()
         {
@@ -14,11 +11,14 @@ namespace GradePortalAPI.Models
             IsActive = true;
             CreatedDate = DateTime.Now;
         }
-        /// <inheritdoc/>
+
+        /// <inheritdoc />
         public string Id { get; set; }
-        /// <inheritdoc/>
+
+        /// <inheritdoc />
         public bool IsActive { get; set; }
-        /// <inheritdoc/>
+
+        /// <inheritdoc />
         public DateTime CreatedDate { get; set; }
     }
 }

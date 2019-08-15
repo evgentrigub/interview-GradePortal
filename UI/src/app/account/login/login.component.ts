@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, MinLengthValidator } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationService } from '../../_services/authentication.service';
 import { first, retry, timeout } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
 import { ok } from 'assert';

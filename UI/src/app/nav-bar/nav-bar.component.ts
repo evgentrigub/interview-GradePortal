@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { User } from '../_models/user';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../account/services/authentication.service';
+import { AuthenticationService } from '../_services/authentication.service';
 
 @Component({
   selector: 'app-nav-bar',

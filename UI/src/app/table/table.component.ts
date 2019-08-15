@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AuthenticationService } from '../account/services/authentication.service';
-import { UserService } from '../account/services/user.service';
+import { AuthenticationService } from '../_services/authentication.service';
+import { UserService } from '../_services/user.service';
 import { User } from '../_models/user';
 import { first, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -21,7 +21,7 @@ export class TableComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  constructor(private authenticationService: AuthenticationService, private userService: UserService, private router: Router) {}
+  constructor(private authenticationService: AuthenticationService, private userService: UserService, private router: Router) { }
 
   ngOnInit() {
     this._loadUsers();

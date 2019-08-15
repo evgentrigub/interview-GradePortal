@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { User } from 'src/app/_models/user';
 import { Subscription, Subject, of, Observable, concat, forkJoin } from 'rxjs';
-import { AuthenticationService } from '../account/services/authentication.service';
+import { AuthenticationService } from '../_services/authentication.service';
 import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../account/services/user.service';
+import { UserService } from '../_services/user.service';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MatTableDataSource, MatSnackBar, MatAutocompleteSelectedEvent, MatPaginator, MatSort } from '@angular/material';
 import { switchMap, distinctUntilChanged, debounceTime, map, startWith, tap } from 'rxjs/operators';
-import { SkillService } from '../account/services/skill.service';
+import { SkillService } from '../_services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { SkillToSend } from '../_models/skill-to-send';
 import { EvaluationToSend } from '../_models/evaluation-to-send';

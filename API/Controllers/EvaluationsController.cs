@@ -8,15 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
-    public class EvaluationController : ControllerBase
+    public class EvaluationsController : ControllerBase
     {
         private readonly IEvaluateService _evaluateService;
 
         private readonly IMapper _mapper;
 
-        public EvaluationController(
+        public EvaluationsController(
             IMapper mapper,
             IEvaluateService evaluateService
         )
@@ -26,17 +26,17 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpPost]
-        public bool Create([FromBody] EvaluateDto evaluation)
+        public IActionResult Create([FromBody] EvaluateDto evaluation)
         {
             var res = _evaluateService.Create(evaluation);
-            return res;
+            return Ok(res);
         }
 
         [HttpDelete("{id}")]
-        public bool DeleteEvaluation(string id)
+        public IActionResult DeleteEvaluation(string id)
         {
             var res = _evaluateService.Delete(id);
-            return res;
+            return Ok(res);
         }
     }
 }

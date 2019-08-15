@@ -37,7 +37,6 @@ export class TableComponent implements OnInit {
   private _loadUsers(): void {
     this.userService.getAll()
       .subscribe(data => {
-        console.log(data);
         this.dataSource = new MatTableDataSource(data);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;

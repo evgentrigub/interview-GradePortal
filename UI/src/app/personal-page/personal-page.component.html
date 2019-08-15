@@ -6,10 +6,10 @@
       <button mat-button *ngIf="pageOwner && !editUserMode" (click)="showChangeMode()">Edit</button>
       <button mat-button *ngIf="editUserMode" (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
       <button mat-button *ngIf="editUserMode" (click)="cancelChangeMode()">Cancel</button>
-      <div>
+      <div *ngIf="!isLoading; else loading">
         <mat-card-header *ngIf="!editUserMode" style="text-align: center; margin-top: 100px">
           <mat-card-title>{{userDataValue.firstName}} {{userDataValue.lastName}}</mat-card-title>
-          <mat-card-subtitle>{{userDataValue.username}}</mat-card-subtitle>
+          <mat-card-subtitle>Username: {{userDataValue.username}}</mat-card-subtitle>
           <mat-card-subtitle>{{userDataValue.city}}</mat-card-subtitle>
           <mat-card-subtitle>{{userDataValue.position}}</mat-card-subtitle>
         </mat-card-header>
@@ -54,7 +54,7 @@
                     <mat-icon>check</mat-icon>
                   </button>
                 </div>
-                <button *ngIf="!newSkillMode && isPageOwner" mat-icon-button color="primary" (click)="addSkill()">
+                <button *ngIf="!newSkillMode && pageOwner" mat-icon-button color="primary" (click)="addSkill()">
                   <mat-icon>add_box</mat-icon>
                 </button>
               </td>
@@ -90,23 +90,36 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="evaluate">
+            <ng-container matColumnDef="rating">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Rating</th>
               <td mat-cell *matCellDef="let skill">
-                <div *ngIf="evaluateSkill!=skill.id">
-                  {{ skill.averageEvaluate }}
-                  <button mat-icon-button color="accent" (click)="addEvaluation(skill)">
+                {{ skill.averageEvaluate }}
+              </td>
+              <td mat-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <ng-container matColumnDef="expertValue">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>My Value</th>
+              <td mat-cell *matCellDef="let skill">
+                <div *ngIf="evaluatedSkill!=skill.id">
+                  {{ skill.expertEvaluate }}
+                  <button *ngIf="skill.expertEvaluate == 0" mat-icon-button color="accent"
+                    (click)="addEvaluation(skill)">
                     <mat-icon>add</mat-icon>
                   </button>
+                  <button *ngIf="skill.expertEvaluate != 0" mat-icon-button color="accent" disabled=true>
+                    <mat-icon>check</mat-icon>
+                  </button>
                 </div>
-                <div *ngIf="evaluateSkill==skill.id">
+                <div *ngIf="evaluatedSkill==skill.id">
                   <mat-form-field>
                     <input matInput placeholder="Value" [formControl]="evaluationControl" type="number" />
                   </mat-form-field>
-                  <button mat-icon-button color="primary" (click)="cancelEvaluation()">
+                  <button mat-icon-button color="warn" (click)="cancelEvaluation()">
                     <mat-icon>undo</mat-icon>
                   </button>
-                  <button mat-icon-button color="primary" (click)="saveEvaluate()" [disabled]="!canSaveEvaluation()">
+                  <button mat-icon-button color="primary" (click)="saveEvaluate(skill)"
+                    [disabled]="!canSaveEvaluation()">
                     <mat-icon>check</mat-icon>
                   </button>
                 </div>

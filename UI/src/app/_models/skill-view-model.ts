@@ -3,4 +3,5 @@ export interface SkillViewModel {
   name: string;
   description: string;
   averageEvaluate: number;
+  expertEvaluate: number;
 }

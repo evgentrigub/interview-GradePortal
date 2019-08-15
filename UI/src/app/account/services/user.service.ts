@@ -29,12 +29,12 @@ export class UserService {
   //   return this.http.get<UserViewModel>(`${environment.apiUrl}/users/get/${username}`).pipe(catchError(this.handleError));
   // }
 
-  getByUsername(username: string): Observable<UserViewModel> {
-    return this.http.get<UserViewModel>(`${environment.apiUrl}/users/GetByUsername/${username}`)
+  getByUsername(username: string): Observable<UserData> {
+    return this.http.get<UserData>(`${environment.apiUrl}/users/GetUser/${username}`)
       .pipe(
         tap(user => {
-          user.userData.city = user.userData.city ? user.userData.city : 'Not Filled';
-          user.userData.position = user.userData.position ? user.userData.position : 'Not Filled';
+          user.city = user.city ? user.city : 'Not Filled';
+          user.position = user.position ? user.position : 'Not Filled';
         }),
         catchError(this.handleError)
       );

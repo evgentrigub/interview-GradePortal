@@ -5,6 +5,7 @@ import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { environment } from 'src/environments/environment';
 import { catchError, map, tap } from 'rxjs/operators';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
+import { EvaluationToSend } from 'src/app/_models/evaluation-to-send';
 
 const emptySkills: Observable<SkillViewModel[]> = of([]);
 
@@ -14,23 +15,14 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
 export class SkillService {
   constructor(private http: HttpClient) { }
 
-  // getUserSkills(id: string): Observable<SkillViewModel[]> {
-  //   return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/GetUserSkills/?userId=${id}`).pipe(
-  //     tap(res => {
-  //       for (const element of res) {
-  //         element.averageAssessment = 0;
-  //       }
-  //     })
-  //   );
-  // const skills = [
-  //   { id: 'aaaaa', name: 'Back-end', description: 'bbbbbbbbbbbbbbbb' },
-  //   { id: 'aaaaa', name: 'Print', description: 'cccccccccccc' },
-  // ] as SkillViewModel[];
-  // return of(skills);
-  // }
+  getUserSkills(username: string, expertId: string): Observable<SkillViewModel[]> {
+    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/GetSkills/${username}?expertId=${expertId}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 
   addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
-    // return of({ id: '1234', name: skill.name, description: skill.description } as Skill);
     return this.http.post<SkillViewModel>(`${environment.apiUrl}/skills/CreateOrAddSkill/${userId}`, skill)
       .pipe(catchError(this.handleError));
   }
@@ -50,18 +42,18 @@ export class SkillService {
       return emptySkills;
     }
 
-    // const skills = [
-    //   { id: 'dddddddd', name: 'Front-end', description: 'aaaaaaaaaaaaaaa' },
-    //   { id: 'cccccccc', name: 'Front-end 2', description: 'dddddddddddd' },
-    // ] as SkillViewModel[];
-    // return of(skills);
-
     const params: HttpParams = new HttpParams({ fromObject: { query, limit: '10' } });
 
-    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/search`, { params }).pipe(
-      catchError(this.handleError),
-      tap(x => console.log('autocompleSkill result:', x))
-    );
+    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/search`, { params })
+      .pipe(
+        catchError(this.handleError),
+        // tap(x => console.log('autocompleSkill result:', x))
+      );
+  }
+
+  addEvaluation(evaluation: EvaluationToSend): Observable<boolean> {
+    return this.http.post<boolean>(`${environment.apiUrl}/evaluations/create`, evaluation)
+      .pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -15,7 +15,7 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
 export class SkillService {
   constructor(private http: HttpClient) { }
 
-  getUserSkills(username: string, expertId: string): Observable<SkillViewModel[]> {
+  getUserSkills(username: string, expertId?: string): Observable<SkillViewModel[]> {
     return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/GetSkills/${username}?expertId=${expertId}`)
       .pipe(
         catchError(this.handleError)

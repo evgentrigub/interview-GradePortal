@@ -4,10 +4,12 @@
       src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg" class="avatar" />
     <form [formGroup]="userFormGroup">
       <button mat-button *ngIf="pageOwner && !editUserMode" (click)="showChangeMode()">Edit</button>
-      <button mat-button *ngIf="editUserMode" (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
-      <button mat-button *ngIf="editUserMode" (click)="cancelChangeMode()">Cancel</button>
+      <div *ngIf="editUserMode">
+        <button mat-button (click)="saveUserData()" [disabled]="!canSaveUserData()">Save</button>
+        <button mat-button (click)="cancelChangeMode()">Cancel</button>
+      </div>
       <div *ngIf="!isLoading; else loading">
-        <mat-card-header *ngIf="!editUserMode" style="text-align: center; margin-top: 100px">
+        <mat-card-header *ngIf="!editUserMode">
           <mat-card-title>{{userDataValue.firstName}} {{userDataValue.lastName}}</mat-card-title>
           <mat-card-subtitle>Username: {{userDataValue.username}}</mat-card-subtitle>
           <mat-card-subtitle>{{userDataValue.city}}</mat-card-subtitle>

@@ -28,31 +28,31 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   get pageOwner(): boolean {
-    return this._isPageOwner;
+    return this.isPageOwner;
   }
   set pageOwner(isOwner: boolean) {
-    this._isPageOwner = isOwner;
+    this.isPageOwner = isOwner;
   }
 
   get editUserMode(): boolean {
-    return this._isEditMode;
+    return this.isEditMode;
   }
   set editUserMode(isEdit: boolean) {
-    this._isEditMode = isEdit;
+    this.isEditMode = isEdit;
   }
 
   get evaluatedSkill(): string {
-    return this._evaluateSkillId;
+    return this.evaluateSkillId;
   }
   set evaluatedSkill(skillId: string) {
-    this._evaluateSkillId = skillId;
+    this.evaluateSkillId = skillId;
   }
 
   get newSkillMode(): boolean {
-    return this._isCreateNewSkill;
+    return this.isCreateNewSkill;
   }
   set newSkillMode(isMode: boolean) {
-    this._isCreateNewSkill = isMode;
+    this.isCreateNewSkill = isMode;
   }
 
   get isSkillExisted(): boolean {
@@ -73,23 +73,22 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
 
   private userFormGroup: FormGroup;
   private previosUserDataState: UserData;
-  nameSkillOptions: Observable<SkillViewModel[]>;
-  displayedColumns: string[] = [];
-  dataSource: MatTableDataSource<SkillViewModel>;
-
+  private displayedColumns: string[] = [];
   readonly newSkillFormGroup: FormGroup;
   private newSkillNameControl: FormControl = new FormControl();
   private lastAutoCompleteValue = '';
 
   private routeUsername = '';
-  private _isEditMode = false;
-  private _isCreateNewSkill = false;
-  private _evaluateSkillId = '';
-  private _isPageOwner = false;
+  private isPageOwner = false;
+  private isEditMode = false;
+  private isCreateNewSkill = false;
+  private evaluateSkillId = '';
 
+  nameSkillOptions: Observable<SkillViewModel[]>;
+  dataSource: MatTableDataSource<SkillViewModel>;
   evaluationControl: FormControl;
 
-  isLoading = true;
+  private isLoading = true;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -120,13 +119,12 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
           this.currentUser = user ? user : null;
           if (this.routeUsername) {
             this.pageOwner = (user && user.username === this.routeUsername) ? true : false;
-            this.displayedColumns = this.pageOwner ?
+            this.displayedColumns = !user || this.pageOwner ?
               ['action', 'name', 'description', 'rating'] :
               ['action', 'name', 'description', 'rating', 'expertValue'];
-            const userByRoute$: Observable<UserData | null> =
-              this.routeUsername ? this.userService.getByUsername(this.routeUsername) : of(null);
-            const skills$: Observable<SkillViewModel[] | null> =
-              this.routeUsername ? this.skillService.getUserSkills(this.routeUsername, this.currentUser.id) : of(null);
+            const userByRoute$: Observable<UserData> = this.userService.getByUsername(this.routeUsername);
+            const skills$: Observable<SkillViewModel[]> = user ?
+              this.skillService.getUserSkills(this.routeUsername, user.id) : this.skillService.getUserSkills(this.routeUsername)
             return forkJoin(userByRoute$, skills$);
           } else {
             return of(null);
@@ -137,6 +135,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         data => {
           const userData = data[0];
           const skills = data[1];
+          console.log("TCL: PersonalPageComponent -> skills", skills)
 
           if (!data && !userData && !skills) {
             this.dataSource.data = [];
@@ -189,7 +188,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         tap(
           () => {
             this.showMessage(`Account updated successfully! Username: ${data.username}`);
-            this._isEditMode = false;
+            this.isEditMode = false;
             this.userFormGroup.markAsPristine();
             this.detector.markForCheck();
           },
@@ -276,7 +275,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         tap(
           skill => {
             this.showMessage(`New skill ${skill.name} saved successfully!`);
-            this._isCreateNewSkill = false;
+            this.isCreateNewSkill = false;
             this.newSkillFormGroup.reset();
             this.updateSkillsDataSource();
             this.detector.markForCheck();

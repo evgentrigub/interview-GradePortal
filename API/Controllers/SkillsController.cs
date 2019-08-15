@@ -37,7 +37,7 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpGet("{username}")]
-        public IActionResult GetSkills(string username, string expertId)
+        public IActionResult GetSkills(string username, string expertId = null)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace GradePortalAPI.Controllers
                     Name = skill.Name,
                     Description = skill.Description,
                     AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, user.Id),
-                    ExpertEvaluate = _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId)
+                    ExpertEvaluate = expertId != null ? _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId) : 0
                 });
 
                 return Ok(skillsDto);

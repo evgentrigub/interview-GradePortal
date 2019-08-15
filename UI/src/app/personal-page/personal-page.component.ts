@@ -23,7 +23,6 @@ function reloadComponent() {
   styleUrls: ['./personal-page.component.css'],
 })
 export class PersonalPageComponent implements OnInit, OnDestroy {
-
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -109,7 +108,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       name: this.newSkillNameControl,
       description: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
       averageEvaluate: this.formBuilder.control(0),
-      expertEvaluate: this.formBuilder.control(0)
+      expertEvaluate: this.formBuilder.control(0),
     });
 
     this.routeUsername = this.route.snapshot.paramMap.get('username') as string;
@@ -118,13 +117,15 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         switchMap(user => {
           this.currentUser = user ? user : null;
           if (this.routeUsername) {
-            this.pageOwner = (user && user.username === this.routeUsername) ? true : false;
-            this.displayedColumns = !user || this.pageOwner ?
-              ['action', 'name', 'description', 'rating'] :
-              ['action', 'name', 'description', 'rating', 'expertValue'];
+            this.pageOwner = user && user.username === this.routeUsername ? true : false;
+            this.displayedColumns =
+              !user || this.pageOwner
+                ? ['action', 'name', 'description', 'rating']
+                : ['action', 'name', 'description', 'rating', 'expertValue'];
             const userByRoute$: Observable<UserData> = this.userService.getByUsername(this.routeUsername);
-            const skills$: Observable<SkillViewModel[]> = user ?
-              this.skillService.getUserSkills(this.routeUsername, user.id) : this.skillService.getUserSkills(this.routeUsername)
+            const skills$: Observable<SkillViewModel[]> = user
+              ? this.skillService.getUserSkills(this.routeUsername, user.id)
+              : this.skillService.getUserSkills(this.routeUsername);
             return forkJoin(userByRoute$, skills$);
           } else {
             return of(null);
@@ -135,7 +136,6 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
         data => {
           const userData = data[0];
           const skills = data[1];
-          console.log("TCL: PersonalPageComponent -> skills", skills)
 
           if (!data && !userData && !skills) {
             this.dataSource.data = [];
@@ -183,7 +183,8 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       return;
     }
     const data = group.value as UserData;
-    this.userService.update(data)
+    this.userService
+      .update(data)
       .pipe(
         tap(
           () => {
@@ -229,10 +230,11 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       userId: userData.id,
       skillId: skill.id,
       expertId: this.currentUser.id,
-      value: evaluateControl.value
+      value: evaluateControl.value,
     };
 
-    this.skillService.addEvaluation(evaluation)
+    this.skillService
+      .addEvaluation(evaluation)
       .pipe(
         tap(
           _ => {
@@ -304,10 +306,11 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   }
 
   private updateSkillsDataSource(): void {
-    this.skillService.getUserSkills(this.routeUsername, this.currentUser.id)
-      .subscribe(res => {
-        if (res) { this.dataSource.data = res; }
-      });
+    this.skillService.getUserSkills(this.routeUsername, this.currentUser.id).subscribe(res => {
+      if (res) {
+        this.dataSource.data = res;
+      }
+    });
   }
 
   private createUserFormGroup(data: UserData): FormGroup {

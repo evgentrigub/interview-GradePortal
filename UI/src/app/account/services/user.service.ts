@@ -10,7 +10,7 @@ import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAll() {
     return this.http.get<UserData[]>(`${environment.apiUrl}/users/getall`).pipe(
@@ -30,24 +30,21 @@ export class UserService {
   // }
 
   getByUsername(username: string): Observable<UserData> {
-    return this.http.get<UserData>(`${environment.apiUrl}/users/GetUser/${username}`)
-      .pipe(
-        tap(user => {
-          user.city = user.city ? user.city : 'Not Filled';
-          user.position = user.position ? user.position : 'Not Filled';
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.get<UserData>(`${environment.apiUrl}/users/GetUser/${username}`).pipe(
+      tap(user => {
+        user.city = user.city ? user.city : 'Not Filled';
+        user.position = user.position ? user.position : 'Not Filled';
+      }),
+      catchError(this.handleError)
+    );
   }
 
   update(user: UserData): Observable<null> {
-    return this.http.put<null>(`${environment.apiUrl}/users/update/${user.id}`, user)
-      .pipe(catchError(this.handleError));
+    return this.http.put<null>(`${environment.apiUrl}/users/update/${user.id}`, user).pipe(catchError(this.handleError));
   }
 
   delete(id: number) {
-    return this.http.delete(`${environment.apiUrl}/users/delete/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete(`${environment.apiUrl}/users/delete/${id}`).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

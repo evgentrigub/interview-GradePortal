@@ -83,4 +83,4 @@ import { MatFormFieldModule } from '@angular/material';
     ScrollingModule,
   ],
 })
-export class MaterialModule { }
+export class MaterialModule {}

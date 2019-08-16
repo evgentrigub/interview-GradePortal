@@ -11,28 +11,28 @@ const emptySkills: Observable<Array<string>> = of([]);
   providedIn: 'root',
 })
 export class SearchPanelService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   searchSomething(queryString: string, group: SearchGroup): Observable<Array<string>> {
-    const result = ['aaaaa', 'bbbbb', 'ccccccc'];
-    return of(result);
+    // const result = ['aaaaa', 'bbbbb', 'ccccccc'];
+    // return of(result);
 
-    // if (!queryString) {
-    //   return emptySkills;
-    // }
+    if (!queryString) {
+      return emptySkills;
+    }
 
-    // const query = queryString.trim();
+    const query = queryString.trim();
 
-    // if (query.length < 3) {
-    //   return emptySkills;
-    // }
+    if (query.length < 3) {
+      return emptySkills;
+    }
 
-    // const params: HttpParams = new HttpParams({ fromObject: { query, limit: '10' } });
+    const params: HttpParams = new HttpParams({ fromObject: { query, group: group.toString() } });
 
-    // return this.http.get<Array<string>>(`${environment.apiUrl}/skills/search`, { params }).pipe(
-    //   catchError(this.handleError),
-    //   tap(x => console.log('autocompleSkill result:', x))
-    // );
+    return this.http.get<Array<string>>(`${environment.apiUrl}/search/paramSearch`, { params }).pipe(
+      catchError(this.handleError),
+      tap(x => console.log('autocompleSkill result:', x))
+    );
   }
 
   private handleError(error: HttpErrorResponse) {

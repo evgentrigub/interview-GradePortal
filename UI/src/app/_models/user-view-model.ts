@@ -14,3 +14,8 @@ export interface UserData {
   city: string;
   position: string;
 }
+
+export interface UserDataTable {
+  items: UserData[];
+  totalCount: number;
+}

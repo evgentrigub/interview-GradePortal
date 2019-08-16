@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -94,12 +95,19 @@ namespace GradePortalAPI.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpPost]
+        public IActionResult GetAll([FromBody] TableParamsDto tableParams)
         {
-            var users = _userService.GetAll();
-            var userViewModels = _mapper.Map<IList<UserViewModel>>(users);
-            return Ok(userViewModels);
+            var users = _userService.GetAll(tableParams);
+            var usersView = _mapper.Map<IList<UserViewModel>>(users);
+
+            var userTableData = new UserDataTable()
+            {
+                Items = usersView,
+                TotalCount = _userService.CountAllUsers()
+            };
+
+            return Ok(userTableData);
         }
 
         [HttpGet("{username}")]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
@@ -50,9 +51,11 @@ namespace GradePortalAPI.Services
             return user;
         }
 
-        public IEnumerable<User> GetAll()
+        public IEnumerable<User> GetAll(TableParamsDto tableParams)
         {
-            return _context.Users;
+            var users = _context.Users.Skip(tableParams.Skip()).Take(tableParams.Take());
+
+            return users;
         }
 
         public User GetById(string id)
@@ -106,6 +109,11 @@ namespace GradePortalAPI.Services
                 _context.Users.Remove(user);
                 _context.SaveChanges();
             }
+        }
+
+        public int CountAllUsers()
+        {
+            return _context.Users.Count();
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

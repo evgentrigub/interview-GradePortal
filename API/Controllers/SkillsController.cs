@@ -17,7 +17,7 @@ namespace GradePortalAPI.Controllers
     {
         private readonly IEvaluateService _evaluateService;
         private readonly IMapper _mapper;
-        private readonly ISkillSearchService _searchService;
+        private readonly ISearchService _searchService;
         private readonly ISkillService _skillService;
         private readonly IUserService _userService;
 
@@ -25,7 +25,7 @@ namespace GradePortalAPI.Controllers
             ISkillService skillService,
             IUserService userService,
             IEvaluateService evaluateService,
-            ISkillSearchService searchService,
+            ISearchService searchService,
             IMapper mapper
         )
         {
@@ -85,7 +85,7 @@ namespace GradePortalAPI.Controllers
             {
                 if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3) return Ok(new List<Skill>());
 
-                var list = _searchService.Search(query).Take(limit);
+                var list = _searchService.SkillSearch(query).Take(limit);
 
                 return Ok(list.ToList());
             }

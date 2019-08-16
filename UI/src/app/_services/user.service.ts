@@ -10,7 +10,7 @@ import { UserViewModel, UserData, UserDataTable } from 'src/app/_models/user-vie
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAll(page: number, pageSize: number): Observable<UserDataTable> {
     const params = { page, pageSize };
@@ -62,5 +62,4 @@ export class UserService {
   // getById(username: string): Observable<UserViewModel> {
   //   return this.http.get<UserViewModel>(`${environment.apiUrl}/users/get/${username}`).pipe(catchError(this.handleError));
   // }
-
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -101,7 +100,7 @@ namespace GradePortalAPI.Controllers
             var users = _userService.GetAll(tableParams);
             var usersView = _mapper.Map<IList<UserViewModel>>(users);
 
-            var userTableData = new UserDataTable()
+            var userTableData = new UserDataTable
             {
                 Items = usersView,
                 TotalCount = _userService.CountAllUsers()

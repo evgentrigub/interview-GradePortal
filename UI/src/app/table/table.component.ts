@@ -12,7 +12,6 @@ import { startWith, switchMap, map, catchError } from 'rxjs/operators';
   styleUrls: ['./table.component.css'],
 })
 export class TableComponent implements OnInit, AfterViewInit {
-
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
@@ -25,14 +24,9 @@ export class TableComponent implements OnInit, AfterViewInit {
   isLoadingResults = true;
   isRateLimitReached = false;
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-    private snackBar: MatSnackBar
-  ) { }
+  constructor(private userService: UserService, private router: Router, private snackBar: MatSnackBar) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
     // this.sort.sortChange.subscribe(r => this.paginator.pageIndex = 0);
@@ -53,7 +47,8 @@ export class TableComponent implements OnInit, AfterViewInit {
           this.isLoadingResults = false;
           return of([]);
         })
-      ).subscribe(data => this.users = data);
+      )
+      .subscribe(data => (this.users = data));
   }
 
   clickUser(user: UserData) {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
@@ -53,7 +52,8 @@ namespace GradePortalAPI.Services
                     res = _context.Users.Where(r => EF.Functions.Like(r.City, $"%{query}%")).Select(r => r.City);
                     break;
                 case SearchGroup.Position:
-                    res = _context.Users.Where(r => EF.Functions.Like(r.Position, $"%{query}%")).Select(r => r.Position);
+                    res = _context.Users.Where(r => EF.Functions.Like(r.Position, $"%{query}%"))
+                        .Select(r => r.Position);
                     break;
                 case SearchGroup.Skill:
                     res = _context.Skills.Where(r => EF.Functions.Like(r.Name, $"%{query}%")).Select(r => r.Name);

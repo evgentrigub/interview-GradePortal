@@ -11,7 +11,7 @@ const emptySkills: Observable<Array<string>> = of([]);
   providedIn: 'root',
 })
 export class SearchPanelService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   searchSomething(queryString: string, group: SearchGroup): Observable<Array<string>> {
     // const result = ['aaaaa', 'bbbbb', 'ccccccc'];

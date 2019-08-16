@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Helpers;
-using GradePortalAPI.Models;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
@@ -17,8 +14,8 @@ namespace GradePortalAPI.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly ISearchService _searchService;
         private readonly IMapper _mapper;
+        private readonly ISearchService _searchService;
 
         public SearchController(
             ISearchService searchService,
@@ -42,7 +39,7 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
     }

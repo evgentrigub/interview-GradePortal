@@ -50,7 +50,9 @@ namespace GradePortalAPI.Controllers
                     Name = skill.Name,
                     Description = skill.Description,
                     AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, user.Id),
-                    ExpertEvaluate = expertId != null ? _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId) : 0
+                    ExpertEvaluate = expertId != null
+                        ? _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId)
+                        : 0
                 });
 
                 return Ok(skillsDto);

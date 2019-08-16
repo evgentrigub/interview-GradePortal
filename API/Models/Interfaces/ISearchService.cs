@@ -9,7 +9,8 @@ namespace GradePortalAPI.Models.Interfaces
     {
         [NotNull]
         IQueryable<SkillDto> SkillSearch([NotNull] string query);
+
         [NotNull]
-        IQueryable<string> ParamSearch([NotNull]string query, SearchGroup num);
+        IQueryable<string> ParamSearch([NotNull] string query, SearchGroup num);
     }
 }

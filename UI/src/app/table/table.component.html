@@ -5,6 +5,8 @@
       <mat-card-subtitle>This table contains all registered users.</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      <app-search-panel></app-search-panel>
+      <br />
       <table mat-table [dataSource]="dataSource" matSort style="width: 100%">
         <ng-container matColumnDef="num">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>№</th>
@@ -30,7 +32,7 @@
         <tr mat-row *matRowDef="let user; columns: displayedColumns" (click)="clickUser(user)"></tr>
       </table>
 
-      <mat-paginator [pageSizeOptions]="[2, 5]"></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

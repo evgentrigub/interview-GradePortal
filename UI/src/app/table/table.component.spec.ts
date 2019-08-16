@@ -6,10 +6,15 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBarModule, MatProgressSpinnerModule, MatTableModule, MatCardModule, MatPaginatorModule } from '@angular/material';
+import { UserService } from '../_services/user.service';
+import { UserData } from '../_models/user-view-model';
+import { of } from 'rxjs';
 
+// tslint:disable: no-use-before-declare
 describe('TableComponent', () => {
   let component: TableComponent;
   let fixture: ComponentFixture<TableComponent>;
+  let service: UserService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -23,13 +28,16 @@ describe('TableComponent', () => {
         MatProgressSpinnerModule,
         MatCardModule,
         MatTableModule,
-        MatPaginatorModule
-      ]
+        MatPaginatorModule,
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TableComponent);
+    service = TestBed.get(UserService);
+    spyOn(service, 'getAll').and.returnValue(of(DATA));
+
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -38,3 +46,15 @@ describe('TableComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+const DATA: UserData[] = [
+  {
+    num: 0,
+    id: '1',
+    firstName: 'Evgen',
+    lastName: 'Trigubov',
+    username: 'evgentrigub',
+    city: 'Zelek',
+    position: 'Dev',
+  },
+];

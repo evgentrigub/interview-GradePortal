@@ -12,11 +12,7 @@ describe('NavBarComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [NavBarComponent],
-      imports: [
-        MatToolbarModule,
-        HttpClientTestingModule,
-        RouterTestingModule
-      ]
+      imports: [MatToolbarModule, HttpClientTestingModule, RouterTestingModule],
     }).compileComponents();
   }));
 

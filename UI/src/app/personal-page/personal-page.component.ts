@@ -355,16 +355,4 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   private showMessage(msg: any): void {
     this.snackBar.open(msg, 'ok');
   }
-
-  // private textComparer(x: Skill, y: Skill): boolean {
-  //   return x.name === y.name && x.description === y.description;
-  // }
-
-  // skillDisplay(skill?: Skill): string | null {
-
-  //   if (!skill) {
-  //     return null;
-  //   }
-  //   return skill.name;
-  // }
 }

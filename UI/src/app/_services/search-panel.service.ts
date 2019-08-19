@@ -4,6 +4,8 @@ import { Observable, of, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { SearchGroup } from '../_enums/search-group-enum';
+import { ISearchOptions } from '../_models/search-options';
+import { UserData } from '../_models/user-view-model';
 
 const emptySkills: Observable<Array<string>> = of([]);
 
@@ -11,12 +13,9 @@ const emptySkills: Observable<Array<string>> = of([]);
   providedIn: 'root',
 })
 export class SearchPanelService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   searchSomething(queryString: string, group: SearchGroup): Observable<Array<string>> {
-    // const result = ['aaaaa', 'bbbbb', 'ccccccc'];
-    // return of(result);
-
     if (!queryString) {
       return emptySkills;
     }
@@ -33,6 +32,12 @@ export class SearchPanelService {
       catchError(this.handleError),
       tap(x => console.log('autocompleSkill result:', x))
     );
+  }
+
+  getFilteredUsers(options: ISearchOptions): Observable<UserData> {
+    return this.http.get<UserData>(`${environment.apiUrl}/search/usersSearch/`,
+      { params: new HttpParams({ fromString: options.toQueryString() }) })
+      .pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

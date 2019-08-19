@@ -102,13 +102,14 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.router.routeReuseStrategy.shouldReuseRoute = reloadComponent;
 
     this.userFormGroup = this.formBuilder.group({});
+
     this.newSkillNameControl = this.formBuilder.control('', [Validators.required, Validators.minLength(1)]);
     this.newSkillFormGroup = this.formBuilder.group({
-      id: this.formBuilder.control(null),
+      id: [null],
       name: this.newSkillNameControl,
-      description: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
-      averageEvaluate: this.formBuilder.control(0),
-      expertEvaluate: this.formBuilder.control(0),
+      description: ['', [Validators.required, Validators.minLength(5)]],
+      averageEvaluate: [0],
+      expertEvaluate: [0],
     });
 
     this.routeUsername = this.route.snapshot.paramMap.get('username') as string;
@@ -183,6 +184,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
       return;
     }
     const data = group.value as UserData;
+    this.userFormGroup.disable();
     this.userService
       .update(data)
       .pipe(
@@ -191,6 +193,7 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
             this.showMessage(`Account updated successfully! Username: ${data.username}`);
             this.isEditMode = false;
             this.userFormGroup.markAsPristine();
+            this.userFormGroup.enable();
             this.detector.markForCheck();
           },
           err => this.showMessage(err)
@@ -316,11 +319,11 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
   private createUserFormGroup(data: UserData): FormGroup {
     return this.formBuilder.group({
       id: this.formBuilder.control(data.id),
-      firstName: this.formBuilder.control(data.firstName, [Validators.required, Validators.minLength(1)]),
-      lastName: this.formBuilder.control(data.lastName, [Validators.required, Validators.minLength(1)]),
-      username: this.formBuilder.control(data.username, [Validators.required, Validators.minLength(1)]),
-      city: this.formBuilder.control(data.city, [Validators.required, Validators.minLength(1)]),
-      position: this.formBuilder.control(data.position, [Validators.required, Validators.minLength(1)]),
+      firstName: [data.firstName, [Validators.required, Validators.minLength(1)]],
+      lastName: [data.lastName, [Validators.required, Validators.minLength(1)]],
+      username: [data.username, [Validators.required, Validators.minLength(1)]],
+      city: [data.city, [Validators.required, Validators.minLength(1)]],
+      position: [data.position, [Validators.required, Validators.minLength(1)]],
     });
   }
 

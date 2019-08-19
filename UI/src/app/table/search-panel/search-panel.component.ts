@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { MatAutocompleteSelectedEvent, MatSnackBar } from '@angular/material';
 import { Observable, of } from 'rxjs';
-import { startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
-import { FormControl, AbstractControl } from '@angular/forms';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, map, tap } from 'rxjs/operators';
+import { FormControl, AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { SearchPanelService } from 'src/app/_services/search-panel.service';
 import { SearchGroup } from 'src/app/_enums/search-group-enum';
+import { KeyValue } from '@angular/common';
+import { ISearchOptions, SearchOptions } from 'src/app/_models/search-options';
+import { UserData } from 'src/app/_models/user-view-model';
 
 interface AutoCompleteObject {
   placeholder: string;
@@ -19,6 +22,13 @@ interface AutoCompleteObject {
   styleUrls: ['./search-panel.component.css'],
 })
 export class SearchPanelComponent {
+
+  @Output()
+  readonly filteredUsers = new EventEmitter<UserData>();
+
+  searchForm: FormGroup;
+  filteredParams: ISearchOptions = new SearchOptions();
+
   autoCompleteObjects: AutoCompleteObject[];
 
   cityOptions: Observable<Array<string>>;
@@ -29,7 +39,18 @@ export class SearchPanelComponent {
   positionSearchControl: FormControl = new FormControl();
   skillSearchControl: FormControl = new FormControl();
 
-  constructor(private searchService: SearchPanelService, private snackBar: MatSnackBar) {
+  constructor(
+    private searchService: SearchPanelService,
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar) {
+
+    this.searchForm = this.formBuilder.group({
+      name: [''],
+      city: this.citySearchControl,
+      pos: this.positionSearchControl,
+      skill: this.skillSearchControl
+    });
+
     this.cityOptions = this.getAutocompleteOptions(this.citySearchControl, SearchGroup.City);
     this.positionOptions = this.getAutocompleteOptions(this.positionSearchControl, SearchGroup.Position);
     this.skillOptions = this.getAutocompleteOptions(this.skillSearchControl, SearchGroup.Skill);
@@ -57,12 +78,19 @@ export class SearchPanelComponent {
   }
 
   search() {
-    this.showMessage('Search!!');
+    const searchValue = this.searchForm.value;
+    this.filteredParams.filter = new Array<KeyValue<string, string>>();
+    for (const el of Object.getOwnPropertyNames(searchValue)) {
+      this.filteredParams.filter.push({ key: el, value: searchValue[el] });
+    }
+    this.searchService.getFilteredUsers(this.filteredParams).subscribe(r => {
+      this.filteredUsers.emit(r);
+    });
+
   }
 
   autocompleteEvent(event: MatAutocompleteSelectedEvent): void {
     const skill = event.option.value;
-    console.log(skill);
   }
 
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {

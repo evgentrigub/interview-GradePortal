@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using AutoMapper;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
@@ -35,7 +35,23 @@ namespace GradePortalAPI.Controllers
 
                 var list = _searchService.ParamSearch(query, group);
 
-                return Ok(list.ToList());
+                return Ok(list);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new {message = e.Message});
+            }
+        }
+
+        [HttpGet]
+        public IActionResult UsersSearch([FromQuery] SearchOptions filters)
+        {
+            try
+            {
+                var users = _searchService.UsersSearch(filters.Filters);
+                var userView = _mapper.Map<IEnumerable<UserViewModel>>(users);
+
+                return Ok(userView);
             }
             catch (AppException e)
             {

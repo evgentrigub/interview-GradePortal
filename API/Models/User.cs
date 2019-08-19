@@ -10,6 +10,10 @@ namespace GradePortalAPI.Models
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
+
+        public string QuickSearch =>
+            FirstName.ToUpperInvariant() + LastName.ToUpperInvariant() + FirstName.ToUpperInvariant();
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }

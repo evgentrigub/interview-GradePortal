@@ -124,12 +124,12 @@ namespace GradePortalAPI.Migrations
             modelBuilder.Entity("GradePortalAPI.Models.UserSkill", b =>
             {
                 b.HasOne("GradePortalAPI.Models.Skill", "Skill")
-                    .WithMany("Skills")
+                    .WithMany("UserSkills")
                     .HasForeignKey("SkillId")
                     .OnDelete(DeleteBehavior.Cascade);
 
                 b.HasOne("GradePortalAPI.Models.User", "User")
-                    .WithMany("Skills")
+                    .WithMany("UserSkills")
                     .HasForeignKey("UserId")
                     .OnDelete(DeleteBehavior.Cascade);
             });

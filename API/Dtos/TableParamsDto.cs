@@ -2,13 +2,13 @@
 {
     public class TableParamsDto
     {
-        private int pageSize;
+        private int _pageSize;
         public int Page { get; set; }
 
         public int PageSize
         {
-            get => pageSize <= 0 ? 10 : pageSize;
-            set => pageSize = value > 5000 ? 5000 : value;
+            get => _pageSize <= 0 ? 10 : _pageSize;
+            set => _pageSize = value > 5000 ? 5000 : value;
         }
 
         public int Skip()

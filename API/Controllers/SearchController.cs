@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using AutoMapper;
+using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
@@ -16,13 +18,16 @@ namespace GradePortalAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ISearchService _searchService;
+        private readonly IUserService _userService;
 
         public SearchController(
             ISearchService searchService,
+            IUserService userService,
             IMapper mapper
         )
         {
             _searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -44,14 +49,13 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult UsersSearch([FromQuery] SearchOptions filters)
+        public IActionResult UsersSearch([FromQuery] SearchOptionsDto filters)
         {
             try
             {
-                var users = _searchService.UsersSearch(filters.Filters);
-                var userView = _mapper.Map<IEnumerable<UserViewModel>>(users);
+                var data = _searchService.UsersSearch(filters.Filters, filters.Skip(), filters.Take());
 
-                return Ok(userView);
+                return Ok(data);
             }
             catch (AppException e)
             {

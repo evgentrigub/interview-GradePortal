@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.ViewModels;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +18,14 @@ namespace GradePortalAPI.Services
         private static readonly IQueryable<SkillDto> Empty = new SkillDto[0].AsQueryable();
 
         [NotNull] private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public SearchService([NotNull] DataContext context)
+        public SearchService(
+            [NotNull] DataContext context,
+            IMapper mapper
+            )
         {
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(context));
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
@@ -65,7 +72,7 @@ namespace GradePortalAPI.Services
             return (res ?? throw new InvalidOperationException()).Take(10);
         }
 
-        public IQueryable<User> UsersSearch(Dictionary<string, string> options)
+        public UserDataTable UsersSearch(Dictionary<string, string> options, int skip, int take)
         {
             var res = _context.Users.Include(r => r.UserSkills).ThenInclude(r => r.Skill).AsQueryable();
 
@@ -98,7 +105,17 @@ namespace GradePortalAPI.Services
                     u.UserSkills.Select(c => c.Skill).Any(s => s.Name.ToUpperInvariant().Contains(skill)));
             }
 
-            return res;
+            var cutRes = res.Skip(skip).Take(take);
+
+            var usersView = _mapper.Map<IEnumerable<UserViewModel>>(cutRes);
+
+            var userTableData = new UserDataTable
+            {
+                Items = usersView,
+                TotalCount = res.Count()
+            };
+
+            return userTableData;
         }
 
         private string GetFilterFromFiltersDictionaryOrDefault(string filterKey, IDictionary<string, string> filters)

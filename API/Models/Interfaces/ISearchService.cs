@@ -2,6 +2,7 @@
 using System.Linq;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Models.Enums;
+using GradePortalAPI.Models.ViewModels;
 using JetBrains.Annotations;
 
 namespace GradePortalAPI.Models.Interfaces
@@ -14,6 +15,6 @@ namespace GradePortalAPI.Models.Interfaces
         [NotNull]
         IQueryable<string> ParamSearch([NotNull] string query, SearchGroup num);
 
-        IQueryable<User> UsersSearch(Dictionary<string, string> options);
+        UserDataTable UsersSearch(Dictionary<string, string> options, int skip, int take);
     }
 }

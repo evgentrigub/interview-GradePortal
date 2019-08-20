@@ -98,7 +98,7 @@ namespace GradePortalAPI.Controllers
         public IActionResult GetAll([FromBody] TableParamsDto tableParams)
         {
             var users = _userService.GetAll(tableParams);
-            var usersView = _mapper.Map<IList<UserViewModel>>(users);
+            var usersView = _mapper.Map<IEnumerable<UserViewModel>>(users);
 
             var userTableData = new UserDataTable
             {

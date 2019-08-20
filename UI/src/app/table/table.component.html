@@ -5,7 +5,8 @@
       <mat-card-subtitle>This table contains all registered users.</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <app-search-panel></app-search-panel>
+      <app-search-panel #filterData (outParams)="getFilteredUsers($event)">
+      </app-search-panel>
       <br />
       <div class="loading-shade" *ngIf="isLoadingResults">
         <mat-spinner></mat-spinner>

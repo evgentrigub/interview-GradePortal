@@ -2,9 +2,9 @@
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace GradePortalAPI.Models.ViewModels
+namespace GradePortalAPI.Dtos
 {
-    public class SearchOptions
+    public class SearchOptionsDto: TableParamsDto
     {
         public string SerializedFilters { get; set; }
 

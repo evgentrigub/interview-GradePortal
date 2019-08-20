@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, OnChanges } from '@angular/core';
 import { MatAutocompleteSelectedEvent, MatSnackBar } from '@angular/material';
 import { Observable, of } from 'rxjs';
 import { startWith, debounceTime, distinctUntilChanged, switchMap, map, tap } from 'rxjs/operators';
@@ -6,7 +6,7 @@ import { FormControl, AbstractControl, FormGroup, FormBuilder } from '@angular/f
 import { SearchPanelService } from 'src/app/_services/search-panel.service';
 import { SearchGroup } from 'src/app/_enums/search-group-enum';
 import { KeyValue } from '@angular/common';
-import { ISearchOptions, SearchOptions } from 'src/app/_models/search-options';
+import { ISearchOptions, SearchOptions, PaginatorParams } from 'src/app/_models/search-options';
 import { UserData } from 'src/app/_models/user-view-model';
 
 interface AutoCompleteObject {
@@ -23,8 +23,14 @@ interface AutoCompleteObject {
 })
 export class SearchPanelComponent {
 
+  @Input()
+  paginatorParams: PaginatorParams;
+
+  // @Output()
+  // readonly filteredUsers = new EventEmitter<UserData>();
+
   @Output()
-  readonly filteredUsers = new EventEmitter<UserData>();
+  readonly outParams = new EventEmitter<ISearchOptions>();
 
   searchForm: FormGroup;
   filteredParams: ISearchOptions = new SearchOptions();
@@ -83,10 +89,11 @@ export class SearchPanelComponent {
     for (const el of Object.getOwnPropertyNames(searchValue)) {
       this.filteredParams.filter.push({ key: el, value: searchValue[el] });
     }
-    this.searchService.getFilteredUsers(this.filteredParams).subscribe(r => {
-      this.filteredUsers.emit(r);
-    });
+    this.outParams.emit(this.filteredParams);
+  }
 
+  reset() {
+    this.outParams.emit(null);
   }
 
   autocompleteEvent(event: MatAutocompleteSelectedEvent): void {

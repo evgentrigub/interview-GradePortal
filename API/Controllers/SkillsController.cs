@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.Interfaces.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
@@ -94,6 +96,36 @@ namespace GradePortalAPI.Controllers
             catch (AppException e)
             {
                 return BadRequest(new {message = e.Message});
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Find(string id)
+        {
+            try
+            {
+                var res = await _skillService.FindById(id);
+                return Ok(res);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                var res = await _skillService.Delete(id);
+                return Ok(res);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }

@@ -5,15 +5,16 @@ using AutoMapper;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Services.Repositories;
 
 namespace GradePortalAPI.Services
 {
-    public class SkillService : ISkillService
+    public class SkillService : BaseRepository<Skill>, ISkillService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public SkillService(DataContext context, IMapper mapper)
+        public SkillService(DataContext context, IMapper mapper) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(context));
@@ -59,7 +60,7 @@ namespace GradePortalAPI.Services
             return newSkill;
         }
 
-        private Skill AddSkillToUser(User user, Skill skill)
+        public Skill AddSkillToUser(User user, Skill skill)
         {
             if (skill != null && user != null)
             {

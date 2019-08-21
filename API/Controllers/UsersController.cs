@@ -85,8 +85,8 @@ namespace GradePortalAPI.Controllers
 
             try
             {
-                _userService.Create(user, userAuthDto.Password);
-                return Ok();
+                var res = _userService.Create(user, userAuthDto.Password);
+                return Ok(res);
             }
             catch (AppException e)
             {

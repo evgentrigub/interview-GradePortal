@@ -6,7 +6,9 @@ using System.Text;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Services
 {
@@ -32,13 +34,13 @@ namespace GradePortalAPI.Services
             return user;
         }
 
-        public User Create(User user, string password)
+        public IResult<User> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new AppException("Password is incorrect");
+                return new Result<User>(message: "Password is empty!", isSuccess: true, data: null); ;
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username has already existed. Username: " + user.Username);
+                 return new Result<User>(message:"Username has already created!", isSuccess:true, data:null);;
 
             CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
 
@@ -48,7 +50,7 @@ namespace GradePortalAPI.Services
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return user;
+            return new Result<User>(message:"Created successfully !", isSuccess:true, data:user);
         }
 
         public IEnumerable<User> GetAll(TableParamsDto tableParams)

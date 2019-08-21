@@ -18,6 +18,8 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { PersonalPageComponent } from './personal-page/personal-page.component';
 import { SearchPanelComponent } from './table/search-panel/search-panel.component';
 import { TableComponent } from './table/table.component';
+import { UserDataComponent } from './personal-page/user-data/user-data.component';
+import { SkillsTableComponent } from './personal-page/skills-table/skills-table.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { TableComponent } from './table/table.component';
     NavBarComponent,
     PersonalPageComponent,
     SearchPanelComponent,
+    UserDataComponent,
+    SkillsTableComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,4 +48,4 @@ import { TableComponent } from './table/table.component';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

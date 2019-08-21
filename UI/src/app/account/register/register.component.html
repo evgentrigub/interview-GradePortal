@@ -5,62 +5,34 @@
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>First name</mat-label>
-          <input
-            matInput
-            [(ngModel)]="valueFirstName"
-            formControlName="firstName"
-            [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }"
-          />
-          <button mat-button *ngIf="valueFirstName" matSuffix mat-icon-button aria-label="Clear" (click)="valueFirstName = ''">
-            <mat-icon>close</mat-icon>
-          </button>
+          <input matInput formControlName="firstName" [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }" />
         </mat-form-field>
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>Last name</mat-label>
-          <input
-            matInput
-            [(ngModel)]="valueLastName"
-            formControlName="lastName"
-            [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }"
-          />
-          <button mat-button *ngIf="valueLastName" matSuffix mat-icon-button aria-label="Clear" (click)="valueLastName = ''">
-            <mat-icon>close</mat-icon>
-          </button>
+          <input matInput formControlName="lastName" [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }" />
         </mat-form-field>
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>Username</mat-label>
-          <input
-            matInput
-            [(ngModel)]="valueLogin"
-            formControlName="username"
-            [ngClass]="{ 'is-invalid': submitted && f.username.errors }"
-          />
+          <input matInput [(ngModel)]="valueLogin" formControlName="username"
+            [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
           <button mat-button *ngIf="valueLogin" matSuffix mat-icon-button aria-label="Clear" (click)="valueLogin = ''">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>Password</mat-label>
-          <input
-            matInput
-            [type]="hide ? 'password' : 'text'"
-            formControlName="password"
-            [ngClass]="{ 'is-invalid': submitted && f.password.errors }"
-          />
+          <input matInput [type]="hide ? 'password' : 'text'" formControlName="password"
+            [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
           <mat-icon matSuffix (click)="hide = !hide">{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
         </mat-form-field>
         <div style="text-align:center">
           <button mat-raised-button color="accent" style="width:50%; margin:10px; border-radius: 5px">Sign Up</button>
-          <button mat-raised-button color="primary" style="width:50%; border-radius: 5px" routerLink="/login">Sign In</button>
+          <button mat-raised-button color="primary" style="width:50%; border-radius: 5px" routerLink="/login">Sign
+            In</button>
         </div>
         <div *ngIf="loading">
-          <mat-progress-spinner
-            style="margin: 0 auto"
-            color="accent"
-            mode="indeterminate"
-            diameter="80"
-            strokeWidth="9"
-          ></mat-progress-spinner>
+          <mat-progress-spinner style="margin: 0 auto" color="accent" mode="indeterminate" diameter="80"
+            strokeWidth="9"></mat-progress-spinner>
         </div>
       </form>
     </div>

@@ -1,0 +1,102 @@
+<form [formGroup]="newSkillFormGroup">
+  <mat-card-content>
+    <div class="mat-elevation-z8" style="width: 70rem">
+      <table *ngIf="dataSource; else loading" mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let skill"></td>
+          <td mat-cell *matFooterCellDef="let skill">
+            <div *ngIf="editMode">
+              <button mat-icon-button color="primary" (click)="CancelEdit(1)">
+                <mat-icon>undo</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" (click)="Save(1)" [disabled]="!CanSave(1)">
+                <mat-icon>check</mat-icon>
+              </button>
+            </div>
+            <button *ngIf="!editMode && pageOwner" mat-icon-button color="primary" (click)="Edit(1)">
+              <mat-icon>add_box</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let skill">
+            {{ skill.name }}
+          </td>
+          <td mat-cell *matFooterCellDef>
+            <mat-form-field *ngIf="editMode">
+              <input matInput placeholder="Name" formControlName="name" [matAutocomplete]="auto" />
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setAutocompleteEvent($event)">
+                <mat-option *ngFor="let skill of nameSkillOptions | async" [value]="skill" style="height: auto;">
+                  {{ skill.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+          <td mat-cell *matCellDef="let skill">
+            {{ skill.description }}
+          </td>
+          <td mat-cell *matFooterCellDef>
+            <mat-form-field *ngIf="editMode">
+              <input matInput placeholder="Description" formControlName="description"
+                [attr.disabled]="isSkillExisted || null" />
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="rating">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Rating</th>
+          <td mat-cell *matCellDef="let skill">
+            {{ skill.averageEvaluate }}
+          </td>
+          <td mat-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <ng-container matColumnDef="expertValue">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>My Value</th>
+          <td mat-cell *matCellDef="let skill">
+            <div *ngIf="evaluatedSkill != skill.id">
+              {{ skill.expertEvaluate }}
+              <button *ngIf="skill.expertEvaluate == 0" mat-icon-button color="accent" (click)="Edit(2,skill)">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button *ngIf="skill.expertEvaluate != 0" mat-icon-button color="accent" disabled="true">
+                <mat-icon>check</mat-icon>
+              </button>
+            </div>
+            <div *ngIf="evaluatedSkill == skill.id">
+              <mat-form-field>
+                <input matInput placeholder="Value" [formControl]="evaluationControl" type="number" />
+              </mat-form-field>
+              <button mat-icon-button color="warn" (click)="CancelEdit(2)">
+                <mat-icon>undo</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" (click)="Save(2,skill)" [disabled]="!CanSave(2)">
+                <mat-icon>check</mat-icon>
+              </button>
+            </div>
+          </td>
+          <td mat-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let skill; columns: displayedColumns"></tr>
+        <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
+    </div>
+  </mat-card-content>
+</form>
+
+<ng-template #loading>
+  <div style="display: flex; justify-content: center;">
+    <mat-progress-spinner mode="indeterminate" diameter="130" strokeWidth="9"></mat-progress-spinner>
+  </div>
+</ng-template>

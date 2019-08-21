@@ -1,13 +1,11 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges } from '@angular/core';
-import { MatAutocompleteSelectedEvent, MatSnackBar } from '@angular/material';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { startWith, debounceTime, distinctUntilChanged, switchMap, map, tap } from 'rxjs/operators';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 import { FormControl, AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { SearchPanelService } from 'src/app/_services/search-panel.service';
 import { SearchGroup } from 'src/app/_enums/search-group-enum';
 import { KeyValue } from '@angular/common';
-import { ISearchOptions, SearchOptions, PaginatorParams } from 'src/app/_models/search-options';
-import { UserData } from 'src/app/_models/user-view-model';
+import { ISearchOptions, SearchOptions } from 'src/app/_models/search-options';
 
 interface AutoCompleteObject {
   placeholder: string;
@@ -23,17 +21,11 @@ interface AutoCompleteObject {
 })
 export class SearchPanelComponent {
 
-  @Input()
-  paginatorParams: PaginatorParams;
-
-  // @Output()
-  // readonly filteredUsers = new EventEmitter<UserData>();
-
   @Output()
   readonly outParams = new EventEmitter<ISearchOptions>();
 
-  searchForm: FormGroup;
-  filteredParams: ISearchOptions = new SearchOptions();
+  readonly searchForm: FormGroup;
+  private filteredParams: ISearchOptions = new SearchOptions();
 
   autoCompleteObjects: AutoCompleteObject[];
 
@@ -47,8 +39,7 @@ export class SearchPanelComponent {
 
   constructor(
     private searchService: SearchPanelService,
-    private formBuilder: FormBuilder,
-    private snackBar: MatSnackBar) {
+    private formBuilder: FormBuilder) {
 
     this.searchForm = this.formBuilder.group({
       name: [''],
@@ -83,7 +74,7 @@ export class SearchPanelComponent {
     ];
   }
 
-  search() {
+  search(): void {
     const searchValue = this.searchForm.value;
     this.filteredParams.filter = new Array<KeyValue<string, string>>();
     for (const el of Object.getOwnPropertyNames(searchValue)) {
@@ -92,12 +83,8 @@ export class SearchPanelComponent {
     this.outParams.emit(this.filteredParams);
   }
 
-  reset() {
+  reset(): void {
     this.outParams.emit(null);
-  }
-
-  autocompleteEvent(event: MatAutocompleteSelectedEvent): void {
-    const skill = event.option.value;
   }
 
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {
@@ -124,9 +111,5 @@ export class SearchPanelComponent {
         })
       )
     );
-  }
-
-  private showMessage(msg: any): void {
-    this.snackBar.open(msg, 'ok');
   }
 }

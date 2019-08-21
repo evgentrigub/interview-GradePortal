@@ -13,7 +13,7 @@ import { SearchPanelService } from '../_services/search-panel.service';
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css'],
 })
-export class TableComponent implements OnInit, AfterViewInit {
+export class TableComponent implements AfterViewInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
@@ -24,16 +24,13 @@ export class TableComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<UserData>;
 
   resultsLength = 0;
-  isLoadingResults = true;
-  isRateLimitReached = false;
+  isLoading = true;
 
   constructor(
     private userService: UserService,
     private searchService: SearchPanelService,
     private router: Router,
     private snackBar: MatSnackBar) { }
-
-  ngOnInit() { }
 
   ngAfterViewInit() {
     // this.sort.sortChange.subscribe(r => this.paginator.pageIndex = 0);
@@ -55,7 +52,7 @@ export class TableComponent implements OnInit, AfterViewInit {
       .pipe(
         startWith({}),
         switchMap(() => {
-          this.isLoadingResults = true;
+          this.isLoading = true;
           if (!this.searchParams || this.searchParams.filter.length === 0) {
             return this.userService.getAll(this.paginator.pageIndex, this.paginator.pageSize);
           } else {
@@ -65,13 +62,13 @@ export class TableComponent implements OnInit, AfterViewInit {
           }
         }),
         map(data => {
-          this.isLoadingResults = false;
+          this.isLoading = false;
           this.resultsLength = data.totalCount;
           return data.items;
         }),
         catchError(e => {
           this.showMessage(e);
-          this.isLoadingResults = false;
+          this.isLoading = false;
           return of([]);
         })
       )

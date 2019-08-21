@@ -22,7 +22,7 @@ function reloadComponent() {
   templateUrl: './personal-page.component.html',
   styleUrls: ['./personal-page.component.css'],
 })
-export class PersonalPageComponent implements OnInit, OnDestroy {
+export class PersonalPageComponent implements OnDestroy {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -33,61 +33,18 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     this.isPageOwner = isOwner;
   }
 
-  get editUserMode(): boolean {
-    return this.isEditMode;
-  }
-  set editUserMode(isEdit: boolean) {
-    this.isEditMode = isEdit;
-  }
-
-  get evaluatedSkill(): string {
-    return this.evaluateSkillId;
-  }
-  set evaluatedSkill(skillId: string) {
-    this.evaluateSkillId = skillId;
-  }
-
-  get newSkillMode(): boolean {
-    return this.isCreateNewSkill;
-  }
-  set newSkillMode(isMode: boolean) {
-    this.isCreateNewSkill = isMode;
-  }
-
-  get isSkillExisted(): boolean {
-    if (!this.newSkillNameControl) {
-      return false;
-    }
-    const skillName = this.newSkillNameControl.value;
-    return this.lastAutoCompleteValue === skillName ? true : false;
-  }
-
-  get userDataValue(): UserData {
-    return this.userFormGroup.value;
-  }
-
   private readonly destroyed$ = new Subject<void>();
-  private currentUser: User | null;
   private currentUserSubscription: Subscription;
 
-  private userFormGroup: FormGroup;
-  private previosUserDataState: UserData;
-  private displayedColumns: string[] = [];
-  readonly newSkillFormGroup: FormGroup;
-  private newSkillNameControl: FormControl = new FormControl();
-  private lastAutoCompleteValue = '';
+  currentUser: User | null;
+  routeUsername = '';
+  isPageOwner = false;
 
-  private routeUsername = '';
-  private isPageOwner = false;
-  private isEditMode = false;
-  private isCreateNewSkill = false;
-  private evaluateSkillId = '';
-
-  nameSkillOptions: Observable<SkillViewModel[]>;
   dataSource: MatTableDataSource<SkillViewModel>;
-  evaluationControl: FormControl;
+  displayedColumns: string[] = [];
 
-  private isLoading = true;
+  userDataSub$: Observable<UserData>;
+  userSkills$: Observable<SkillViewModel[]>;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -95,27 +52,14 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private userService: UserService,
     private skillService: SkillService,
-    private formBuilder: FormBuilder,
-    private detector: ChangeDetectorRef,
     private snackBar: MatSnackBar
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = reloadComponent;
 
-    this.userFormGroup = this.formBuilder.group({});
-
-    this.newSkillNameControl = this.formBuilder.control('', [Validators.required, Validators.minLength(1)]);
-    this.newSkillFormGroup = this.formBuilder.group({
-      id: [null],
-      name: this.newSkillNameControl,
-      description: ['', [Validators.required, Validators.minLength(5)]],
-      averageEvaluate: [0],
-      expertEvaluate: [0],
-    });
-
     this.routeUsername = this.route.snapshot.paramMap.get('username') as string;
     this.currentUserSubscription = this.authenticate.currentUser
       .pipe(
-        switchMap(user => {
+        tap(user => {
           this.currentUser = user ? user : null;
           if (this.routeUsername) {
             this.pageOwner = user && user.username === this.routeUsername ? true : false;
@@ -123,236 +67,21 @@ export class PersonalPageComponent implements OnInit, OnDestroy {
               !user || this.pageOwner
                 ? ['action', 'name', 'description', 'rating']
                 : ['action', 'name', 'description', 'rating', 'expertValue'];
-            const userByRoute$: Observable<UserData> = this.userService.getByUsername(this.routeUsername);
-            const skills$: Observable<SkillViewModel[]> = user
+            this.userDataSub$ = this.userService.getByUsername(this.routeUsername);
+            this.userSkills$ = user
               ? this.skillService.getUserSkills(this.routeUsername, user.id)
               : this.skillService.getUserSkills(this.routeUsername);
-            return forkJoin(userByRoute$, skills$);
+            return forkJoin(this.userDataSub$, this.userSkills$);
           } else {
             return of(null);
           }
         })
-      )
-      .subscribe(
-        data => {
-          const userData = data[0];
-          const skills = data[1];
-
-          if (!data && !userData && !skills) {
-            this.dataSource.data = [];
-            return;
-          }
-          this.userFormGroup = this.createUserFormGroup(userData);
-          this.dataSource = new MatTableDataSource(skills);
-          this.dataSource.sort = this.sort;
-          this.dataSource.paginator = this.paginator;
-          this.detector.markForCheck();
-          this.isLoading = false;
-        },
-        err => this.showMessage(err)
-      );
-  }
-
-  ngOnInit() {
-    this.nameSkillOptions = this.getAutocompleteSkills();
+      ).subscribe(_ => { }, err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
-  }
-
-  // USER DATA
-
-  showChangeMode(): void {
-    this.editUserMode = true;
-    this.previosUserDataState = this.userFormGroup.value;
-  }
-
-  cancelChangeMode(): void {
-    this.userFormGroup.setValue(this.previosUserDataState);
-    this.editUserMode = false;
-  }
-
-  canSaveUserData(): boolean {
-    return this.userFormGroup.dirty && this.userFormGroup.valid;
-  }
-
-  saveUserData(): void {
-    const group = this.userFormGroup;
-    if (!group) {
-      return;
-    }
-    const data = group.value as UserData;
-    this.userFormGroup.disable();
-    this.userService
-      .update(data)
-      .pipe(
-        tap(
-          () => {
-            this.showMessage(`Account updated successfully! Username: ${data.username}`);
-            this.isEditMode = false;
-            this.userFormGroup.markAsPristine();
-            this.userFormGroup.enable();
-            this.detector.markForCheck();
-          },
-          err => this.showMessage(err)
-        )
-      )
-      .subscribe();
-  }
-
-  // EVALUATION
-
-  addEvaluation(skill: SkillViewModel): void {
-    this.evaluatedSkill = skill.id;
-    this.evaluationControl = new FormControl(skill.expertEvaluate, [Validators.required, Validators.min(0), Validators.max(5)]);
-  }
-
-  cancelEvaluation(): void {
-    this.evaluatedSkill = '';
-  }
-
-  canSaveEvaluation(): boolean {
-    return this.evaluationControl.dirty && this.evaluationControl.valid;
-  }
-
-  saveEvaluate(skill: SkillViewModel): void {
-    const evaluateControl = this.evaluationControl;
-    if (!evaluateControl) {
-      return;
-    }
-
-    const group = this.userFormGroup;
-    if (!group) {
-      return;
-    }
-    const userData = this.userFormGroup.value as UserData;
-
-    const evaluation: EvaluationToSend = {
-      userId: userData.id,
-      skillId: skill.id,
-      expertId: this.currentUser.id,
-      value: evaluateControl.value,
-    };
-
-    this.skillService
-      .addEvaluation(evaluation)
-      .pipe(
-        tap(
-          _ => {
-            this.showMessage(`You rated skill at ${evaluateControl.value} points`);
-            this.evaluatedSkill = '';
-            this.updateSkillsDataSource();
-            this.detector.markForCheck();
-          },
-          err => this.showMessage(err)
-        )
-      )
-      .subscribe();
-  }
-
-  // SKILLS
-
-  addSkill(): void {
-    this.newSkillMode = true;
-  }
-
-  undoAdd(): void {
-    this.newSkillMode = false;
-    this.newSkillFormGroup.reset();
-  }
-
-  canSaveSkill(): boolean {
-    return this.newSkillFormGroup.dirty && this.newSkillFormGroup.valid;
-  }
-
-  saveOrCreateSkill(): void {
-    const group = this.newSkillFormGroup;
-    if (!group) {
-      return;
-    }
-    const skillToSave = group.value as SkillToSend;
-
-    this.skillService
-      .addOrCreateSkill(this.currentUser.id, skillToSave)
-      .pipe(
-        tap(
-          skill => {
-            this.showMessage(`New skill ${skill.name} saved successfully!`);
-            this.isCreateNewSkill = false;
-            this.newSkillFormGroup.reset();
-            this.updateSkillsDataSource();
-            this.detector.markForCheck();
-          },
-          err => this.showMessage(err)
-        )
-      )
-      .subscribe();
-  }
-
-  // AUTOCOMPLETE
-
-  setAutocompleteEvent(event: MatAutocompleteSelectedEvent): void {
-    const skill = event.option.value as SkillToSend;
-    console.log(skill);
-
-    if (!skill) {
-      return;
-    }
-    this.lastAutoCompleteValue = skill.name;
-
-    this.newSkillFormGroup.setValue(skill);
-    this.newSkillFormGroup.markAsDirty();
-
-    this.detector.markForCheck();
-  }
-
-  private updateSkillsDataSource(): void {
-    this.skillService.getUserSkills(this.routeUsername, this.currentUser.id).subscribe(res => {
-      if (res) {
-        this.dataSource.data = res;
-      }
-    });
-  }
-
-  private createUserFormGroup(data: UserData): FormGroup {
-    return this.formBuilder.group({
-      id: this.formBuilder.control(data.id),
-      firstName: [data.firstName, [Validators.required, Validators.minLength(1)]],
-      lastName: [data.lastName, [Validators.required, Validators.minLength(1)]],
-      username: [data.username, [Validators.required, Validators.minLength(1)]],
-      city: [data.city, [Validators.required, Validators.minLength(1)]],
-      position: [data.position, [Validators.required, Validators.minLength(1)]],
-    });
-  }
-
-  private getAutocompleteSkills(): Observable<SkillViewModel[]> {
-    return this.newSkillNameControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(value => {
-        const options = this.filterData(value || '');
-        return options;
-      })
-    );
-  }
-
-  private filterData(value: any): Observable<SkillViewModel[]> {
-    if (!value) {
-      return of([]);
-    }
-
-    return this.skillService.getAutocompleteSkills(value).pipe(
-      map(response =>
-        response.filter((option: SkillViewModel) => {
-          return option.name.toLowerCase().includes(value.toLowerCase());
-          // return option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
-          // return option.name;
-        })
-      )
-    );
   }
 
   private showMessage(msg: any): void {

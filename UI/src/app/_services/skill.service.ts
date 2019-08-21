@@ -13,7 +13,7 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
   providedIn: 'root',
 })
 export class SkillService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getUserSkills(username: string, expertId?: string): Observable<SkillViewModel[]> {
     return this.http
@@ -50,21 +50,21 @@ export class SkillService {
     );
   }
 
-  addEvaluation(evaluation: EvaluationToSend): Observable<boolean> {
-    return this.http.post<boolean>(`${environment.apiUrl}/evaluations/create`, evaluation).pipe(catchError(this.handleError));
+  addEvaluation(evaluation: EvaluationToSend): Observable<null> {
+    return this.http.post<null>(`${environment.apiUrl}/evaluations/create`, evaluation).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {
-    let msg: string;
+    // let msg: string;
 
-    if (error.error instanceof ErrorEvent) {
-      msg = 'Произошла ошибка:' + error.error.message;
-    } else {
-      msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
-    }
+    // if (error.error instanceof ErrorEvent) {
+    //   msg = 'Произошла ошибка:' + error.error.message;
+    // } else {
+    //   msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
+    // }
 
-    console.error('PositionService::handleError() ' + msg);
+    console.error('PositionService::handleError() ' + error.message);
 
-    return throwError(msg);
+    return throwError('Произошла ошибка:' + error.error.message);
   }
 }

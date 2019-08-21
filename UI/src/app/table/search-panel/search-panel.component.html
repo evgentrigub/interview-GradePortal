@@ -19,7 +19,7 @@
         <mat-form-field>
           <input matInput [placeholder]="object.placeholder" [formControl]="object.control" [matAutocomplete]="auto" />
         </mat-form-field>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="autocompleteEvent($event)">
+        <mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let el of object.options | async" [value]="el" style="height: auto;">
             {{ el }}
           </mat-option>
@@ -30,6 +30,4 @@
     <button mat-button color="primary" (click)="search()">Search</button>
     <button mat-button color="warn" (click)="reset()">Reset</button>
   </form>
-
-
 </mat-expansion-panel>

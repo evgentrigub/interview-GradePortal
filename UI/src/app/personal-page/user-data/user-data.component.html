@@ -1,0 +1,42 @@
+<div style="display: flex; justify-content: space-around;">
+  <img style="min-width: 300px; min-height: 300px;" mat-card-avatar
+    src="https://cdn.pixabay.com/photo/2017/10/18/21/36/portrait-2865605_960_720.jpg" class="avatar" />
+  <form [formGroup]="userFormGroup">
+    <button mat-button *ngIf="pageOwner && !editMode" (click)="Edit()">Edit</button>
+    <div *ngIf="editMode">
+      <button mat-button (click)="Save()" [disabled]="!CanSave()">Save</button>
+      <button mat-button (click)="CancelEdit()">Cancel</button>
+    </div>
+    <div *ngIf="!isLoading; else loading">
+      <mat-card-header *ngIf="!editMode">
+        <mat-card-title>{{ userDataValue.firstName }} {{ userDataValue.lastName }}</mat-card-title>
+        <mat-card-subtitle>Username: {{ userDataValue.username }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ userDataValue.city }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ userDataValue.position }}</mat-card-subtitle>
+      </mat-card-header>
+    </div>
+    <div *ngIf="editMode" style="display: flex; flex-direction: column">
+      <mat-form-field>
+        <input matInput placeholder="First Name" formControlName="firstName" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Last Name" formControlName="lastName" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Username" formControlName="username" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="City" formControlName="city" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Position" formControlName="position" />
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+
+<ng-template #loading>
+  <div style="display: flex; justify-content: center">
+    <mat-progress-spinner mode="indeterminate" diameter="130" strokeWidth="9"></mat-progress-spinner>
+  </div>
+</ng-template>

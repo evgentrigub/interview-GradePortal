@@ -2,14 +2,14 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Users Table</mat-card-title>
-      <mat-card-subtitle>This table contains all registered users.</mat-card-subtitle>
+      <mat-card-subtitle>This table contains all registered users</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <app-search-panel #filterData (outParams)="getFilteredUsers($event)">
       </app-search-panel>
       <br />
-      <div class="loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner></mat-spinner>
+      <div class="loading-shade" *ngIf="isLoading">
+        <mat-spinner diameter="130" strokeWidth="9" style="vertical-align: middle"></mat-spinner>
       </div>
       <table mat-table [dataSource]="users" style="width: 100%">
         <ng-container matColumnDef="num">

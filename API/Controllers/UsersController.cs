@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
@@ -44,18 +45,18 @@ namespace GradePortalAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Authenticate([FromBody] UserAuthDto userAuthDto)
+        public async Task<IActionResult> Authenticate([FromBody] UserAuthDto userAuthDto)
         {
             try
             {
-                var user = _userService.Authenticate(userAuthDto.Username, userAuthDto.Password);
+                var res = await _userService.Authenticate(userAuthDto.Username, userAuthDto.Password);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[]
                     {
-                        new Claim(ClaimTypes.Name, user.Id)
+                        new Claim(ClaimTypes.Name, res.Data.Id)
                     }),
                     Expires = DateTime.UtcNow.AddDays(1),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -66,8 +67,8 @@ namespace GradePortalAPI.Controllers
 
                 return Ok(new UserAuthenticateModel
                 {
-                    Id = user.Id,
-                    Username = user.Username,
+                    Id = res.Data.Id,
+                    Username = res.Data.Username,
                     Token = tokenToSend
                 });
             }
@@ -121,7 +122,7 @@ namespace GradePortalAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var user = _userService.GetById(id);
+            var user = _userService.FindById(id);
             var userViewModel = _mapper.Map<UserViewModel>(user);
             return Ok(userViewModel);
         }

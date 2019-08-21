@@ -39,21 +39,21 @@ namespace GradePortalAPI.Controllers
         }
 
         [HttpGet("{username}")]
-        public IActionResult GetSkills(string username, string expertId = null)
+        public async Task<IActionResult> GetSkills(string username, string expertId = null)
         {
             try
             {
-                var user = _userService.GetByUserName(username);
-                var skills = _skillService.GetUserSkills(user.Id);
+                var result = await _userService.GetByUserName(username);
+                var skills = _skillService.GetUserSkills(result.Data.Id);
 
                 var skillsDto = skills.Select(skill => new SkillDto
                 {
                     Id = skill.Id,
                     Name = skill.Name,
                     Description = skill.Description,
-                    AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, user.Id),
+                    AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, result.Data.Id),
                     ExpertEvaluate = expertId != null
-                        ? _evaluateService.GetSkillValueByExpert(user.Id, skill.Id, expertId)
+                        ? _evaluateService.GetSkillValueByExpert(result.Data.Id, skill.Id, expertId)
                         : 0
                 });
 

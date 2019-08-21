@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GradePortalAPI.Models.Interfaces;
-using GradePortalAPI.Models.Interfaces.Base;
+﻿using System.Threading.Tasks;
 
-namespace GradePortalAPI.Models.Base
+namespace GradePortalAPI.Models.Interfaces.Base
 {
     public interface IBaseRepository<TEnity>
         where  TEnity: class

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GradePortalAPI.Models.Base;
+using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Interfaces
 {

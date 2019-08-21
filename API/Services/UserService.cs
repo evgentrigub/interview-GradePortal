@@ -1,37 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
+using GradePortalAPI.Services.Repositories;
 
 namespace GradePortalAPI.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseRepository<User>, IUserService
     {
         private readonly DataContext _context;
 
-        public UserService(DataContext context)
+        public UserService(DataContext context): base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public User Authenticate(string username, string password)
+        public async Task<IResult<User>> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                throw new AppException("Username or password is empty");
+                return new Result<User>(message: "Username or password is empty", isSuccess:false, data:null);
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
             if (user == null)
-                throw new AppException("User not found. Username or password is incorrect");
+                return new Result<User>(message: "User not found. Username or password is incorrect", isSuccess: false, data: null);
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) return null;
-            return user;
+            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                return new Result<User>(message: "Username or password is incorrect", isSuccess: false, data: null); ;
+            return new Result<User>(message: "Authenticate successful!", isSuccess:true, data:user);
         }
 
         public IResult<User> Create(User user, string password)
@@ -53,11 +57,10 @@ namespace GradePortalAPI.Services
             return new Result<User>(message:"Created successfully !", isSuccess:true, data:user);
         }
 
-        public IEnumerable<User> GetAll(TableParamsDto tableParams)
+        public async Task<IResult<IList<User>>> GetAll(TableParamsDto tableParams)
         {
-            var users = _context.Users.Skip(tableParams.Skip()).Take(tableParams.Take());
-
-            return users;
+            var users = await _context.Users.Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
+            return new Result<IList<User>>(message: "Success", isSuccess:true, data:users);
         }
 
         public User GetById(string id)
@@ -65,24 +68,26 @@ namespace GradePortalAPI.Services
             return _context.Users.Find(id);
         }
 
-        public User GetByUserName(string username)
+        public async Task<IResult<User>> GetByUserName(string username)
         {
-            return _context.Users.SingleOrDefault(r => r.Username == username);
+            var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
+            return new Result<User>(message:"Success", isSuccess:true, data:res);
         }
 
-        public void Update(string id, User user, string password = null)
+        public IResult Update(string id, User user, string password = null)
         {
             if (id != user.Id)
-                throw new AppException("User try update another profile!");
+                return new Result("User try update another profile!", isSuccess:false);
 
             var currentUser = _context.Users.Find(user.Id);
 
             if (currentUser == null)
-                throw new AppException("User not found");
+                return new Result("User not found", isSuccess: false);
+
 
             if (user.Username != currentUser.Username)
                 if (_context.Users.Any(x => x.Username == user.Username))
-                    throw new AppException("Username has already existed. Username:" + user.Username);
+                    return new Result("Username has already existed. Username:" + user.Username, isSuccess: false);
 
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
@@ -101,16 +106,19 @@ namespace GradePortalAPI.Services
 
             _context.Users.Update(currentUser);
             _context.SaveChanges();
+            return new Result("Username has already existed. Username:" + user.Username, isSuccess: false);
         }
 
-        public void Delete(int id)
+        public IResult Delete(int id)
         {
             var user = _context.Users.Find(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
                 _context.SaveChanges();
+                return new Result("User deleted.", isSuccess:true);
             }
+            return new Result(message:"User not found", isSuccess:false);
         }
 
         public int CountAllUsers()

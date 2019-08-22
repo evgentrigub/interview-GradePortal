@@ -1,39 +1,46 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.Interfaces.Base;
+using GradePortalAPI.Services.Repositories;
 
 namespace GradePortalAPI.Services
 {
-    public class EvaluateService : IEvaluateService
+    public class EvaluateService : BaseRepository<Evaluation>, IEvaluateService
     {
         private readonly DataContext _context;
+        private readonly ISkillService _skillService;
+        private readonly IUserService _userService;
 
-        public EvaluateService(DataContext context)
+        public EvaluateService(
+            DataContext context,
+            ISkillService skillService,
+            IUserService userService
+            ) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _skillService = skillService ?? throw new ArgumentNullException(nameof(skillService));
         }
 
-        public Evaluation Get(string evaluateId)
+        /// <inheritdoc />
+        public async Task<IResult> Create(EvaluateDto evaluateDto)
         {
-            return _context.Evaluations.Find(evaluateId);
-        }
-
-        public bool Create(EvaluateDto evaluateDto)
-        {
-            var expert = _context.Users.Find(evaluateDto.ExpertId);
-            var user = _context.Users.Find(evaluateDto.UserId);
-            var skill = _context.Skills.Find(evaluateDto.SkillId);
+            var expert = await _userService.FindById(evaluateDto.ExpertId);
+            var user = await _userService.FindById(evaluateDto.UserId);
+            var skill = await _skillService.FindById(evaluateDto.SkillId);
 
             if (expert == null || user == null || skill == null)
-                throw new AppException("User, Expert or Skill not found. Username: " + user + ", skill: " + skill +
-                                       ", expert:");
+                throw new AppException("User, Expert or Skill not found.");
 
             var userSkill = user.UserSkills.Where(r => r.SkillId == skill.Id);
             if (userSkill == null)
-                throw new AppException("Can't find evaluated skill. Username: " + user.Username + ", skill: " +
+                throw new AppException("Skill not found. Username: " + user.Username + ", skill: " +
                                        skill.Name);
 
             var newEvaluate = new Evaluation
@@ -47,44 +54,35 @@ namespace GradePortalAPI.Services
             _context.Evaluations.Add(newEvaluate);
             _context.SaveChanges();
 
-            return true;
+            return new Result("Success", isSuccess:true);
         }
 
-        public bool Delete(string evaluateId)
-        {
-            var evaluate = _context.Evaluations.Find(evaluateId);
-            if (evaluate != null)
-            {
-                _context.Evaluations.Remove(evaluate);
-                _context.SaveChanges();
-
-                return true;
-            }
-
-            throw new AppException("Evaluate not found");
-        }
-
+        /// <inheritdoc />
         public double GetAverageEvaluate(string skillId, string userId)
         {
-            var evaluations = _context.Evaluations.Where(r => r.Skill.Id == skillId && r.User.Id == userId)
+            var evaluations = _context.Evaluations
+                .Where(r => r.Skill.Id == skillId && r.User.Id == userId)
                 .Select(r => r.Value);
-            if (evaluations.Count() != 0)
+
+            if (evaluations.Sum() == 0)
             {
-                double a = evaluations.Sum();
-                double b = evaluations.Count();
-                return a / b;
+                throw new AppException("Evaluations not found");
             }
 
-            return 0;
+            double a = evaluations.Sum();
+            double b = evaluations.Count();
+            return a / b;
         }
 
+        /// <inheritdoc />
         public int GetSkillValueByExpert(string userId, string skillId, string expertId)
         {
             var evaluation = _context.Evaluations.SingleOrDefault(r =>
                 r.User.Id == userId && r.Expert.Id == expertId && r.Skill.Id == skillId);
-            if (evaluation != null) return evaluation.Value;
+            if (evaluation == null)
+                throw new AppException("Evaluation not found");
 
-            return 0;
+            return evaluation.Value;
         }
     }
 }

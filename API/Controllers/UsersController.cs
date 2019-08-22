@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +10,9 @@ using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.Interfaces.Base;
 using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,39 +21,40 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace GradePortalAPI.Controllers
 {
-    //[Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly AppSettings _appSettings;
-        private readonly IEvaluateService _evaluateService;
         private readonly IMapper _mapper;
-        private readonly ISkillService _skillService;
         private readonly IUserService _userService;
 
         public UsersController(
             IUserService userService,
             IMapper mapper,
-            IOptions<AppSettings> appSettings,
-            ISkillService skillService,
-            IEvaluateService evaluateService
+            IOptions<AppSettings> appSettings
         )
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _skillService = skillService ?? throw new ArgumentNullException(nameof(userService));
-            _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
-        [AllowAnonymous]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userDto"></param>
+        /// <returns></returns>
+        /// <response code="202">Returns authenticated user</response>
+        /// <response code="400">If something wrong with authenticate</response>
         [HttpPost]
-        public async Task<IActionResult> Authenticate([FromBody] UserAuthDto userAuthDto)
+        [ProducesResponseType((int) HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Authenticate([FromBody] UserAuthDto userDto)
         {
             try
             {
-                var res = await _userService.Authenticate(userAuthDto.Username, userAuthDto.Password);
+                var res = await _userService.Authenticate(userDto.Username, userDto.Password);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -65,12 +70,14 @@ namespace GradePortalAPI.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenToSend = tokenHandler.WriteToken(token);
 
-                return Ok(new UserAuthenticateModel
+                var user = new UserAuthenticateModel
                 {
                     Id = res.Data.Id,
                     Username = res.Data.Username,
                     Token = tokenToSend
-                });
+                };
+
+                return Ok(new Result<User>(message: "Authenticate successful!", isSuccess: true, data: res.Data));
             }
             catch (AppException e)
             {
@@ -78,15 +85,24 @@ namespace GradePortalAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userDto"></param>
+        /// <returns></returns>
+        /// <response code="201">Returns registered user</response>
+        /// <response code="400">If username exist or password null</response>
         [HttpPost]
-        public IActionResult Register([FromBody] UserAuthDto userAuthDto)
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Register([FromBody] UserDto userDto)
         {
-            var user = _mapper.Map<User>(userAuthDto);
+            var user = _mapper.Map<User>(userDto);
 
             try
             {
-                var res = _userService.Create(user, userAuthDto.Password);
+                var res = await _userService.Create(user, userDto.Password);
                 return Ok(res);
             }
             catch (AppException e)
@@ -95,47 +111,76 @@ namespace GradePortalAPI.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult GetAll([FromBody] TableParamsDto tableParams)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableParams"></param>
+        /// <returns></returns>
+        /// <response code="200">Returns users per page in table</response>
+        /// <response code="400">If error while getting users</response>
+        [HttpGet]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetUsers([FromQuery] TableParamsDto tableParams)
         {
-            var users = _userService.GetAll(tableParams);
-            var usersView = _mapper.Map<IEnumerable<UserViewModel>>(users);
-
+            var result = await _userService.GetUsersWithParams(tableParams);
             var userTableData = new UserDataTable
             {
-                Items = usersView,
+                Items = _mapper.Map<IList<UserViewModel>>(result.Data),
                 TotalCount = _userService.CountAllUsers()
             };
+            var res = new Result<UserDataTable>(
+                message: result.Message, isSuccess: result.IsSuccess, data: userTableData);
 
-            return Ok(userTableData);
+            return Ok(res);
         }
 
+        /// <summary>
+        /// Get user info by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <response code="200">Returns registered user</response>
+        /// <response code="400">If username is empty</response>
         [HttpGet("{username}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult GetUser(string username)
         {
-            var user = _userService.GetByUserName(username);
-            var userViewModel = _mapper.Map<UserViewModel>(user);
-            return Ok(userViewModel);
+            try
+            {
+                var user = _userService.GetByUserName(username);
+                var userViewModel = _mapper.Map<UserViewModel>(user);
+                return Ok(userViewModel);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
-
-        [HttpGet("{id}")]
-        public IActionResult Get(string id)
-        {
-            var user = _userService.FindById(id);
-            var userViewModel = _mapper.Map<UserViewModel>(user);
-            return Ok(userViewModel);
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userDto"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns registered user</response>
+        /// <response code="400">If error while updating</response>
+        [Authorize]
         [HttpPut("{id}")]
-        public IActionResult Update(string id, [FromBody] UserAuthDto userAuthDto)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Update(string id, [FromBody] UserDto userDto)
         {
-            var user = _mapper.Map<User>(userAuthDto);
+            var user = _mapper.Map<User>(userDto);
 
             try
             {
-                _userService.Update(id, user, userAuthDto.Password);
-                return Ok();
+                var res = _userService.Update(id, user, userDto.Password);
+                return Ok(res);
             }
             catch (AppException e)
             {
@@ -143,19 +188,30 @@ namespace GradePortalAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns registered user</response>
+        /// <response code="400">If error while deleting</response>
+        [Authorize]
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Delete(string id)
         {
-            _userService.Delete(id);
-            return Ok();
+            try
+            {
+                var res = await _userService.Delete(id);
+                return Ok(res);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
-
-        //[HttpPost]
-        //public IActionResult AddUserSkill(string id, Skill skill)
-        //{
-        //    var user = _userService.GetById(id);
-        //    var isExisted = _userService.IsExisted(skill);
-        //    return Ok();
-        //}
     }
 }

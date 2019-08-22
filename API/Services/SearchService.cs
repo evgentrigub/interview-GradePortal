@@ -29,6 +29,7 @@ namespace GradePortalAPI.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        /// <inheritdoc />
         public IQueryable<SkillDto> SkillSearch(string query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
@@ -47,6 +48,7 @@ namespace GradePortalAPI.Services
             return res.Take(20);
         }
 
+        /// <inheritdoc />
         public IQueryable<string> ParamSearch(string query, SearchGroup num)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
@@ -72,6 +74,7 @@ namespace GradePortalAPI.Services
             return (res ?? throw new InvalidOperationException()).Take(10);
         }
 
+        /// <inheritdoc />
         public UserDataTable UsersSearch(Dictionary<string, string> options, int skip, int take)
         {
             var res = _context.Users.Include(r => r.UserSkills).ThenInclude(r => r.Skill).AsQueryable();

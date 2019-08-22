@@ -22,8 +22,8 @@ namespace GradePortalAPI.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserAuthDto>();
-            CreateMap<UserAuthDto, User>();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
             CreateMap<User, UserViewModel>();
             CreateMap<UserViewModel, User>();
             CreateMap<SkillDto, Skill>();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,10 +10,12 @@ using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
 {
+    //[Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class SkillsController : ControllerBase
@@ -32,28 +35,36 @@ namespace GradePortalAPI.Controllers
         )
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _skillService = skillService ?? throw new ArgumentNullException(nameof(skillService));
+            _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
             _searchService = searchService ?? throw new ArgumentNullException(nameof(skillService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="expertId"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("{username}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetSkills(string username, string expertId = null)
         {
             try
             {
-                var result = await _userService.GetByUserName(username);
-                var skills = _skillService.GetUserSkills(result.Data.Id);
-
-                var skillsDto = skills.Select(skill => new SkillDto
+                var userResult = await _userService.GetByUserName(username);
+                var skillsResult = await _skillService.GetUserSkills(userResult.Data.Id);
+                var skillsDto = skillsResult.Data.Select(skill => new SkillDto
                 {
                     Id = skill.Id,
                     Name = skill.Name,
                     Description = skill.Description,
-                    AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, result.Data.Id),
+                    AverageEvaluate = _evaluateService.GetAverageEvaluate(skill.Id, userResult.Data.Id),
                     ExpertEvaluate = expertId != null
-                        ? _evaluateService.GetSkillValueByExpert(result.Data.Id, skill.Id, expertId)
+                        ? _evaluateService.GetSkillValueByExpert(userResult.Data.Id, skill.Id, expertId)
                         : 0
                 });
 
@@ -65,13 +76,23 @@ namespace GradePortalAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="skillDto"></param>
+        /// <returns></returns>
         [HttpPost("{userId}")]
-        public IActionResult CreateOrAddSkill(string userId, [FromBody] SkillDto skillDto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> CreateOrAddSkill(string userId, [FromBody] SkillDto skillDto)
         {
             var skill = _mapper.Map<Skill>(skillDto);
             try
             {
-                var addedSkill = _skillService.AddOrCreateSkill(userId, skill);
+                var addedSkill = await _skillService.AddOrCreateSkill(userId, skill);
                 var sk = _mapper.Map<SkillDto>(addedSkill);
 
                 return Ok(sk);
@@ -82,24 +103,16 @@ namespace GradePortalAPI.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult Search(string query, CancellationToken cancellationToken, int limit = 10)
-        {
-            try
-            {
-                if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3) return Ok(new List<Skill>());
-
-                var list = _searchService.SkillSearch(query).Take(limit);
-
-                return Ok(list.ToList());
-            }
-            catch (AppException e)
-            {
-                return BadRequest(new {message = e.Message});
-            }
-        }
-
-        [HttpGet]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Find(string id)
         {
             try
@@ -107,14 +120,22 @@ namespace GradePortalAPI.Controllers
                 var res = await _skillService.FindById(id);
                 return Ok(res);
             }
-            catch (Exception e)
+            catch (AppException e)
             {
-                Console.WriteLine(e);
-                throw;
+                return BadRequest(new { message = e.Message });
             }
         }
 
-        [HttpDelete]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -122,10 +143,9 @@ namespace GradePortalAPI.Controllers
                 var res = await _skillService.Delete(id);
                 return Ok(res);
             }
-            catch (Exception e)
+            catch (AppException e)
             {
-                Console.WriteLine(e);
-                throw;
+                return BadRequest(new { message = e.Message });
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,6 +11,7 @@ using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
 using GradePortalAPI.Services.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace GradePortalAPI.Services
 {
@@ -24,27 +24,30 @@ namespace GradePortalAPI.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        /// <inheritdoc />
         public async Task<IResult<User>> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return new Result<User>(message: "Username or password is empty", isSuccess:false, data:null);
+                throw new AppException("Username or password is empty");
 
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
             if (user == null)
-                return new Result<User>(message: "User not found. Username or password is incorrect", isSuccess: false, data: null);
+                throw new AppException("User not found. Username or password is incorrect");
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                return new Result<User>(message: "Username or password is incorrect", isSuccess: false, data: null); ;
+                throw new AppException("Username or password is incorrect");
+
             return new Result<User>(message: "Authenticate successful!", isSuccess:true, data:user);
         }
 
-        public IResult<User> Create(User user, string password)
+        /// <inheritdoc />
+        public async Task<IResult<User>> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                return new Result<User>(message: "Password is empty!", isSuccess: true, data: null); ;
+                throw new AppException("Password is empty!");
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                 return new Result<User>(message:"Username has already created!", isSuccess:true, data:null);;
+                throw new AppException("Username has already created!");
 
             CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
 
@@ -52,42 +55,48 @@ namespace GradePortalAPI.Services
             user.PasswordHash = passwordHash;
 
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return new Result<User>(message:"Created successfully !", isSuccess:true, data:user);
         }
 
-        public async Task<IResult<IList<User>>> GetAll(TableParamsDto tableParams)
+        /// <inheritdoc />
+        public async Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams)
         {
-            var users = await _context.Users.Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
+            var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
             return new Result<IList<User>>(message: "Success", isSuccess:true, data:users);
         }
 
+        /// <inheritdoc />
         public User GetById(string id)
         {
             return _context.Users.Find(id);
         }
 
+        /// <inheritdoc />
         public async Task<IResult<User>> GetByUserName(string username)
         {
+            if (username == null)
+                throw new AppException("Username is empty");
+
             var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
             return new Result<User>(message:"Success", isSuccess:true, data:res);
         }
 
+        /// <inheritdoc />
         public IResult Update(string id, User user, string password = null)
         {
             if (id != user.Id)
-                return new Result("User try update another profile!", isSuccess:false);
+                throw new AppException("User try update another profile!");
 
             var currentUser = _context.Users.Find(user.Id);
 
             if (currentUser == null)
-                return new Result("User not found", isSuccess: false);
+                throw new AppException("User not found");
 
 
-            if (user.Username != currentUser.Username)
-                if (_context.Users.Any(x => x.Username == user.Username))
-                    return new Result("Username has already existed. Username:" + user.Username, isSuccess: false);
+            if (user.Username != currentUser.Username && _context.Users.Any(x => x.Username == user.Username))
+                throw new AppException("Username has already existed. Username:" + user.Username);
 
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
@@ -106,24 +115,19 @@ namespace GradePortalAPI.Services
 
             _context.Users.Update(currentUser);
             _context.SaveChanges();
-            return new Result("Username has already existed. Username:" + user.Username, isSuccess: false);
+            return new Result("Update successful!", true);
         }
 
-        public IResult Delete(int id)
-        {
-            var user = _context.Users.Find(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-                return new Result("User deleted.", isSuccess:true);
-            }
-            return new Result(message:"User not found", isSuccess:false);
-        }
-
+        /// <inheritdoc />
         public int CountAllUsers()
         {
             return _context.Users.Count();
+        }
+
+        /// <inheritdoc />
+        public IQueryable<User> GetAll()
+        {
+            return _context.Users.AsQueryable();
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

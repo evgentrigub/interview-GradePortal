@@ -15,6 +15,7 @@ namespace GradePortalAPI.Helpers
     {
         public AppException(string message) : base(message)
         {
+
         }
     }
 

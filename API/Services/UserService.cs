@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
+using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
 using GradePortalAPI.Services.Repositories;
@@ -32,7 +35,7 @@ namespace GradePortalAPI.Services
 
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
             if (user == null)
-                throw new AppException("User not found. Username or password is incorrect");
+                throw new BadRequestCustomException("User not found", "Try again");
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 throw new AppException("Username or password is incorrect");

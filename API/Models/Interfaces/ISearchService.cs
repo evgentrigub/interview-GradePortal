@@ -10,7 +10,7 @@ namespace GradePortalAPI.Models.Interfaces
     public interface ISearchService
     {
         /// <summary>
-        /// Search skill name and return skill info
+        ///     Search skill name and return skill info
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -18,7 +18,7 @@ namespace GradePortalAPI.Models.Interfaces
         IQueryable<SkillDto> SkillSearch([NotNull] string query);
 
         /// <summary>
-        /// Return existed options (city, position, skill) for user search
+        ///     Return existed options (city, position, skill) for user search
         /// </summary>
         /// <param name="query"></param>
         /// <param name="num"></param>
@@ -27,7 +27,7 @@ namespace GradePortalAPI.Models.Interfaces
         IQueryable<string> ParamSearch([NotNull] string query, SearchGroup num);
 
         /// <summary>
-        /// Return users with search params in dictionary
+        ///     Return users with search params in dictionary
         /// </summary>
         /// <param name="options"></param>
         /// <param name="skip"></param>

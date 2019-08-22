@@ -2,15 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
-using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Interfaces
 {
-    public interface IUserService: IBaseRepository<User>
+    public interface IUserService : IBaseRepository<User>
     {
         /// <summary>
-        /// Authenticate user with username and password
+        ///     Authenticate user with username and password
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
@@ -18,14 +17,14 @@ namespace GradePortalAPI.Models.Interfaces
         Task<IResult<User>> Authenticate(string username, string password);
 
         /// <summary>
-        /// Get users with table params: page number and page size
+        ///     Get users with table params: page number and page size
         /// </summary>
         /// <param name="tableParams"></param>
         /// <returns></returns>
         Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams);
 
         /// <summary>
-        /// Create new user
+        ///     Create new user
         /// </summary>
         /// <param name="user"></param>
         /// <param name="password"></param>
@@ -33,21 +32,21 @@ namespace GradePortalAPI.Models.Interfaces
         Task<IResult<User>> Create(User user, string password);
 
         /// <summary>
-        /// Get user personal data with username (for UI routing with username)
+        ///     Get user personal data with username (for UI routing with username)
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
         Task<IResult<User>> GetByUserName(string username);
 
         /// <summary>
-        /// Get user for token validation
+        ///     Get user for token validation
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         User GetById(string id);
 
         /// <summary>
-        /// Update user personal data
+        ///     Update user personal data
         /// </summary>
         /// <param name="id"></param>
         /// <param name="user"></param>
@@ -56,13 +55,13 @@ namespace GradePortalAPI.Models.Interfaces
         IResult Update(string id, User user, string password = null);
 
         /// <summary>
-        /// Get all users in table for future async request
+        ///     Get all users in table for future async request
         /// </summary>
         /// <returns></returns>
         IQueryable<User> GetAll();
 
         /// <summary>
-        /// Return quantity of all users
+        ///     Return quantity of all users
         /// </summary>
         /// <returns></returns>
         int CountAllUsers();

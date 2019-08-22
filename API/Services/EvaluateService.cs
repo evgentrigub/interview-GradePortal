@@ -21,7 +21,7 @@ namespace GradePortalAPI.Services
             DataContext context,
             ISkillService skillService,
             IUserService userService
-            ) : base(context)
+        ) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -54,7 +54,7 @@ namespace GradePortalAPI.Services
             _context.Evaluations.Add(newEvaluate);
             _context.SaveChanges();
 
-            return new Result("Success", isSuccess:true);
+            return new Result("Success", true);
         }
 
         /// <inheritdoc />
@@ -64,10 +64,7 @@ namespace GradePortalAPI.Services
                 .Where(r => r.Skill.Id == skillId && r.User.Id == userId)
                 .Select(r => r.Value);
 
-            if (evaluations.Sum() == 0)
-            {
-                throw new AppException("Evaluations not found");
-            }
+            if (evaluations.Sum() == 0) throw new AppException("Evaluations not found");
 
             double a = evaluations.Sum();
             double b = evaluations.Count();

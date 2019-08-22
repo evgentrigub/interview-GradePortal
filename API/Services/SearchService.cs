@@ -4,7 +4,6 @@ using System.Linq;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
-using GradePortalAPI.Models;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
@@ -23,7 +22,7 @@ namespace GradePortalAPI.Services
         public SearchService(
             [NotNull] DataContext context,
             IMapper mapper
-            )
+        )
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(context));
             _context = context ?? throw new ArgumentNullException(nameof(context));

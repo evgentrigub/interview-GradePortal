@@ -4,17 +4,17 @@ using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Interfaces
 {
-    public interface IEvaluateService: IBaseRepository<Evaluation>
+    public interface IEvaluateService : IBaseRepository<Evaluation>
     {
         /// <summary>
-        /// Create new evaluation
+        ///     Create new evaluation
         /// </summary>
         /// <param name="evaluateDto"></param>
         /// <returns></returns>
         Task<IResult> Create(EvaluateDto evaluateDto);
 
         /// <summary>
-        /// Get average evaluation value of all experts
+        ///     Get average evaluation value of all experts
         /// </summary>
         /// <param name="skillId"></param>
         /// <param name="userId"></param>
@@ -22,7 +22,7 @@ namespace GradePortalAPI.Models.Interfaces
         double GetAverageEvaluate(string skillId, string userId);
 
         /// <summary>
-        /// Get evaluation value of skill by expert
+        ///     Get evaluation value of skill by expert
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="skillId"></param>

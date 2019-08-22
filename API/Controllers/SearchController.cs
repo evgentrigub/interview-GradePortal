@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
@@ -28,7 +27,6 @@ namespace GradePortalAPI.Controllers
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="query"></param>
         /// <param name="cancellationToken"></param>
@@ -36,10 +34,10 @@ namespace GradePortalAPI.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult SearchSkills(string query, CancellationToken cancellationToken, int limit = 10)
         {
             try
@@ -52,20 +50,19 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="query"></param>
         /// <param name="group"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public IActionResult ParamSearch(string query, SearchGroup group, CancellationToken cancellationToken)
         {
             try
@@ -83,13 +80,12 @@ namespace GradePortalAPI.Controllers
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public IActionResult UsersSearch([FromQuery] SearchOptionsDto options)
         {
             try

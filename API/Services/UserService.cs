@@ -19,7 +19,7 @@ namespace GradePortalAPI.Services
     {
         private readonly DataContext _context;
 
-        public UserService(DataContext context): base(context)
+        public UserService(DataContext context) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -37,7 +37,7 @@ namespace GradePortalAPI.Services
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 throw new AppException("Username or password is incorrect");
 
-            return new Result<User>(message: "Authenticate successful!", isSuccess:true, data:user);
+            return new Result<User>(message: "Authenticate successful!", isSuccess: true, data: user);
         }
 
         /// <inheritdoc />
@@ -57,14 +57,14 @@ namespace GradePortalAPI.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new Result<User>(message:"Created successfully !", isSuccess:true, data:user);
+            return new Result<User>(message: "Created successfully !", isSuccess: true, data: user);
         }
 
         /// <inheritdoc />
         public async Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams)
         {
             var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
-            return new Result<IList<User>>(message: "Success", isSuccess:true, data:users);
+            return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
         }
 
         /// <inheritdoc />
@@ -80,7 +80,7 @@ namespace GradePortalAPI.Services
                 throw new AppException("Username is empty");
 
             var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
-            return new Result<User>(message:"Success", isSuccess:true, data:res);
+            return new Result<User>(message: "Success", isSuccess: true, data: res);
         }
 
         /// <inheritdoc />

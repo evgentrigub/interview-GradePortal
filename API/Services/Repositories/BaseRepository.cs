@@ -11,16 +11,18 @@ namespace GradePortalAPI.Services.Repositories
         where TEntity : class
     {
         private readonly DataContext _context;
-        protected virtual DbSet<TEntity> Set { get; }
 
         public BaseRepository(DataContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            this.Set = _context.Set<TEntity>();
+            Set = _context.Set<TEntity>();
         }
+
+        protected virtual DbSet<TEntity> Set { get; }
+
         public async Task<TEntity> FindById(string id)
         {
-             return await Set.FindAsync(id);
+            return await Set.FindAsync(id);
         }
 
         public async Task<IResult> Delete(string id)
@@ -28,9 +30,7 @@ namespace GradePortalAPI.Services.Repositories
             var entity = await FindById(id);
             Set.Remove(entity);
 
-            return new Result("The entity was deleted successfully", isSuccess: true);
+            return new Result("The entity was deleted successfully", true);
         }
-
-
     }
 }

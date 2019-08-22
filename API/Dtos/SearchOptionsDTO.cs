@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GradePortalAPI.Dtos
 {
-    public class SearchOptionsDto: TableParamsDto
+    public class SearchOptionsDto : TableParamsDto
     {
         public string SerializedFilters { get; set; }
 

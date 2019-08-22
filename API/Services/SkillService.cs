@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
@@ -35,7 +34,7 @@ namespace GradePortalAPI.Services
                 .Where(u => u.Id == userId)
                 .SelectMany(u => u.UserSkills)
                 .Select(us => us.Skill).ToListAsync();
-            return new Result<IList<Skill>>(message:"Success!", isSuccess:true, data:skills);
+            return new Result<IList<Skill>>(message: "Success!", isSuccess: true, data: skills);
         }
 
         /// <inheritdoc />
@@ -52,16 +51,18 @@ namespace GradePortalAPI.Services
             {
                 var newSkill = await CreateNew(skill);
                 var sk = await AddSkillToUser(user, newSkill);
-                return new Result<Skill>(message:"Skill "+newSkill.Name+" has created and added to your collection", 
-                    isSuccess: true, data:sk);
+                return new Result<Skill>(
+                    message: "Skill " + newSkill.Name + " has created and added to your collection",
+                    isSuccess: true, data: sk);
             }
+
             var addedSkill = await AddSkillToUser(user, skill);
             return new Result<Skill>(message: "Skill " + skill.Name + " added to your collection",
                 isSuccess: true, data: addedSkill);
         }
 
         /// <summary>
-        /// Create new skill
+        ///     Create new skill
         /// </summary>
         /// <param name="skill"></param>
         /// <returns></returns>
@@ -70,7 +71,7 @@ namespace GradePortalAPI.Services
             var newSkill = new Skill {Name = skill.Name, Description = skill.Description};
 
             var a = _context.Skills.Add(newSkill);
-            if(a == null)
+            if (a == null)
                 throw new AppException("Create skill error");
 
             await _context.SaveChangesAsync();
@@ -79,7 +80,7 @@ namespace GradePortalAPI.Services
         }
 
         /// <summary>
-        /// Add skill to user collection
+        ///     Add skill to user collection
         /// </summary>
         /// <param name="user"></param>
         /// <param name="skill"></param>
@@ -98,6 +99,7 @@ namespace GradePortalAPI.Services
                 await _context.SaveChangesAsync();
                 return skill;
             }
+
             throw new AppException("Add skill to user error. User or Skill is null");
         }
     }

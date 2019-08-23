@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
-import { FormControl, AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormControl, AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SearchPanelService } from 'src/app/_services/search-panel.service';
 import { SearchGroup } from 'src/app/_enums/search-group-enum';
 import { KeyValue } from '@angular/common';
@@ -33,9 +33,9 @@ export class SearchPanelComponent {
   positionOptions: Observable<Array<string>>;
   skillOptions: Observable<Array<string>>;
 
-  citySearchControl: FormControl = new FormControl();
-  positionSearchControl: FormControl = new FormControl();
-  skillSearchControl: FormControl = new FormControl();
+  citySearchControl: FormControl = new FormControl('', [Validators.nullValidator]);
+  positionSearchControl: FormControl = new FormControl('', [Validators.nullValidator]);
+  skillSearchControl: FormControl = new FormControl('', [Validators.nullValidator]);
 
   constructor(
     private searchService: SearchPanelService,
@@ -85,6 +85,11 @@ export class SearchPanelComponent {
 
   reset(): void {
     this.outParams.emit(null);
+    this.searchForm.reset();
+  }
+
+  canSearch(): boolean {
+    return this.searchForm.dirty;
   }
 
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {

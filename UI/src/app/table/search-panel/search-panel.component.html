@@ -27,7 +27,7 @@
       </mat-grid-tile>
     </mat-grid-list>
 
-    <button mat-button color="primary" (click)="search()">Search</button>
+    <button mat-button color="primary" [disabled]="!canSearch()" (click)="search()">Search</button>
     <button mat-button color="warn" (click)="reset()">Reset</button>
   </form>
 </mat-expansion-panel>

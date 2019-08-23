@@ -8,6 +8,7 @@ import { MatSnackBar, MatTableDataSource, MatAutocompleteSelectedEvent, MatPagin
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { Observable, of } from 'rxjs';
 import { EvaluationToSend } from 'src/app/_models/evaluation-to-send';
+import { Result } from 'src/app/_models/result-model';
 
 @Component({
   selector: 'app-skills-table',
@@ -20,7 +21,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   @Input()
-  userSkills: SkillViewModel[];
+  userSkillsResult: Result<SkillViewModel[]>;
 
   @Input()
   displayedColumns: string[];
@@ -80,13 +81,13 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   }
 
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
-    if (changes.hasOwnProperty('userSkills')) {
-      const chg = changes.userSkills;
-      const skills = chg.currentValue;
-      if (!skills) {
+    if (changes.hasOwnProperty('userSkillsResult')) {
+      const chg = changes.userSkillsResult;
+      const result = chg.currentValue as Result<SkillViewModel[]>
+      if (!result) {
         return;
       }
-      this.dataSource = new MatTableDataSource(skills);
+      this.dataSource = new MatTableDataSource(result.data);
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
       this.detector.markForCheck();
@@ -103,7 +104,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
       case (2):
         this.evaluatedSkill = skill.id;
         this.evaluationControl = new FormControl(skill.expertEvaluate, [Validators.required, Validators.min(0), Validators.max(5)]);
-        break
+        break;
     }
   }
   protected CancelEdit(groupNum: number): void {
@@ -115,11 +116,9 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
       case (2):
         this.evaluatedSkill = '';
-        break
+        break;
     }
-
   }
-
 
   protected CanSave(groupNum: number): boolean {
     switch (groupNum) {
@@ -131,8 +130,6 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     }
   }
   protected Save(groupNum: number, skill: SkillViewModel): void {
-
-
     switch (groupNum) {
       case (1):
         const group = this.newSkillFormGroup;
@@ -145,8 +142,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           .addOrCreateSkill(this.currentUser.id, skillToSave)
           .pipe(
             tap(
-              skill => {
-                this.showMessage(`New skill ${skill.name} saved successfully!`);
+              newSkill => {
+                this.showMessage(`New skill ${newSkill.name} saved successfully!`);
                 this.isEditMode = false;
                 this.newSkillFormGroup.reset();
                 this.updateSkillsDataSource();
@@ -170,8 +167,6 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           expertId: this.currentUser.id,
           value: evaluateControl.value,
         };
-        console.log("TCL: SkillsTableComponent -> evaluation", evaluation)
-
 
         this.skillService
           .addEvaluation(evaluation)
@@ -235,8 +230,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   updateSkillsDataSource(): void {
     this.skillService.getUserSkills(this.routeUsername, this.currentUser.id).subscribe(res => {
-      if (res) {
-        this.dataSource.data = res;
+      if (res.isSuccess) {
+        this.dataSource.data = res.data;
       }
     });
   }

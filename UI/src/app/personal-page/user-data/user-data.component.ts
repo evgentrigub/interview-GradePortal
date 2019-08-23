@@ -5,6 +5,11 @@ import { UserData } from 'src/app/_models/user-view-model';
 import { UserService } from 'src/app/_services/user.service';
 import { MatSnackBar } from '@angular/material';
 import { tap } from 'rxjs/operators';
+import { Result } from 'src/app/_models/result-model';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
+import { Subscription, Observable, BehaviorSubject } from 'rxjs';
+import { User, UserAuthenticated } from 'src/app/_models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-data',
@@ -14,7 +19,7 @@ import { tap } from 'rxjs/operators';
 export class UserDataComponent extends EditBaseComponent implements OnInit, OnChanges {
 
   @Input()
-  userData: UserData | null | undefined;
+  userDataResult: Result<UserData> | null | undefined;
 
   @Input()
   pageOwner: boolean;
@@ -25,28 +30,32 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
 
   userFormGroup: FormGroup;
   private previosUserDataState: UserData;
+  private currentUser$: Observable<UserAuthenticated>;
 
   isLoading = true;
 
   constructor(
+    private authenticate: AuthenticationService,
     private userService: UserService,
     private formBuilder: FormBuilder,
     private detector: ChangeDetectorRef,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {
     super();
     this.userFormGroup = this.formBuilder.group({});
+    this.currentUser$ = this.authenticate.currentUser;
   }
 
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
-    if (changes.hasOwnProperty('userData')) {
-      const chg = changes.userData;
-      const data = chg.currentValue;
-      if (!data) {
+    if (changes.hasOwnProperty('userDataResult')) {
+      const chg = changes.userDataResult;
+      const res = chg.currentValue as Result<UserData>;
+      if (!res) {
         return;
       }
       this.isLoading = false;
-      this.userFormGroup = this.createUserFormGroup(data);
+      this.userFormGroup = this.createUserFormGroup(res.data);
     }
   }
 
@@ -54,6 +63,7 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
   }
 
   protected Edit(): void {
+    console.log(this.userDataResult)
     this.editMode = true;
     this.previosUserDataState = this.userFormGroup.value;
   }
@@ -75,17 +85,38 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
       .update(data)
       .pipe(
         tap(
-          () => {
-            this.showMessage(`Account updated successfully! Username: ${data.username}`);
-            this.isEditMode = false;
-            this.userFormGroup.markAsPristine();
-            this.userFormGroup.enable();
-            this.detector.markForCheck();
+          result => {
+            if (result.isSuccess) {
+              this.currentUser$.subscribe(res => {
+                const user = this.changeUserInLocalStorage(data, res);
+                if (user) {
+                  this.isEditMode = false;
+                  this.userFormGroup.markAsPristine();
+                  this.userFormGroup.enable();
+                  this.detector.markForCheck();
+
+                  this.showMessage(`Account updated successfully! Username: ${data.username}`);
+                  this.router.navigate([`/${user.username}`]);
+                }
+              });
+            }
           },
           err => this.showMessage(err)
         )
       )
       .subscribe();
+  }
+
+  private changeUserInLocalStorage(newUser: UserData, previousUser: UserAuthenticated) {
+    const user = newUser as UserAuthenticated;
+    user.token = previousUser.token;
+    this.authenticate.logout();
+
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.authenticate.currentUserSubject.next(user);
+    this.authenticate.currentUserSubject =
+      new BehaviorSubject<UserAuthenticated>(JSON.parse(localStorage.getItem('currentUser')));
+    return user;
   }
 
   private createUserFormGroup(data: UserData): FormGroup {

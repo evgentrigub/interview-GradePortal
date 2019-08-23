@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { User } from 'src/app/_models/user';
+import { User, UserAuthenticated } from 'src/app/_models/user';
 import { Subscription, Subject, of, Observable, concat, forkJoin } from 'rxjs';
 import { AuthenticationService } from '../_services/authentication.service';
 import { UserViewModel, UserData } from 'src/app/_models/user-view-model';
@@ -12,6 +12,7 @@ import { SkillService } from '../_services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { SkillToSend } from '../_models/skill-to-send';
 import { EvaluationToSend } from '../_models/evaluation-to-send';
+import { Result } from '../_models/result-model';
 
 function reloadComponent() {
   return false;
@@ -36,15 +37,15 @@ export class PersonalPageComponent implements OnDestroy {
   private readonly destroyed$ = new Subject<void>();
   private currentUserSubscription: Subscription;
 
-  currentUser: User | null;
+  currentUser: UserAuthenticated | null;
   routeUsername = '';
   isPageOwner = false;
 
   dataSource: MatTableDataSource<SkillViewModel>;
   displayedColumns: string[] = [];
 
-  userDataSub$: Observable<UserData>;
-  userSkills$: Observable<SkillViewModel[]>;
+  userDataSub$: Observable<Result<UserData>>;
+  userSkills$: Observable<Result<SkillViewModel[]>>;
 
   constructor(
     private authenticate: AuthenticationService,

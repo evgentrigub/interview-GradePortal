@@ -38,9 +38,8 @@ export class TableComponent implements AfterViewInit {
   }
 
   clickUser(user: UserData) {
-    this.router.navigate([`/${user.username}`], { state: { user } });
+    this.router.navigate([`/${user.username}`]);
   }
-
 
   getFilteredUsers(params: ISearchOptions) {
     this.searchParams = params;
@@ -61,10 +60,14 @@ export class TableComponent implements AfterViewInit {
             return this.searchService.getFilteredUsers(this.searchParams);
           }
         }),
-        map(data => {
-          this.isLoading = false;
-          this.resultsLength = data.totalCount;
-          return data.items;
+        map(result => {
+          if (result) {
+            const data = result.data;
+            this.isLoading = false;
+            this.resultsLength = data.totalCount;
+            return data.items;
+          }
+          return [];
         }),
         catchError(e => {
           this.showMessage(e);

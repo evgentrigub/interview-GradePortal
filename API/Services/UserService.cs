@@ -35,7 +35,7 @@ namespace GradePortalAPI.Services
 
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
             if (user == null)
-                throw new BadRequestCustomException("User not found", "Try again");
+                return new Result<User>(message:"User not found", isSuccess: false, data:null);
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 throw new AppException("Username or password is incorrect");
@@ -44,7 +44,7 @@ namespace GradePortalAPI.Services
         }
 
         /// <inheritdoc />
-        public async Task<IResult<User>> Create(User user, string password)
+        public async Task<IResult> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is empty!");
@@ -56,11 +56,15 @@ namespace GradePortalAPI.Services
 
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
+            user.QuickSearchName = user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() +
+                                   user.FirstName.ToUpperInvariant();
+            user.QuickSearchCity = user.City.ToUpperInvariant();
+            user.QuickSearchPosition = user.Position.ToUpperInvariant();
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new Result<User>(message: "Created successfully !", isSuccess: true, data: user);
+            return new Result(message: "Created successfully !", isSuccess: true);
         }
 
         /// <inheritdoc />
@@ -106,6 +110,11 @@ namespace GradePortalAPI.Services
             currentUser.Username = user.Username;
             currentUser.City = user.City;
             currentUser.Position = user.Position;
+            
+            currentUser.QuickSearchName = 
+                user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() + user.FirstName.ToUpperInvariant();
+            currentUser.QuickSearchCity = user.City.ToUpperInvariant();
+            currentUser.QuickSearchPosition = user.Position.ToUpperInvariant();
 
             if (!string.IsNullOrWhiteSpace(password))
             {

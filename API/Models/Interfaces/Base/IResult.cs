@@ -1,4 +1,7 @@
-﻿namespace GradePortalAPI.Models.Interfaces.Base
+﻿using System.Runtime.InteropServices;
+using JetBrains.Annotations;
+
+namespace GradePortalAPI.Models.Interfaces.Base
 {
     /// <summary>
     ///     Result of operation

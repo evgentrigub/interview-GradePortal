@@ -52,6 +52,8 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var res = await _userService.Authenticate(userDto.Username, userDto.Password);
+                if (res.IsSuccess == false)
+                    return Ok(res);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -67,14 +69,10 @@ namespace GradePortalAPI.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenToSend = tokenHandler.WriteToken(token);
 
-                var user = new UserAuthenticateModel
-                {
-                    Id = res.Data.Id,
-                    Username = res.Data.Username,
-                    Token = tokenToSend
-                };
+                var user = _mapper.Map<UserAuthenticateModel>(res.Data);
+                user.Token = tokenToSend;
 
-                return Ok(new Result<User>(message: "Authenticate successful!", isSuccess: true, data: res.Data));
+                return Ok(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true, data: user));
             }
             catch (AppException e)
             {
@@ -140,13 +138,13 @@ namespace GradePortalAPI.Controllers
         [HttpGet("{username}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public IActionResult GetUser(string username)
+        public async Task<IActionResult> GetUser(string username)
         {
             try
             {
-                var user = _userService.GetByUserName(username);
-                var userViewModel = _mapper.Map<UserViewModel>(user);
-                return Ok(userViewModel);
+                var result = await _userService.GetByUserName(username);
+                var userViewModel = _mapper.Map<UserViewModel>(result.Data);
+                return Ok(new Result<UserViewModel>(message: result.Message, isSuccess:result.IsSuccess, data: userViewModel));
             }
             catch (AppException e)
             {

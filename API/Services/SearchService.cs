@@ -82,21 +82,21 @@ namespace GradePortalAPI.Services
             if (name != null)
             {
                 name = name.ToUpperInvariant().Replace(" ", "");
-                res = res.Where(r => r.QuickSearch.Contains(name));
+                res = res.Where(r => r.QuickSearchName.Contains(name));
             }
 
             var city = GetFilterFromFiltersDictionaryOrDefault("city", options);
             if (city != null)
             {
                 city = city.ToUpperInvariant();
-                res = res.Where(r => r.City.ToUpperInvariant().Contains(city));
+                res = res.Where(r => r.QuickSearchCity.Contains(city));
             }
 
             var position = GetFilterFromFiltersDictionaryOrDefault("pos", options);
             if (position != null)
             {
                 position = position.ToUpperInvariant();
-                res = res.Where(r => r.Position.ToUpperInvariant().Contains(position));
+                res = res.Where(r => r.QuickSearchPosition.Contains(position));
             }
 
             var skill = GetFilterFromFiltersDictionaryOrDefault("skill", options);
@@ -104,7 +104,7 @@ namespace GradePortalAPI.Services
             {
                 skill = skill.ToUpperInvariant();
                 res = res.Where(u =>
-                    u.UserSkills.Select(c => c.Skill).Any(s => s.Name.ToUpperInvariant().Contains(skill)));
+                    u.UserSkills.Select(c => c.Skill).Any(s => s.QuickSearch.Contains(skill)));
             }
 
             var cutRes = res.Skip(skip).Take(take);

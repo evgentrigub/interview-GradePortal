@@ -4,14 +4,16 @@ using GradePortalAPI.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GradePortalAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190823114857_6")]
+    partial class _6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,11 +90,7 @@ namespace GradePortalAPI.Migrations
 
                     b.Property<string>("Position");
 
-                    b.Property<string>("QuickSearchCity");
-
                     b.Property<string>("QuickSearchName");
-
-                    b.Property<string>("QuickSearchPosition");
 
                     b.Property<string>("Username");
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Models.Interfaces;
@@ -33,9 +34,9 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult Create([FromBody] EvaluateDto evaluation)
+        public async Task<IActionResult> Create([FromBody] EvaluateDto evaluation)
         {
-            var res = _evaluateService.Create(evaluation);
+            var res = await _evaluateService.Create(evaluation);
             return Ok(res);
         }
 

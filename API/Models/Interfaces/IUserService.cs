@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Interfaces
@@ -29,7 +30,7 @@ namespace GradePortalAPI.Models.Interfaces
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<IResult<User>> Create(User user, string password);
+        Task<IResult> Create(User user, string password);
 
         /// <summary>
         ///     Get user personal data with username (for UI routing with username)

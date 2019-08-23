@@ -8,5 +8,6 @@ namespace GradePortalAPI.Models
         public ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
         public string Name { get; set; }
         public string Description { get; set; }
+        public string QuickSearch { get; set; }
     }
 }

@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GradePortalAPI.Controllers
 {
@@ -38,13 +42,13 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult SearchSkills(string query, CancellationToken cancellationToken, int limit = 10)
+        public async Task<IActionResult> SearchSkills(string query, CancellationToken cancellationToken, int limit = 10)
         {
             try
             {
                 if (limit <= 0 || string.IsNullOrWhiteSpace(query) || query.Length < 3) return Ok(new List<Skill>());
 
-                var list = _searchService.SkillSearch(query).Take(limit);
+                var list = await _searchService.SkillSearch(query).Take(limit).ToListAsync(cancellationToken);
 
                 return Ok(list);
             }
@@ -63,13 +67,13 @@ namespace GradePortalAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public IActionResult ParamSearch(string query, SearchGroup group, CancellationToken cancellationToken)
+        public async Task<IActionResult> ParamSearch(string query, SearchGroup group, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return Ok(new List<string>());
 
-                var list = _searchService.ParamSearch(query, group);
+                var list = await _searchService.ParamSearch(query, group).ToListAsync(cancellationToken);
 
                 return Ok(list);
             }
@@ -86,13 +90,12 @@ namespace GradePortalAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public IActionResult UsersSearch([FromQuery] SearchOptionsDto options)
+        public async Task<IActionResult> UsersSearch([FromQuery] SearchOptionsDto options)
         {
             try
             {
                 var data = _searchService.UsersSearch(options.Filters, options.Skip(), options.Take());
-
-                return Ok(data);
+                return Ok(new Result<UserDataTable>(message:"Search successful!", isSuccess: true, data:data));
             }
             catch (AppException e)
             {

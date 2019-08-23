@@ -30,7 +30,7 @@ namespace GradePortalAPI.Services.Repositories
             var entity = await FindById(id);
             Set.Remove(entity);
 
-            return new Result("The entity was deleted successfully", true);
+            return new Result("Delete successfully", true);
         }
     }
 }

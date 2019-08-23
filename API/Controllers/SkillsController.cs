@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -6,6 +8,7 @@ using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +22,6 @@ namespace GradePortalAPI.Controllers
     {
         private readonly IEvaluateService _evaluateService;
         private readonly IMapper _mapper;
-        private readonly ISearchService _searchService;
         private readonly ISkillService _skillService;
         private readonly IUserService _userService;
 
@@ -27,14 +29,12 @@ namespace GradePortalAPI.Controllers
             ISkillService skillService,
             IUserService userService,
             IEvaluateService evaluateService,
-            ISearchService searchService,
             IMapper mapper
         )
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _skillService = skillService ?? throw new ArgumentNullException(nameof(skillService));
             _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(userService));
-            _searchService = searchService ?? throw new ArgumentNullException(nameof(skillService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -64,7 +64,7 @@ namespace GradePortalAPI.Controllers
                         : 0
                 });
 
-                return Ok(skillsDto);
+                return Ok(new Result<IEnumerable<SkillDto>>(message:skillsResult.Message, isSuccess:skillsResult.IsSuccess, data:skillsDto));
             }
             catch (AppException e)
             {
@@ -87,10 +87,10 @@ namespace GradePortalAPI.Controllers
             var skill = _mapper.Map<Skill>(skillDto);
             try
             {
-                var addedSkill = await _skillService.AddOrCreateSkill(userId, skill);
-                var sk = _mapper.Map<SkillDto>(addedSkill);
+                var result = await _skillService.AddOrCreateSkill(userId, skill);
+                var sk = _mapper.Map<SkillDto>(result.Data);
 
-                return Ok(sk);
+                return Ok(new Result<SkillDto>(message: result.Message, isSuccess:result.IsSuccess, data:sk));
             }
             catch (AppException e)
             {
@@ -111,8 +111,9 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                var res = await _skillService.FindById(id);
-                return Ok(res);
+                var result = await _skillService.FindById(id);
+                var sk = _mapper.Map<SkillDto>(result);
+                return Ok(new Result<SkillDto>(message:"Skill found", isSuccess: true, data:sk));
             }
             catch (AppException e)
             {

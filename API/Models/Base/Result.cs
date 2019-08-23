@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using GradePortalAPI.Models.Interfaces.Base;
+using JetBrains.Annotations;
 
 namespace GradePortalAPI.Models.Base
 {
@@ -13,25 +15,31 @@ namespace GradePortalAPI.Models.Base
         /// <param name="isSuccess">Флаг успешности.</param>
         public Result(string message, bool isSuccess)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
-            IsSuccess = isSuccess;
-        }
-
-        public bool IsSuccess { get; }
-        public string Message { get; }
-    }
-
-    public class Result<T> : IResult<T>
-    {
-        public Result(T data, string message, bool isSuccess)
-        {
-            Data = data;
             Message = message;
             IsSuccess = isSuccess;
         }
 
         public bool IsSuccess { get; }
         public string Message { get; }
+        public string Description { get; set; }
+        public int? HttpErrorCode { get; set; }
+    }
+
+    public class Result<T> : IResult<T>
+    {
+        public Result(T data, string message, bool isSuccess, [CanBeNull] string description = "", int code = 0)
+        {
+            Data = data;
+            Message = message;
+            Description = description;
+            IsSuccess = isSuccess;
+            HttpErrorCode = code;
+        }
+
+        public bool IsSuccess { get; }
+        public string Message { get; }
+        [CanBeNull] public string Description { get; set; }
+        public int? HttpErrorCode { get; set; }
         public T Data { get; }
     }
 }

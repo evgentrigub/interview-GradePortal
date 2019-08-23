@@ -64,7 +64,7 @@ namespace GradePortalAPI.Services
                 .Where(r => r.Skill.Id == skillId && r.User.Id == userId)
                 .Select(r => r.Value);
 
-            if (evaluations.Sum() == 0) throw new AppException("Evaluations not found");
+            if (evaluations.Count() == 0) return 0;
 
             double a = evaluations.Sum();
             double b = evaluations.Count();
@@ -77,7 +77,7 @@ namespace GradePortalAPI.Services
             var evaluation = _context.Evaluations.SingleOrDefault(r =>
                 r.User.Id == userId && r.Expert.Id == expertId && r.Skill.Id == skillId);
             if (evaluation == null)
-                throw new AppException("Evaluation not found");
+                return 0;
 
             return evaluation.Value;
         }

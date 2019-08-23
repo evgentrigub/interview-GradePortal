@@ -105,7 +105,7 @@ namespace GradePortalAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<ExceptionMiddleware>();
+            //app.UseMiddleware<ExceptionMiddleware>();
             app.UseMvc();
         }
     }

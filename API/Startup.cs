@@ -30,7 +30,6 @@ namespace GradePortalAPI
         {
             services.AddDbContext<DataContext>(
                 x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            //services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddAutoMapper();
@@ -71,7 +70,7 @@ namespace GradePortalAPI
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISkillService, SkillService>();
-            services.AddScoped<ISkillSearchService, SkillSearchService>();
+            services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<IEvaluateService, EvaluateService>();
             services.AddSwaggerGen(c =>
             {
@@ -104,12 +103,8 @@ namespace GradePortalAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
 
+            //app.UseMiddleware<ExceptionMiddleware>();
             app.UseMvc();
         }
     }

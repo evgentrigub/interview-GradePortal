@@ -9,6 +9,11 @@ table {
   width: 100%;
 }
 
+.table-row:hover {
+  background-color: lightgrey;
+  cursor: pointer;
+}
+
 .jumbotron {
   padding: 2rem 1rem;
   margin-bottom: 2rem;

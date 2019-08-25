@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { User } from '../_models/user';
+import { User, UserAuthenticated } from '../_models/user';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../_services/authentication.service';
@@ -11,7 +11,7 @@ import { AuthenticationService } from '../_services/authentication.service';
 })
 export class NavBarComponent implements OnDestroy {
   isAuthorised: boolean;
-  currentUser: User | null;
+  currentUser: UserAuthenticated | null;
   currentUserSubscription: Subscription;
 
   constructor(private router: Router, private authenticationService: AuthenticationService) {

@@ -15,6 +15,7 @@ namespace GradePortalAPI.Helpers
     {
         public AppException(string message) : base(message)
         {
+
         }
     }
 
@@ -22,8 +23,10 @@ namespace GradePortalAPI.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserAuthDto>();
-            CreateMap<UserAuthDto, User>();
+            CreateMap<User, UserAuthenticateModel>();
+            CreateMap<UserAuthenticateModel,User>();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
             CreateMap<User, UserViewModel>();
             CreateMap<UserViewModel, User>();
             CreateMap<SkillDto, Skill>();

@@ -2,35 +2,41 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Users Table</mat-card-title>
-      <mat-card-subtitle>This table contains all registered users.</mat-card-subtitle>
+      <mat-card-subtitle>This table contains all registered users</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <table mat-table [dataSource]="dataSource" matSort style="width: 100%">
+      <app-search-panel #filterData (outParams)="getFilteredUsers($event)">
+      </app-search-panel>
+      <br />
+      <div class="loading-shade" *ngIf="isLoading">
+        <mat-spinner diameter="130" strokeWidth="9" style="vertical-align: middle"></mat-spinner>
+      </div>
+      <table mat-table [dataSource]="users" style="width: 100%">
         <ng-container matColumnDef="num">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>№</th>
+          <th mat-header-cell *matHeaderCellDef>№</th>
           <td mat-cell *matCellDef="let user">{{ user.num }}</td>
         </ng-container>
 
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let user">{{ user.firstName }} {{ user.lastName }}</td>
         </ng-container>
 
         <ng-container matColumnDef="city">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>City</th>
+          <th mat-header-cell *matHeaderCellDef>City</th>
           <td mat-cell *matCellDef="let user">{{ user.city }}</td>
         </ng-container>
 
         <ng-container matColumnDef="position">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
+          <th mat-header-cell *matHeaderCellDef>Position</th>
           <td mat-cell *matCellDef="let user">{{ user.position }}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let user; columns: displayedColumns" (click)="clickUser(user)"></tr>
+        <tr mat-row *matRowDef="let user; columns: displayedColumns" class="table-row" (click)="clickUser(user)"></tr>
       </table>
 
-      <mat-paginator [pageSizeOptions]="[2, 5]"></mat-paginator>
+      <mat-paginator [length]="resultsLength" [pageSizeOptions]="[3, 5]"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

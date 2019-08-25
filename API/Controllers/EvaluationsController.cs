@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Models.Interfaces;
@@ -8,31 +10,45 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
 {
+    //[Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class EvaluationsController : ControllerBase
     {
         private readonly IEvaluateService _evaluateService;
 
-        private readonly IMapper _mapper;
-
         public EvaluationsController(
             IMapper mapper,
             IEvaluateService evaluateService
         )
         {
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _evaluateService = evaluateService ?? throw new ArgumentNullException(nameof(evaluateService));
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="evaluation"></param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult Create([FromBody] EvaluateDto evaluation)
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Create([FromBody] EvaluateDto evaluation)
         {
-            var res = _evaluateService.Create(evaluation);
+            var res = await _evaluateService.Create(evaluation);
             return Ok(res);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult DeleteEvaluation(string id)
         {
             var res = _evaluateService.Delete(id);

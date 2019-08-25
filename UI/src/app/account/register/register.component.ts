@@ -3,9 +3,11 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../_services/authentication.service';
 import { UserService } from '../../_services/user.service';
-import { first } from 'rxjs/operators';
+import { first, tap, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material';
+import { User } from 'src/app/_models/user';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -26,7 +28,6 @@ export class RegisterComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private authneticateService: AuthenticationService,
     private snackbar: MatSnackBar
   ) {
     if (this.authenticationService.currentUserValue) {
@@ -54,13 +55,20 @@ export class RegisterComponent implements OnInit {
     }
 
     this.loading = true;
+    const user = this.registerForm.value as User;
     // setTimeout(() => {
-    this.authneticateService
-      .register(this.registerForm.value)
-      .pipe(first())
+    this.authenticationService
+      .register(user)
+      .pipe(
+        first(),
+        switchMap(r => {
+          const userLogin$ = this.authenticationService.login(user.username, user.password);
+          return userLogin$;
+        })
+      )
       .subscribe(
-        data => {
-          this.router.navigate(['/login']);
+        _ => {
+          this.router.navigate(['/table']);
           this.showMessage('Sign up success!');
           this.loading = false;
         },

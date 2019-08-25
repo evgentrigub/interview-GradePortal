@@ -1,0 +1,33 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Search for users
+    </mat-panel-title>
+    <mat-panel-description>
+      Type name, city, position or skill
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <form [formGroup]="searchForm">
+    <mat-grid-list cols="4" rowHeight="63px" gutterSize="5px">
+      <mat-grid-tile>
+        <mat-form-field>
+          <input matInput placeholder="Name" formControlName="name" />
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile *ngFor="let object of autoCompleteObjects">
+        <mat-form-field>
+          <input matInput [placeholder]="object.placeholder" [formControl]="object.control" [matAutocomplete]="auto" />
+        </mat-form-field>
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let el of object.options | async" [value]="el" style="height: auto;">
+            {{ el }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-grid-tile>
+    </mat-grid-list>
+
+    <button mat-button color="primary" [disabled]="!canSearch()" (click)="search()">Search</button>
+    <button mat-button color="warn" (click)="reset()">Reset</button>
+  </form>
+</mat-expansion-panel>

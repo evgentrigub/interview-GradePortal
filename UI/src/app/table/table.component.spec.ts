@@ -10,6 +10,7 @@ import { UserData } from '../_models/user-view-model';
 import { UserService } from '../_services/user.service';
 import { of } from 'rxjs';
 
+// tslint:disable: no-use-before-declare
 describe('TableComponent', () => {
 
   function setup() {
@@ -33,8 +34,8 @@ describe('TableComponent', () => {
         MatProgressSpinnerModule,
         MatCardModule,
         MatTableModule,
-        MatPaginatorModule
-      ]
+        MatPaginatorModule,
+      ],
     }).compileComponents();
   }));
 
@@ -111,3 +112,15 @@ describe('TableComponent', () => {
     }
   ]
 });
+
+const DATA: UserData[] = [
+  {
+    num: 0,
+    id: '1',
+    firstName: 'Evgen',
+    lastName: 'Trigubov',
+    username: 'evgentrigub',
+    city: 'Zelek',
+    position: 'Dev',
+  },
+];

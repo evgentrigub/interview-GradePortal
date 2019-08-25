@@ -1,71 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http;
+using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
+using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
+using GradePortalAPI.Models.Interfaces.Base;
+using GradePortalAPI.Services.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace GradePortalAPI.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseRepository<User>, IUserService
     {
         private readonly DataContext _context;
 
-        public UserService(DataContext context)
+        public UserService(DataContext context) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public User Authenticate(string username, string password)
+        /// <inheritdoc />
+        public async Task<IResult<User>> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                throw new AppException("Username or password is empty");
+                return new Result<User>(message: "Username or password is empty", isSuccess: false, data: null);
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
-            if (user == null)
-                throw new AppException("User not found. Username or password is incorrect");
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) return null;
-            return user;
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                return new Result<User>(message: "Username or password is incorrect. Try login again.", isSuccess: false, data: null);
+
+            return new Result<User>(message: "Authenticate successful!", isSuccess: true, data: user);
         }
 
-        public User Create(User user, string password)
+        /// <inheritdoc />
+        public async Task<IResult> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new AppException("Password is incorrect");
+                throw new AppException("Password is empty!");
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username has already existed. Username: " + user.Username);
+                throw new AppException("Username has already created!");
 
             CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
 
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
+            user.QuickSearchName = user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() +
+                                   user.FirstName.ToUpperInvariant();
+            user.QuickSearchCity = user.City.ToUpperInvariant();
+            user.QuickSearchPosition = user.Position.ToUpperInvariant();
 
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return user;
+            return new Result(message: "Created successfully !", isSuccess: true);
         }
 
-        public IEnumerable<User> GetAll()
+        /// <inheritdoc />
+        public async Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams)
         {
-            return _context.Users;
+            var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
+            return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
         }
 
+        /// <inheritdoc />
         public User GetById(string id)
         {
             return _context.Users.Find(id);
         }
 
-        public User GetByUserName(string username)
+        /// <inheritdoc />
+        public async Task<IResult<User>> GetByUserName(string username)
         {
-            return _context.Users.SingleOrDefault(r => r.Username == username);
+            if (username == null)
+                throw new AppException("Username is empty");
+
+            var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
+            return new Result<User>(message: "Success", isSuccess: true, data: res);
         }
 
-        public void Update(string id, User user, string password = null)
+        /// <inheritdoc />
+        public IResult Update(string id, User user, string password = null)
         {
             if (id != user.Id)
                 throw new AppException("User try update another profile!");
@@ -75,15 +99,20 @@ namespace GradePortalAPI.Services
             if (currentUser == null)
                 throw new AppException("User not found");
 
-            if (user.Username != currentUser.Username)
-                if (_context.Users.Any(x => x.Username == user.Username))
-                    throw new AppException("Username has already existed. Username:" + user.Username);
+
+            if (user.Username != currentUser.Username && _context.Users.Any(x => x.Username == user.Username))
+                throw new AppException("Username has already existed. Username:" + user.Username);
 
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
             currentUser.Username = user.Username;
             currentUser.City = user.City;
             currentUser.Position = user.Position;
+            
+            currentUser.QuickSearchName = 
+                user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() + user.FirstName.ToUpperInvariant();
+            currentUser.QuickSearchCity = user.City.ToUpperInvariant();
+            currentUser.QuickSearchPosition = user.Position.ToUpperInvariant();
 
             if (!string.IsNullOrWhiteSpace(password))
             {
@@ -96,16 +125,19 @@ namespace GradePortalAPI.Services
 
             _context.Users.Update(currentUser);
             _context.SaveChanges();
+            return new Result("Update successful!", true);
         }
 
-        public void Delete(int id)
+        /// <inheritdoc />
+        public int CountAllUsers()
         {
-            var user = _context.Users.Find(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            }
+            return _context.Users.Count();
+        }
+
+        /// <inheritdoc />
+        public IQueryable<User> GetAll()
+        {
+            return _context.Users.AsQueryable();
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

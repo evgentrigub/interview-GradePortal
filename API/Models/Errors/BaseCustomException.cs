@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 
 namespace GradePortalAPI.Models.Errors
 {
-    public class BaseCustomException: Exception
+    public class BaseCustomException
     {
-        public int Status { get; set; }
-        public string Description { get; set; }
-        public BaseCustomException(string message, string description, int status) : base(message)
+        public string Message { get; }
+        public int Status { get; }
+
+        public BaseCustomException(string message, int status)
         {
+            Message = message;
             Status = status;
-            Description = description;
         }
     }
 }

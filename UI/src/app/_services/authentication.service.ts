@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { User, UserAuthenticated } from '../_models/user';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CustomErrorResponse } from '../_models/custom-error-response';
 import { Result } from '../_models/result-model';
@@ -36,7 +36,9 @@ export class AuthenticationService {
           }
           return result;
         }),
-        // catchError(this.handleError)
+        catchError(e => {
+          return this.handleError(e);
+        })
       );
   }
 
@@ -52,18 +54,11 @@ export class AuthenticationService {
     this.currentUserSubject.next(null);
   }
 
-  // private handleError(errorMessage: string) {
-  //   console.error('AuthenticationService::handleError() ' + errorMessage);
-  //   return throwError(errorMessage);
-  // }
+  private handleError(error: CustomErrorResponse) {
+    let msg: string;
+    msg = error.message + ` Status Code: ${error.status}`;
 
-  // private handleError(error: CustomErrorResponse) {
-  //   let msg: string;
-
-  //   msg = `Произошла ошибка: ${error.message}. ${error.description}. Код ошибки ${error.status}`;
-
-  //   console.error('PositionService::handleError() ' + msg);
-
-  //   return throwError('Произошла ошибка:' + msg);
-  // }
+    console.error('AuthenticationService::handleError() ' + msg);
+    return throwError('Error: ' + msg);
+  }
 }

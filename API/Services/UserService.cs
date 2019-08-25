@@ -31,14 +31,12 @@ namespace GradePortalAPI.Services
         public async Task<IResult<User>> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                throw new AppException("Username or password is empty");
+                return new Result<User>(message: "Username or password is empty", isSuccess: false, data: null);
 
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
-            if (user == null)
-                return new Result<User>(message:"User not found", isSuccess: false, data:null);
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                throw new AppException("Username or password is incorrect");
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                return new Result<User>(message: "Username or password is incorrect. Try login again.", isSuccess: false, data: null);
 
             return new Result<User>(message: "Authenticate successful!", isSuccess: true, data: user);
         }

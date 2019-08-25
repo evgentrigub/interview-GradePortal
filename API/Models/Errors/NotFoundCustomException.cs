@@ -8,9 +8,8 @@ namespace GradePortalAPI.Models.Errors
 {
     public class NotFoundCustomException: BaseCustomException
     {
-        public NotFoundCustomException(string message, string description) : base(message, description, (int)HttpStatusCode.NotFound)
+        public NotFoundCustomException(string message) : base(message, (int)HttpStatusCode.NotFound)
         {
-            Status = (int)HttpStatusCode.NotFound;
         }
     }
 }

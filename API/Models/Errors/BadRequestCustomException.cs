@@ -8,9 +8,8 @@ namespace GradePortalAPI.Models.Errors
 {
     public class BadRequestCustomException: BaseCustomException
     {
-        public BadRequestCustomException(string message, string description) : base(message, description, (int)HttpStatusCode.BadRequest)
+        public BadRequestCustomException(string message) : base(message, (int)HttpStatusCode.BadRequest)
         {
-            Status = (int)HttpStatusCode.BadRequest;
         }
     }
 }

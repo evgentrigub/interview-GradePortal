@@ -9,7 +9,6 @@ namespace GradePortalAPI.Models.Base
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="Result" /> class.
-        ///     Конструктор.
         /// </summary>
         /// <param name="message">Сообщение.</param>
         /// <param name="isSuccess">Флаг успешности.</param>
@@ -21,25 +20,27 @@ namespace GradePortalAPI.Models.Base
 
         public bool IsSuccess { get; }
         public string Message { get; }
-        public string Description { get; set; }
-        public int? HttpErrorCode { get; set; }
     }
 
     public class Result<T> : IResult<T>
     {
-        public Result(T data, string message, bool isSuccess, [CanBeNull] string description = "", int code = 0)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Result{T}"/> class.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="isSuccess">if set to <c>true</c> [is success].</param>
+        /// <param name="description">The description.</param>
+        /// <param name="code">The code.</param>
+        public Result(T data, string message, bool isSuccess)
         {
             Data = data;
             Message = message;
-            Description = description;
             IsSuccess = isSuccess;
-            HttpErrorCode = code;
         }
 
         public bool IsSuccess { get; }
         public string Message { get; }
-        [CanBeNull] public string Description { get; set; }
-        public int? HttpErrorCode { get; set; }
         public T Data { get; }
     }
 }

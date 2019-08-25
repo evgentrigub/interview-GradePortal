@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -10,12 +11,15 @@ using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
+using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using Newtonsoft.Json;
 
 namespace GradePortalAPI.Controllers
 {
@@ -53,7 +57,8 @@ namespace GradePortalAPI.Controllers
             {
                 var res = await _userService.Authenticate(userDto.Username, userDto.Password);
                 if (res.IsSuccess == false)
-                    return Ok(res);
+                    return NotFound(new NotFoundCustomException(res.Message));
+
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -72,11 +77,11 @@ namespace GradePortalAPI.Controllers
                 var user = _mapper.Map<UserAuthenticateModel>(res.Data);
                 user.Token = tokenToSend;
 
-                return Ok(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true, data: user));
+                return Accepted(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true, data: user));
             }
-            catch (AppException e)
+            catch (AppException exception)
             {
-                return BadRequest(new {message = e.Message});
+                return BadRequest(new {exception.Message});
             }
         }
 
@@ -97,7 +102,7 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var res = await _userService.Create(user, userDto.Password);
-                return Ok(res);
+                return Created("", res);
             }
             catch (AppException e)
             {

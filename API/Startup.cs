@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Helpers;
-using GradePortalAPI.Middleware;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

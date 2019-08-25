@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../_services/user.service';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular/material';
@@ -30,11 +30,13 @@ export class TableComponent implements AfterViewInit {
     private userService: UserService,
     private searchService: SearchPanelService,
     private router: Router,
-    private snackBar: MatSnackBar) { }
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef) { }
 
   ngAfterViewInit() {
     // this.sort.sortChange.subscribe(r => this.paginator.pageIndex = 0);
     this.loadUsersData();
+    this.cdr.detectChanges();
   }
 
   clickUser(user: UserData) {

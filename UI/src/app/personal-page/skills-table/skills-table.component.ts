@@ -83,7 +83,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
     if (changes.hasOwnProperty('userSkillsResult')) {
       const chg = changes.userSkillsResult;
-      const result = chg.currentValue as Result<SkillViewModel[]>
+      const result = chg.currentValue as Result<SkillViewModel[]>;
       if (!result) {
         return;
       }
@@ -175,7 +175,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
               _ => {
                 this.showMessage(`You rated skill at ${evaluateControl.value} points`);
                 this.evaluatedSkill = '';
-                this.updateSkillsDataSource()
+                this.updateSkillsDataSource();
                 this.detector.markForCheck();
               },
               err => this.showMessage(err)

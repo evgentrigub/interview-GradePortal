@@ -28,7 +28,7 @@ namespace GradePortalAPI.Services
         {
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             if (user == null)
-                throw new AppException("User not found");
+                return new Result<IList<Skill>>(message: "User not found. UserId: "+userId, isSuccess: false, data: null);
 
             var skills = await _userService.GetAll()
                 .Where(u => u.Id == userId)
@@ -42,10 +42,10 @@ namespace GradePortalAPI.Services
         {
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             if (user == null || skill == null)
-                throw new AppException("User or Skill not found");
+                return new Result<Skill>(message: "User or Skill not found", isSuccess: false, data: null);
 
             if (string.IsNullOrEmpty(skill.Name) || string.IsNullOrEmpty(skill.Description))
-                throw new AppException("Skill: Name or Description is empty");
+                return new Result<Skill>(message: "Skill Name or Description is empty", isSuccess: false, data: null);
 
             if (string.IsNullOrEmpty(skill.Id))
             {
@@ -70,13 +70,19 @@ namespace GradePortalAPI.Services
         {
             var newSkill = new Skill {Name = skill.Name, Description = skill.Description};
 
-            var a = _context.Skills.Add(newSkill);
-            if (a == null)
-                throw new AppException("Create skill error");
+            try
+            {
+                _context.Skills.Add(newSkill);
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-            return newSkill;
+                return newSkill;
+            }
+            catch (AppException e)
+            {
+                throw new AppException("Create skill Error:"+e.Message);
+            }
+
         }
 
         /// <summary>
@@ -87,7 +93,10 @@ namespace GradePortalAPI.Services
         /// <returns></returns>
         private async Task<Skill> AddSkillToUser(User user, Skill skill)
         {
-            if (skill != null && user != null)
+            if (skill == null || user == null)
+                throw new AppException("Add skill to user. Error: User or Skill is null");
+
+            try
             {
                 var userSkills = new UserSkill
                 {
@@ -99,8 +108,10 @@ namespace GradePortalAPI.Services
                 await _context.SaveChangesAsync();
                 return skill;
             }
-
-            throw new AppException("Add skill to user error. User or Skill is null");
+            catch (AppException e)
+            {
+                throw new AppException("Add skill to user. Error: "+e.Message);
+            }
         }
     }
 }

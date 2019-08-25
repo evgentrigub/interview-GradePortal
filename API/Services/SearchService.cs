@@ -4,6 +4,8 @@ using System.Linq;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
+using GradePortalAPI.Models;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
@@ -15,6 +17,7 @@ namespace GradePortalAPI.Services
     public class SearchService : ISearchService
     {
         private static readonly IQueryable<SkillDto> Empty = new SkillDto[0].AsQueryable();
+        private static readonly IQueryable<string> EmptyArr = new string[0].AsQueryable();
 
         [NotNull] private readonly DataContext _context;
         private readonly IMapper _mapper;
@@ -31,46 +34,61 @@ namespace GradePortalAPI.Services
         /// <inheritdoc />
         public IQueryable<SkillDto> SkillSearch(string query)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            if (query == null)
+                throw new AppException(message: "Search query is null");
 
             if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return Empty;
 
-            var res = _context.Skills
-                .Where(r => EF.Functions.Like(r.Name, $"%{query}%"))
-                .Select(r => new SkillDto
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Description = r.Description
-                });
+            try
+            {
+                var res = _context.Skills
+                    .Where(r => EF.Functions.Like(r.Name, $"%{query}%"))
+                    .Select(r => new SkillDto
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Description = r.Description
+                    });
 
-            return res.Take(20);
+                return res.Take(20);
+            }
+            catch (AppException e)
+            {
+                throw new AppException(message: "Skill search. Error"+e.Message);
+            }
         }
 
         /// <inheritdoc />
         public IQueryable<string> ParamSearch(string query, SearchGroup num)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            if (query == null)
+                throw new AppException(message: "Search query or is null");
 
-            if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return null;
+            if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return EmptyArr;
 
-            IQueryable<string> res = null;
+            IQueryable<string> res = EmptyArr;
 
-            switch (num)
+            try
             {
-                case SearchGroup.City:
-                    res = _context.Users.Where(r => EF.Functions.Like(r.City, $"%{query}%")).Select(r => r.City);
-                    break;
-                case SearchGroup.Position:
-                    res = _context.Users.Where(r => EF.Functions.Like(r.Position, $"%{query}%"))
-                        .Select(r => r.Position);
-                    break;
-                case SearchGroup.Skill:
-                    res = _context.Skills.Where(r => EF.Functions.Like(r.Name, $"%{query}%")).Select(r => r.Name);
-                    break;
+                switch (num)
+                {
+                    case SearchGroup.City:
+                        res = _context.Users.Where(r => EF.Functions.Like(r.City, $"%{query}%")).Select(r => r.City);
+                        break;
+                    case SearchGroup.Position:
+                        res = _context.Users.Where(r => EF.Functions.Like(r.Position, $"%{query}%"))
+                            .Select(r => r.Position);
+                        break;
+                    case SearchGroup.Skill:
+                        res = _context.Skills.Where(r => EF.Functions.Like(r.Name, $"%{query}%")).Select(r => r.Name);
+                        break;
+                }
+                return res.Take(10);
             }
-
-            return (res ?? throw new InvalidOperationException()).Take(10);
+            catch (AppException e)
+            {
+                throw new AppException(message: "Param search Error" + e.Message);
+            }
         }
 
         /// <inheritdoc />
@@ -78,46 +96,53 @@ namespace GradePortalAPI.Services
         {
             var res = _context.Users.Include(r => r.UserSkills).ThenInclude(r => r.Skill).AsQueryable();
 
-            var name = GetFilterFromFiltersDictionaryOrDefault("name", options);
-            if (name != null)
+            try
             {
-                name = name.ToUpperInvariant().Replace(" ", "");
-                res = res.Where(r => r.QuickSearchName.Contains(name));
+                var name = GetFilterFromFiltersDictionaryOrDefault("name", options);
+                if (name != null)
+                {
+                    name = name.ToUpperInvariant().Replace(" ", "");
+                    res = res.Where(r => r.QuickSearchName.Contains(name));
+                }
+
+                var city = GetFilterFromFiltersDictionaryOrDefault("city", options);
+                if (city != null)
+                {
+                    city = city.ToUpperInvariant();
+                    res = res.Where(r => r.QuickSearchCity.Contains(city));
+                }
+
+                var position = GetFilterFromFiltersDictionaryOrDefault("pos", options);
+                if (position != null)
+                {
+                    position = position.ToUpperInvariant();
+                    res = res.Where(r => r.QuickSearchPosition.Contains(position));
+                }
+
+                var skill = GetFilterFromFiltersDictionaryOrDefault("skill", options);
+                if (skill != null)
+                {
+                    skill = skill.ToUpperInvariant();
+                    res = res.Where(u =>
+                        u.UserSkills.Select(c => c.Skill).Any(s => s.QuickSearch.Contains(skill)));
+                }
+
+                var cutRes = res.Skip(skip).Take(take);
+
+                var usersView = _mapper.Map<IEnumerable<UserViewModel>>(cutRes);
+
+                var userTableData = new UserDataTable
+                {
+                    Items = usersView,
+                    TotalCount = res.Count()
+                };
+
+                return userTableData;
             }
-
-            var city = GetFilterFromFiltersDictionaryOrDefault("city", options);
-            if (city != null)
+            catch (Exception e)
             {
-                city = city.ToUpperInvariant();
-                res = res.Where(r => r.QuickSearchCity.Contains(city));
+                throw new AppException(message: "Users search Error" + e.Message);
             }
-
-            var position = GetFilterFromFiltersDictionaryOrDefault("pos", options);
-            if (position != null)
-            {
-                position = position.ToUpperInvariant();
-                res = res.Where(r => r.QuickSearchPosition.Contains(position));
-            }
-
-            var skill = GetFilterFromFiltersDictionaryOrDefault("skill", options);
-            if (skill != null)
-            {
-                skill = skill.ToUpperInvariant();
-                res = res.Where(u =>
-                    u.UserSkills.Select(c => c.Skill).Any(s => s.QuickSearch.Contains(skill)));
-            }
-
-            var cutRes = res.Skip(skip).Take(take);
-
-            var usersView = _mapper.Map<IEnumerable<UserViewModel>>(cutRes);
-
-            var userTableData = new UserDataTable
-            {
-                Items = usersView,
-                TotalCount = res.Count()
-            };
-
-            return userTableData;
         }
 
         private string GetFilterFromFiltersDictionaryOrDefault(string filterKey, IDictionary<string, string> filters)

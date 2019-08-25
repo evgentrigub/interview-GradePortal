@@ -14,6 +14,7 @@ using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
 using GradePortalAPI.Services.Repositories;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace GradePortalAPI.Services
@@ -33,6 +34,7 @@ namespace GradePortalAPI.Services
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return new Result<User>(message: "Username or password is empty", isSuccess: false, data: null);
 
+
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
 
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
@@ -45,30 +47,38 @@ namespace GradePortalAPI.Services
         public async Task<IResult> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new AppException("Password is empty!");
+                return new Result(message: "Password is empty!", isSuccess: false);
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username has already created!");
+                return new Result(message: "Username has already created!", isSuccess: false);
 
             CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+            if (passwordHash == null || passwordSalt == null)
+                throw new AppException(message: "Can create password hash");
 
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
+
             user.QuickSearchName = user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() +
                                    user.FirstName.ToUpperInvariant();
             user.QuickSearchCity = user.City.ToUpperInvariant();
             user.QuickSearchPosition = user.Position.ToUpperInvariant();
 
-            _context.Users.Add(user);
+            var a = _context.Users.Add(user);
+            if(a == null)
+                throw new AppException(message:"Can't create user");
+
             await _context.SaveChangesAsync();
 
-            return new Result(message: "Created successfully !", isSuccess: true);
+            return new Result(message: "Created successful!", isSuccess: true);
         }
 
         /// <inheritdoc />
         public async Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams)
         {
             var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
+            if(users == null)
+                throw new AppException(message: "Internal Error: can't get users with params: "+tableParams.Page+ " "+tableParams.PageSize);
             return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
         }
 
@@ -82,9 +92,12 @@ namespace GradePortalAPI.Services
         public async Task<IResult<User>> GetByUserName(string username)
         {
             if (username == null)
-                throw new AppException("Username is empty");
+                return new Result<User>(message: "Username is empty. Print username and try again", isSuccess: false, data:null);
 
             var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
+            if(res == null)
+                return new Result<User>(message: "Can't find user with username: "+username, isSuccess: false, data: null);
+
             return new Result<User>(message: "Success", isSuccess: true, data: res);
         }
 
@@ -92,16 +105,17 @@ namespace GradePortalAPI.Services
         public IResult Update(string id, User user, string password = null)
         {
             if (id != user.Id)
-                throw new AppException("User try update another profile!");
+                return new Result(message: "User try update another profile! User id: "+id+", profile id:"+user.Id, isSuccess: false);
 
             var currentUser = _context.Users.Find(user.Id);
 
             if (currentUser == null)
-                throw new AppException("User not found");
-
+                return new Result(message: "User not found", isSuccess: false);
 
             if (user.Username != currentUser.Username && _context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username has already existed. Username:" + user.Username);
+                return new Result(message: "Username has already existed. Username:", isSuccess: false);
+
+            // проверка полей у user
 
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
@@ -142,7 +156,8 @@ namespace GradePortalAPI.Services
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            if (password == null) throw new ArgumentNullException("password");
+            if (password == null)
+                throw new ArgumentNullException("password");
             if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value is empty", "password");
 
             var hmac = new HMACSHA512();

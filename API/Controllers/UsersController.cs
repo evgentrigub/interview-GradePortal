@@ -59,6 +59,7 @@ namespace GradePortalAPI.Controllers
                 if (res.IsSuccess == false)
                     return NotFound(new NotFoundCustomException(res.Message));
 
+                // вынести токен в отдельный метод в сервисе
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -102,6 +103,9 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var res = await _userService.Create(user, userDto.Password);
+                if (res.IsSuccess == false)
+                    return BadRequest(new BadRequestCustomException(res.Message));
+
                 return Created("", res);
             }
             catch (AppException e)
@@ -121,16 +125,23 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetUsers([FromQuery] TableParamsDto tableParams)
         {
-            var result = await _userService.GetUsersWithParams(tableParams);
-            var userTableData = new UserDataTable
+            try
             {
-                Items = _mapper.Map<IList<UserViewModel>>(result.Data),
-                TotalCount = _userService.CountAllUsers()
-            };
-            var res = new Result<UserDataTable>(
-                message: result.Message, isSuccess: result.IsSuccess, data: userTableData);
+                var result = await _userService.GetUsersWithParams(tableParams);
+                var userTableData = new UserDataTable
+                {
+                    Items = _mapper.Map<IList<UserViewModel>>(result.Data),
+                    TotalCount = _userService.CountAllUsers()
+                };
+                var res = new Result<UserDataTable>(
+                    message: result.Message, isSuccess: result.IsSuccess, data: userTableData);
 
-            return Ok(res);
+                return Ok(res);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         /// <summary>
@@ -138,7 +149,7 @@ namespace GradePortalAPI.Controllers
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        /// <response code="200">Returns registered user</response>
+        /// <response code="200">Returns user</response>
         /// <response code="400">If username is empty</response>
         [HttpGet("{username}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
@@ -148,6 +159,8 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var result = await _userService.GetByUserName(username);
+                if (result.IsSuccess == false)
+                    return BadRequest(new BadRequestCustomException(result.Message));
                 var userViewModel = _mapper.Map<UserViewModel>(result.Data);
                 return Ok(new Result<UserViewModel>(message: result.Message, isSuccess:result.IsSuccess, data: userViewModel));
             }
@@ -162,11 +175,11 @@ namespace GradePortalAPI.Controllers
         /// <param name="id"></param>
         /// <param name="userDto"></param>
         /// <returns></returns>
-        /// <response code="204">Returns registered user</response>
+        /// <response code="200">Updated successful</response>
         /// <response code="400">If error while updating</response>
         [Authorize]
         [HttpPut("{id}")]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
@@ -177,6 +190,8 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var res = _userService.Update(id, user, userDto.Password);
+                if (res.IsSuccess == false)
+                    return BadRequest(new BadRequestCustomException(res.Message));
                 return Ok(res);
             }
             catch (AppException e)
@@ -201,8 +216,8 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                var res = await _userService.Delete(id);
-                return Ok(res);
+                await _userService.Delete(id);
+                return NoContent();
             }
             catch (AppException e)
             {

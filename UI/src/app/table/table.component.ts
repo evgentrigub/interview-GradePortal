@@ -17,45 +17,46 @@ export class TableComponent implements AfterViewInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
-  users: UserData[] = [];
-  searchParams: ISearchOptions;
+  private searchParams: ISearchOptions;
 
+  users: UserData[] = [];
   displayedColumns: string[] = ['num', 'name', 'city', 'position'];
   dataSource: MatTableDataSource<UserData>;
-
   resultsLength = 0;
+
   isLoading = true;
 
   constructor(
     private userService: UserService,
     private searchService: SearchPanelService,
-    private router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef) { }
 
-  ngAfterViewInit() {
-    // this.sort.sortChange.subscribe(r => this.paginator.pageIndex = 0);
+  ngAfterViewInit(): void {
     this.loadUsersData();
     this.cdr.detectChanges();
   }
 
-  clickUser(user: UserData) {
-    this.router.navigate([`/${user.username}`]);
-  }
-
-  getFilteredUsers(params: ISearchOptions) {
+  /**
+   * Set search params from emiiter
+   * @param params params with filter by city, position or skill
+   */
+  setFilteredUsers(params: ISearchOptions) {
     this.searchParams = params;
     this.loadUsersData();
   }
 
-  loadUsersData() {
+  /**
+   * Update user table after each change in paginator or search panel
+   */
+  private loadUsersData(): void {
     merge(this.paginator.page)
       .pipe(
         startWith({}),
         switchMap(() => {
           this.isLoading = true;
           if (!this.searchParams || this.searchParams.filter.length === 0) {
-            return this.userService.getAll(this.paginator.pageIndex, this.paginator.pageSize);
+            return this.userService.getUsersWithParams(this.paginator.pageIndex, this.paginator.pageSize);
           } else {
             this.searchParams.pageIndex = this.paginator.pageIndex;
             this.searchParams.pageSize = this.paginator.pageSize;

@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { User, UserAuthenticated } from '../_models/user';
+import { Component, OnDestroy } from '@angular/core';
+import { UserAuthenticated } from '../_models/user';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../_services/authentication.service';
@@ -16,7 +16,6 @@ export class NavBarComponent implements OnDestroy {
 
   constructor(private router: Router, private authenticationService: AuthenticationService) {
     this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
-      // this.isAuthorised = user ? true : false;
       this.currentUser = user ? user : null;
     });
   }
@@ -25,15 +24,10 @@ export class NavBarComponent implements OnDestroy {
     this.currentUserSubscription.unsubscribe();
   }
 
-  clickAccount(): void {
-    if (this.currentUser) {
-      this.router.navigate([`/${this.currentUser.username}`]);
-    } else {
-      this.router.navigate(['/login']);
-    }
-  }
-
-  private _logout(): void {
+  /**
+   * Log out current account
+   */
+  logout(): void {
     this.authenticationService.logout();
     this.router.navigate(['/login']);
   }

@@ -10,7 +10,6 @@ import { ErrorInterceptor } from './account/error.interceptor';
 import { JwtInterceptor } from './account/jwt.interceptor';
 import { LoginComponent } from './account/login/login.component';
 import { RegisterComponent } from './account/register/register.component';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { appRoutingModule } from './app.routing';
 import { MaterialModule } from './material-module';
@@ -36,7 +35,6 @@ import { SkillsTableComponent } from './personal-page/skills-table/skills-table.
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
     ReactiveFormsModule,
     MaterialModule,
     appRoutingModule,
@@ -48,4 +46,4 @@ import { SkillsTableComponent } from './personal-page/skills-table/skills-table.
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

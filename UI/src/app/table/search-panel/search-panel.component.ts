@@ -70,8 +70,15 @@ export class SearchPanelComponent {
     ];
   }
 
+  /**
+   * Emit search params out
+   */
   search(): void {
     const searchValue = this.searchForm.value;
+    if (!searchValue) {
+      return;
+    }
+
     this.filteredParams.filter = new Array<KeyValue<string, string>>();
     for (const el of Object.getOwnPropertyNames(searchValue)) {
       this.filteredParams.filter.push({ key: el, value: searchValue[el] });
@@ -79,15 +86,27 @@ export class SearchPanelComponent {
     this.outParams.emit(this.filteredParams);
   }
 
+  /**
+   * Emit null search params out (return data without params)
+   */
   reset(): void {
     this.outParams.emit(null);
     this.searchForm.reset();
   }
 
+  /**
+   * Check validation for search
+   */
   canSearch(): boolean {
     return this.searchForm.dirty;
   }
 
+  /**
+   * Return autocomplete options after each change
+   * in param input: city, position or skill name.
+   * @param searchControl control of search param: city, position or skill name
+   * @param group number of SearchGroup enum
+   */
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {
     return searchControl.valueChanges.pipe(
       startWith(''),
@@ -105,7 +124,7 @@ export class SearchPanelComponent {
       return of([]);
     }
 
-    return this.searchService.searchAnyParams(value, group).pipe(
+    return this.searchService.getSearchParams(value, group).pipe(
       map(response =>
         response.filter(option => {
           return option.toLowerCase().includes(value.toLowerCase());

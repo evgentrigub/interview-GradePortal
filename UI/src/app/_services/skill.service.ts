@@ -17,7 +17,7 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
 export class SkillService {
   private skillsUrl = `${environment.apiUrl}/skills/`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getUserSkills(username: string, expertId?: string): Observable<Result<SkillViewModel[]>> {
     return this.http
@@ -30,8 +30,8 @@ export class SkillService {
   }
 
   /**
-   * Получить список должностей подходящих под запрос
-   * @param skillQuery запрос автоподстановки должности
+   * Return possible skill options
+   * @param skillQuery search query
    */
   getAutocompleteSkills(skillQuery: string): Observable<SkillViewModel[]> {
     if (!skillQuery) {
@@ -52,14 +52,19 @@ export class SkillService {
     );
   }
 
+  /**
+   * Create new skill evaluatiuon
+   * @param evaluation evaluation model
+   */
   addEvaluation(evaluation: EvaluationToSend): Observable<ResultMessage> {
-    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation).pipe(catchError(this.handleError));
+    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   private handleError(error: CustomErrorResponse) {
-    let msg: string;
-    msg = error.message + ` Status Code: ${error.status}`;
-
+    const msg = error.message + ` Status Code: ${error.status}`;
     console.error('SkillService::handleError() ' + msg);
     return throwError('Error: ' + msg);
   }

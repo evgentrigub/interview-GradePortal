@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, Input, OnChanges, ViewChild } from '@angular/core';
-import { EditBaseComponent } from 'src/app/edit-base/edit-base-component';
+import { EditBaseComponent, ActionType } from 'src/app/edit-base/edit-base-component';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { SkillService } from 'src/app/_services/skill.service';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
@@ -49,14 +49,15 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     this.evaluateSkillId = skillId;
   }
 
-  evaluationControl: FormControl;
   private evaluateSkillId = '';
   readonly newSkillFormGroup: FormGroup;
   private newSkillNameControl: FormControl = new FormControl();
   private lastAutoCompleteValue = '';
+
+  evaluationControl: FormControl;
   nameSkillOptions: Observable<SkillViewModel[]>;
   dataSource: MatTableDataSource<SkillViewModel>;
-  private isLoading: boolean;
+  isLoading: boolean;
 
   constructor(
     private skillService: SkillService,
@@ -95,43 +96,59 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     }
   }
 
-  protected Edit(groupNum: number, skill: SkillViewModel): void {
-    switch (groupNum) {
-      case 1:
+  /**
+   * @param groupNum switch case 1)add new skill; 2)evaluate skill
+   * @param skill skill model for evaluation
+   */
+  protected Edit(type: ActionType, skill: SkillViewModel): void {
+    switch (type) {
+      case 'create skill':
         this.isEditMode = true;
         break;
 
-      case 2:
+      case 'add evaluation':
         this.evaluatedSkill = skill.id;
         this.evaluationControl = new FormControl(skill.expertEvaluate, [Validators.required, Validators.min(0), Validators.max(5)]);
         break;
     }
   }
-  protected CancelEdit(groupNum: number): void {
-    switch (groupNum) {
-      case 1:
+
+  /**
+   * @param groupNum switch case 1)add new skill; 2)evaluate skill
+   */
+  protected CancelEdit(type: ActionType): void {
+    switch (type) {
+      case 'create skill':
         this.isEditMode = false;
         this.newSkillFormGroup.reset();
         break;
 
-      case 2:
+      case 'add evaluation':
         this.evaluatedSkill = '';
         break;
     }
   }
 
-  protected CanSave(groupNum: number): boolean {
-    switch (groupNum) {
-      case 1:
+  /**
+   * @param groupNum switch case 1)add new skill; 2)evaluate skill
+   */
+  protected CanSave(type: ActionType): boolean {
+    switch (type) {
+      case 'create skill':
         return this.newSkillFormGroup.dirty && this.newSkillFormGroup.valid;
 
-      case 2:
+      case 'add evaluation':
         return this.evaluationControl.dirty && this.evaluationControl.valid;
     }
   }
-  protected Save(groupNum: number, skill: SkillViewModel): void {
-    switch (groupNum) {
-      case 1:
+
+  /**
+   * @param groupNum switch case 1)add new skill; 2)evaluate skill
+   * @param skill skill model for evaluation
+   */
+  protected Save(type: ActionType, skill: SkillViewModel): void {
+    switch (type) {
+      case 'create skill':
         const group = this.newSkillFormGroup;
         if (!group) {
           return;
@@ -155,7 +172,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           .subscribe();
         break;
 
-      case 2:
+      case 'add evaluation':
         const evaluateControl = this.evaluationControl;
         if (!evaluateControl) {
           return;
@@ -186,6 +203,11 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     }
   }
 
+  /**
+   * Set all skill model from option.
+   * Includes skill description and id.
+   * @param event option from autocomplete
+   */
   setAutocompleteEvent(event: MatAutocompleteSelectedEvent): void {
     const skill = event.option.value as SkillToSend;
 
@@ -200,6 +222,9 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     this.detector.markForCheck();
   }
 
+  /**
+   * Return autocomplete options after each change in skill name input.
+   */
   private getAutocompleteSkills(): Observable<SkillViewModel[]> {
     return this.newSkillNameControl.valueChanges.pipe(
       startWith(''),
@@ -228,6 +253,9 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     );
   }
 
+  /**
+   * Update skills table datasource.
+   */
   updateSkillsDataSource(): void {
     this.skillService.getUserSkills(this.routeUsername, this.currentUser.id).subscribe(res => {
       if (res.isSuccess) {

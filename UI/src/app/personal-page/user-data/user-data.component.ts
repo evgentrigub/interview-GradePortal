@@ -7,8 +7,8 @@ import { MatSnackBar } from '@angular/material';
 import { tap } from 'rxjs/operators';
 import { Result } from 'src/app/_models/result-model';
 import { AuthenticationService } from 'src/app/_services/authentication.service';
-import { Subscription, Observable, BehaviorSubject } from 'rxjs';
-import { User, UserAuthenticated } from 'src/app/_models/user';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { UserAuthenticated } from 'src/app/_models/user';
 import { Router } from '@angular/router';
 
 @Component({
@@ -54,14 +54,13 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
         return;
       }
       this.isLoading = false;
-      this.userFormGroup = this.createUserFormGroup(res.data);
+      this.userFormGroup = this.getUserFormGroup(res.data);
     }
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   protected Edit(): void {
-    console.log(this.userDataResult);
     this.editMode = true;
     this.previosUserDataState = this.userFormGroup.value;
   }
@@ -87,15 +86,13 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
             if (result.isSuccess) {
               this.currentUser$.subscribe(res => {
                 const user = this.changeUserInLocalStorage(data, res);
-                if (user) {
-                  this.isEditMode = false;
-                  this.userFormGroup.markAsPristine();
-                  this.userFormGroup.enable();
-                  this.detector.markForCheck();
+                this.isEditMode = false;
+                this.userFormGroup.markAsPristine();
+                this.userFormGroup.enable();
+                this.detector.markForCheck();
 
-                  this.showMessage(`Account updated successfully! Username: ${data.username}`);
-                  this.router.navigate([`/${user.username}`]);
-                }
+                this.showMessage(result.message + ` Username: ${data.username}`);
+                this.router.navigate([`/${user.username}`]);
               });
             }
           },
@@ -105,6 +102,11 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
       .subscribe();
   }
 
+  /**
+   * Change user data in local storage, saving authorization token
+   * @param newUser new user data to set to storage
+   * @param previousUser previous user data in storage
+   */
   private changeUserInLocalStorage(newUser: UserData, previousUser: UserAuthenticated) {
     const user = newUser as UserAuthenticated;
     user.token = previousUser.token;
@@ -116,7 +118,11 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
     return user;
   }
 
-  private createUserFormGroup(data: UserData): FormGroup {
+  /**
+   * Return user FormGroup
+   * @param data user data
+   */
+  private getUserFormGroup(data: UserData): FormGroup {
     return this.formBuilder.group({
       id: this.formBuilder.control(data.id),
       firstName: [data.firstName, [Validators.required, Validators.minLength(1)]],

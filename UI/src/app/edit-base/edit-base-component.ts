@@ -1,6 +1,8 @@
 import { SkillViewModel } from '../_models/skill-view-model';
-import { Output, EventEmitter, Input } from '@angular/core';
+import { Input } from '@angular/core';
 import { User } from '../_models/user';
+
+export type ActionType = 'create skill' | 'add evaluation';
 
 export abstract class EditBaseComponent {
   @Input()
@@ -15,8 +17,23 @@ export abstract class EditBaseComponent {
     this.isEditMode = isEdit;
   }
 
-  protected abstract Edit(caseNum?: number, skill?: SkillViewModel): void;
-  protected abstract CancelEdit(caseNum?: number): void;
-  protected abstract CanSave(caseNum?: number): boolean;
-  protected abstract Save(caseNum?: number, skill?: SkillViewModel): void;
+  /**
+   * Switch on the edit mode
+   */
+  protected abstract Edit(type?: ActionType, skill?: SkillViewModel): void;
+
+  /**
+   * Switch off the edit mode
+   */
+  protected abstract CancelEdit(type?: ActionType): void;
+
+  /**
+   * Check validation for save changes
+   */
+  protected abstract CanSave(type?: ActionType): boolean;
+
+  /**
+   * Save changes
+   */
+  protected abstract Save(type?: ActionType, skill?: SkillViewModel): void;
 }

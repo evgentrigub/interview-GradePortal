@@ -2,10 +2,10 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Users Table</mat-card-title>
-      <mat-card-subtitle>This table contains all registered users</mat-card-subtitle>
+      <mat-card-subtitle>This table contains registered users</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <app-search-panel #filterData (outParams)="getFilteredUsers($event)"> </app-search-panel>
+      <app-search-panel #filterData (outParams)="setFilteredUsers($event)"> </app-search-panel>
       <br />
       <div class="loading-shade" *ngIf="isLoading">
         <mat-spinner diameter="130" strokeWidth="9" style="vertical-align: middle"></mat-spinner>
@@ -32,7 +32,9 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let user; columns: displayedColumns" class="table-row" (click)="clickUser(user)"></tr>
+        <tr mat-row *matRowDef="let user; columns: displayedColumns" class="table-row"
+          [routerLink]="['/', user.username]">
+        </tr>
       </table>
 
       <mat-paginator [length]="resultsLength" [pageSizeOptions]="[3, 5]"></mat-paginator>

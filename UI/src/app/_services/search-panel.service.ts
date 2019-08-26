@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { SearchGroup } from '../_enums/search-group-enum';
 import { ISearchOptions } from '../_models/search-options';
-import { UserData, UserDataTable } from '../_models/user-view-model';
+import { UserDataTable } from '../_models/user-view-model';
 import { Result } from '../_models/result-model';
 import { CustomErrorResponse } from '../_models/custom-error-response';
 
@@ -17,9 +17,14 @@ const emptySkills: Observable<Array<string>> = of([]);
 export class SearchPanelService {
   private searchUrl = `${environment.apiUrl}/search/`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  searchAnyParams(queryString: string, group: SearchGroup): Observable<Array<string>> {
+  /**
+   * Return possible search options in search panel
+   * @param queryString search query
+   * @param group group number: city, position or skill
+   */
+  getSearchParams(queryString: string, group: SearchGroup): Observable<Array<string>> {
     if (!queryString) {
       return emptySkills;
     }
@@ -38,6 +43,10 @@ export class SearchPanelService {
     );
   }
 
+  /**
+   * Return filtered users with params
+   * @param options include page num, page size and options: city, position or skill
+   */
   getFilteredUsers(options: ISearchOptions): Observable<Result<UserDataTable>> {
     return this.http
       .get<Result<UserDataTable>>(this.searchUrl + `usersSearch/`, { params: new HttpParams({ fromString: options.toQueryString() }) })
@@ -56,9 +65,7 @@ export class SearchPanelService {
   }
 
   private handleError(error: CustomErrorResponse) {
-    let msg: string;
-    msg = error.message + ` Status Code: ${error.status}`;
-
+    const msg = error.message + ` Status Code: ${error.status}`;
     console.error('SearchPanelService::handleError() ' + msg);
     return throwError('Error: ' + msg);
   }

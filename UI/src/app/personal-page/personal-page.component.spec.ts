@@ -3,18 +3,6 @@ import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  MatAutocompleteModule,
-  MatButtonModule,
-  MatCardModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatPaginatorModule,
-  MatProgressSpinnerModule,
-  MatSnackBarModule,
-  MatTableModule,
-} from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
@@ -23,6 +11,9 @@ import { UserData } from '../_models/user-view-model';
 import { SkillService } from '../_services/skill.service';
 import { UserService } from '../_services/user.service';
 import { PersonalPageComponent } from './personal-page.component';
+import { SkillsTableComponent } from './skills-table/skills-table.component';
+import { UserDataComponent } from './user-data/user-data.component';
+import { MaterialModule } from '../material-module';
 
 // tslint:disable: no-use-before-declare
 describe('PersonalPageComponent', () => {
@@ -33,22 +24,13 @@ describe('PersonalPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PersonalPageComponent],
+      declarations: [PersonalPageComponent, SkillsTableComponent, UserDataComponent],
       imports: [
         BrowserAnimationsModule,
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        MatSnackBarModule,
-        MatProgressSpinnerModule,
-        MatAutocompleteModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatTableModule,
-        MatIconModule,
-        MatButtonModule,
-        MatPaginatorModule,
+        MaterialModule,
       ],
     }).compileComponents();
   }));

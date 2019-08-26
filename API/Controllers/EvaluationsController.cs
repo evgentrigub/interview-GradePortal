@@ -3,6 +3,8 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
+using GradePortalAPI.Helpers;
+using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,8 +38,17 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Create([FromBody] EvaluateDto evaluation)
         {
-            var res = await _evaluateService.Create(evaluation);
-            return Ok(res);
+            try
+            {
+                var res = await _evaluateService.Create(evaluation);
+                if (res.IsSuccess == false)
+                    return NotFound(new NotFoundCustomException(res.Message));
+                return Ok(res);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         /// <summary>

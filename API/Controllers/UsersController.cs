@@ -51,6 +51,7 @@ namespace GradePortalAPI.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.Accepted)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Authenticate([FromBody] UserAuthDto userDto)
         {
             try
@@ -96,6 +97,7 @@ namespace GradePortalAPI.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.Created)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Register([FromBody] UserDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
@@ -123,6 +125,7 @@ namespace GradePortalAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetUsers([FromQuery] TableParamsDto tableParams)
         {
             try
@@ -154,6 +157,7 @@ namespace GradePortalAPI.Controllers
         [HttpGet("{username}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetUser(string username)
         {
             try

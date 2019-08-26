@@ -20,6 +20,6 @@ namespace GradePortalAPI.Models.Interfaces
         /// <param name="userId"></param>
         /// <param name="skill"></param>
         /// <returns></returns>
-        Task<IResult<Skill>> AddOrCreateSkill(string userId, Skill skill);
+        Task<IResult<Skill>> CreateOrAddSkill(string userId, Skill skill);
     }
 }

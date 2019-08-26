@@ -65,7 +65,6 @@ namespace GradePortalAPI.Services
             try
             {
                 _context.Users.Add(user);
-
                 await _context.SaveChangesAsync();
             }
             catch (AppException e)
@@ -79,10 +78,17 @@ namespace GradePortalAPI.Services
         /// <inheritdoc />
         public async Task<IResult<IList<User>>> GetUsersWithParams(TableParamsDto tableParams)
         {
-            var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
-            if(users == null)
-                throw new AppException(message: "Internal Error: can't get users with params: "+tableParams.Page+ " "+tableParams.PageSize);
-            return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
+            try
+            {
+                var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
+                return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
+
+            }
+            catch (AppException e)
+            {
+                throw new AppException(message: "Internal Error: can't get users with params: " 
+                                                + tableParams.Page + " " + tableParams.PageSize+" .Error"+e.Message);
+            }
         }
 
         /// <inheritdoc />

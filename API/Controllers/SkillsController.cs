@@ -9,6 +9,7 @@ using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
+using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,10 +50,13 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetSkills(string username, string expertId = null)
         {
+            var userResult = await _userService.GetByUserName(username);
+            var skillsResult = await _skillService.GetUserSkills(userResult.Data.Id);
+            if (!userResult.IsSuccess || !skillsResult.IsSuccess)
+                return NotFound(new NotFoundCustomException(userResult.Message));
+
             try
             {
-                var userResult = await _userService.GetByUserName(username);
-                var skillsResult = await _skillService.GetUserSkills(userResult.Data.Id);
                 var skillsDto = skillsResult.Data.Select(skill => new SkillDto
                 {
                     Id = skill.Id,
@@ -85,17 +89,13 @@ namespace GradePortalAPI.Controllers
         public async Task<IActionResult> CreateOrAddSkill(string userId, [FromBody] SkillDto skillDto)
         {
             var skill = _mapper.Map<Skill>(skillDto);
-            try
-            {
-                var result = await _skillService.AddOrCreateSkill(userId, skill);
-                var sk = _mapper.Map<SkillDto>(result.Data);
 
-                return Ok(new Result<SkillDto>(message: result.Message, isSuccess:result.IsSuccess, data:sk));
-            }
-            catch (AppException e)
-            {
-                return BadRequest(new {message = e.Message});
-            }
+            var result = await _skillService.CreateOrAddSkill(userId, skill);
+            if (result.IsSuccess == false)
+                return BadRequest(new BadRequestCustomException(result.Message));
+
+            var sk = _mapper.Map<SkillDto>(result.Data);
+            return Ok(new Result<SkillDto>(message: result.Message, isSuccess:result.IsSuccess, data:sk));
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _skillService.FindById(id);
                 var sk = _mapper.Map<SkillDto>(result);
-                return Ok(new Result<SkillDto>(message:"Skill found", isSuccess: true, data:sk));
+                return Ok(new Result<SkillDto>(message:"Success", isSuccess: true, data:sk));
             }
             catch (AppException e)
             {

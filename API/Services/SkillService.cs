@@ -38,7 +38,7 @@ namespace GradePortalAPI.Services
         }
 
         /// <inheritdoc />
-        public async Task<IResult<Skill>> AddOrCreateSkill(string userId, Skill skill)
+        public async Task<IResult<Skill>> CreateOrAddSkill(string userId, Skill skill)
         {
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             if (user == null || skill == null)

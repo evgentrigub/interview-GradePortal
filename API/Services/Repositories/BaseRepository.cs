@@ -22,15 +22,29 @@ namespace GradePortalAPI.Services.Repositories
 
         public async Task<TEntity> FindById(string id)
         {
-            return await Set.FindAsync(id);
+            try
+            {
+                return await Set.FindAsync(id);
+            }
+            catch (AppException e)
+            {
+                throw new AppException("BaseRepository Find Entity Error:" + e.Message);
+            }
         }
 
         public async Task<IResult> Delete(string id)
         {
-            var entity = await FindById(id);
-            Set.Remove(entity);
+            try
+            {
+                var entity = await FindById(id);
+                Set.Remove(entity);
 
-            return new Result("Delete successful", true);
+                return new Result("Delete successful", true);
+            }
+            catch (AppException e)
+            {
+                throw new AppException("BaseRepository Delete Entity Error:" + e.Message);
+            }
         }
     }
 }

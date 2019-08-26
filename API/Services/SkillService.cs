@@ -41,25 +41,34 @@ namespace GradePortalAPI.Services
         /// <inheritdoc />
         public async Task<IResult<Skill>> CreateOrAddSkill(string userId, Skill skill)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            var user = _context.Users.Include(r => r.UserSkills).SingleOrDefault(u => u.Id == userId);
             if (user == null || skill == null)
                 return new Result<Skill>(message: "User or Skill not found", isSuccess: false, data: null);
 
             if (string.IsNullOrEmpty(skill.Name) || string.IsNullOrEmpty(skill.Description))
                 return new Result<Skill>(message: "Skill Name or Description is empty", isSuccess: false, data: null);
 
-            if (string.IsNullOrEmpty(skill.Id))
+            try
             {
-                var newSkill = await CreateNew(skill);
-                var sk = await AddSkillToUser(user, newSkill);
-                return new Result<Skill>(
-                    message: "Skill " + newSkill.Name + " has created and added to your collection",
-                    isSuccess: true, data: sk);
+                if (string.IsNullOrEmpty(skill.Id))
+                {
+                    var newSkill = await CreateNew(skill);
+                    var sk = await AddSkillToUser(user, newSkill);
+                    return new Result<Skill>(
+                        message: "Skill " + newSkill.Name + " has created and added to your collection",
+                        isSuccess: true, data: sk);
+                }
+
+                var addedSkill = await AddSkillToUser(user, skill);
+                return new Result<Skill>(message: "Skill " + skill.Name + " added to your collection",
+                    isSuccess: true, data: addedSkill);
+            }
+            catch (AppException e)
+            {
+                throw new AppException(e.Message);
             }
 
-            var addedSkill = await AddSkillToUser(user, skill);
-            return new Result<Skill>(message: "Skill " + skill.Name + " added to your collection",
-                isSuccess: true, data: addedSkill);
+
         }
 
         /// <summary>
@@ -104,6 +113,11 @@ namespace GradePortalAPI.Services
                     User = user,
                     Skill = skill
                 };
+
+                var existedSkill = user.UserSkills.SingleOrDefault(r => r.UserId == user.Id && r.SkillId == skill.Id);
+                if (existedSkill != null)
+                    throw new AppException("You have already have skill " + skill.Name + " in your collection");
+
                 skill.UserSkills.Add(userSkills);
                 _context.Skills.Update(skill);
                 await _context.SaveChangesAsync();

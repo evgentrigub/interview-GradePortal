@@ -93,12 +93,19 @@ namespace GradePortalAPI.Controllers
         {
             var skill = _mapper.Map<Skill>(skillDto);
 
-            var result = await _skillService.CreateOrAddSkill(userId, skill);
-            if (result.IsSuccess == false)
-                return BadRequest(new BadRequestCustomException(result.Message));
+            try
+            {
+                var result = await _skillService.CreateOrAddSkill(userId, skill);
+                if (result.IsSuccess == false)
+                    return BadRequest(new BadRequestCustomException(result.Message));
 
-            var sk = _mapper.Map<SkillDto>(result.Data);
-            return Ok(new Result<SkillDto>(message: result.Message, isSuccess: result.IsSuccess, data: sk));
+                var sk = _mapper.Map<SkillDto>(result.Data);
+                return Ok(new Result<SkillDto>(message: result.Message, isSuccess: result.IsSuccess, data: sk));
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         /// <summary>

@@ -207,11 +207,11 @@ namespace GradePortalAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <response code="204">Returns registered user</response>
+        /// <response code="200">Returns registered user</response>
         /// <response code="400">If error while deleting</response>
         [Authorize]
         [HttpDelete("{id}")]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
@@ -219,8 +219,8 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                await _userService.Delete(id);
-                return NoContent();
+                var result = await _userService.Delete(id);
+                return Ok(result);
             }
             catch (AppException e)
             {

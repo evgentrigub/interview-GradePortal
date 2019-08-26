@@ -57,8 +57,9 @@ namespace GradePortalAPI.Services
 
             user.QuickSearchName = user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() +
                                    user.FirstName.ToUpperInvariant();
-            user.QuickSearchCity = user.City.ToUpperInvariant();
-            user.QuickSearchPosition = user.Position.ToUpperInvariant();
+
+            user.QuickSearchCity = string.IsNullOrWhiteSpace(user.City) ? null : user.City.ToUpperInvariant();
+            user.QuickSearchPosition = string.IsNullOrWhiteSpace(user.Position) ? null : user.Position.ToUpperInvariant();
 
             if (user.Id != null)
                 throw new AppException("Error: ID has to be null. ID:" + user.Id);

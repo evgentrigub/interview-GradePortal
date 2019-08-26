@@ -20,7 +20,6 @@ interface AutoCompleteObject {
   styleUrls: ['./search-panel.component.css'],
 })
 export class SearchPanelComponent {
-
   @Output()
   readonly outParams = new EventEmitter<ISearchOptions>();
 
@@ -37,15 +36,12 @@ export class SearchPanelComponent {
   positionSearchControl: FormControl = new FormControl('', [Validators.nullValidator]);
   skillSearchControl: FormControl = new FormControl('', [Validators.nullValidator]);
 
-  constructor(
-    private searchService: SearchPanelService,
-    private formBuilder: FormBuilder) {
-
+  constructor(private searchService: SearchPanelService, private formBuilder: FormBuilder) {
     this.searchForm = this.formBuilder.group({
       name: [''],
       city: this.citySearchControl,
       pos: this.positionSearchControl,
-      skill: this.skillSearchControl
+      skill: this.skillSearchControl,
     });
 
     this.cityOptions = this.getAutocompleteOptions(this.citySearchControl, SearchGroup.City);
@@ -109,7 +105,7 @@ export class SearchPanelComponent {
       return of([]);
     }
 
-    return this.searchService.searchSomething(value, group).pipe(
+    return this.searchService.searchAnyParams(value, group).pipe(
       map(response =>
         response.filter(option => {
           return option.toLowerCase().includes(value.toLowerCase());

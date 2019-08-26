@@ -48,4 +48,4 @@ import { SkillsTableComponent } from './personal-page/skills-table/skills-table.
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -3,7 +3,6 @@ import { Output, EventEmitter, Input } from '@angular/core';
 import { User } from '../_models/user';
 
 export abstract class EditBaseComponent {
-
   @Input()
   currentUser: User;
 

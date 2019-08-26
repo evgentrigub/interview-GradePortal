@@ -7,6 +7,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
 import { EvaluationToSend } from 'src/app/_models/evaluation-to-send';
 import { Result, ResultMessage } from '../_models/result-model';
+import { CustomErrorResponse } from '../_models/custom-error-response';
 
 const emptySkills: Observable<SkillViewModel[]> = of([]);
 
@@ -14,20 +15,18 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
   providedIn: 'root',
 })
 export class SkillService {
-
   private skillsUrl = `${environment.apiUrl}/skills/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getUserSkills(username: string, expertId?: string): Observable<Result<SkillViewModel[]>> {
-    return this.http.get<Result<SkillViewModel[]>>(`${environment.apiUrl}/skills/GetSkills/${username}?expertId=${expertId}`)
+    return this.http
+      .get<Result<SkillViewModel[]>>(`${environment.apiUrl}/skills/GetSkills/${username}?expertId=${expertId}`)
       .pipe(catchError(this.handleError));
   }
 
   addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
-    return this.http
-      .post<SkillViewModel>(this.skillsUrl + `CreateOrAddSkill/${userId}`, skill)
-      .pipe(catchError(this.handleError));
+    return this.http.post<SkillViewModel>(this.skillsUrl + `CreateOrAddSkill/${userId}`, skill).pipe(catchError(this.handleError));
   }
 
   /**
@@ -47,30 +46,21 @@ export class SkillService {
 
     const params: HttpParams = new HttpParams({ fromObject: { query, limit: '10' } });
 
-    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/skills/search`, { params })
-      .pipe(
-        catchError(this.handleError)
-        // tap(x => console.log('autocompleSkill result:', x))
-      );
+    return this.http.get<SkillViewModel[]>(`${environment.apiUrl}/search/searchSkills`, { params }).pipe(
+      catchError(this.handleError)
+      // tap(x => console.log('autocompleSkill result:', x))
+    );
   }
 
   addEvaluation(evaluation: EvaluationToSend): Observable<ResultMessage> {
-    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation)
-      .pipe(
-        catchError(this.handleError));
+    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation).pipe(catchError(this.handleError));
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: CustomErrorResponse) {
     let msg: string;
+    msg = error.message + ` Status Code: ${error.status}`;
 
-    if (error.error instanceof ErrorEvent) {
-      msg = 'Произошла ошибка:' + error.error.message;
-    } else {
-      msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
-    }
-
-    console.error('PositionService::handleError() ' + msg);
-
-    return throwError('Произошла ошибка:' + msg);
+    console.error('SkillService::handleError() ' + msg);
+    return throwError('Error: ' + msg);
   }
 }

@@ -8,7 +8,7 @@ import { CustomErrorResponse } from '../_models/custom-error-response';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  constructor(private authenticationService: AuthenticationService) { }
+  constructor(private authenticationService: AuthenticationService) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
@@ -18,7 +18,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           location.reload(true);
         }
 
-        const error = err.error.message ? err.error : new CustomErrorResponse(err.message, err.status);
+        const error = err.error.status ? err.error : new CustomErrorResponse(err.message, err.status);
         return throwError(error);
       })
     );

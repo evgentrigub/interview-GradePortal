@@ -1,6 +1,5 @@
 import { KeyValue } from '@angular/common';
 
-
 export interface PaginatorParams {
   pageSize: number;
   pageIndex: number;
@@ -25,9 +24,8 @@ export class SearchOptions implements ISearchOptions {
 
   filter: KeyValue<string, string>[];
   toQueryString(): string {
-    const queryString = '&page=' + this.pageIndex + '&pageSize=' +
-      this.pageSize + '&serializedFilters=' + encodeURI(JSON.stringify(this.filter));
+    const queryString =
+      '&page=' + this.pageIndex + '&pageSize=' + this.pageSize + '&serializedFilters=' + encodeURI(JSON.stringify(this.filter));
     return queryString;
   }
-
 }

@@ -13,10 +13,9 @@ import { Result } from 'src/app/_models/result-model';
 @Component({
   selector: 'app-skills-table',
   templateUrl: './skills-table.component.html',
-  styleUrls: ['./skills-table.component.css']
+  styleUrls: ['./skills-table.component.css'],
 })
 export class SkillsTableComponent extends EditBaseComponent implements OnInit, OnChanges {
-
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -57,7 +56,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   private lastAutoCompleteValue = '';
   nameSkillOptions: Observable<SkillViewModel[]>;
   dataSource: MatTableDataSource<SkillViewModel>;
-  private isLoading = true;
+  private isLoading: boolean;
 
   constructor(
     private skillService: SkillService,
@@ -82,8 +81,9 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
     if (changes.hasOwnProperty('userSkillsResult')) {
+      this.isLoading = true;
       const chg = changes.userSkillsResult;
-      const result = chg.currentValue as Result<SkillViewModel[]>
+      const result = chg.currentValue as Result<SkillViewModel[]>;
       if (!result) {
         return;
       }
@@ -97,11 +97,11 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   protected Edit(groupNum: number, skill: SkillViewModel): void {
     switch (groupNum) {
-      case (1):
+      case 1:
         this.isEditMode = true;
         break;
 
-      case (2):
+      case 2:
         this.evaluatedSkill = skill.id;
         this.evaluationControl = new FormControl(skill.expertEvaluate, [Validators.required, Validators.min(0), Validators.max(5)]);
         break;
@@ -109,12 +109,12 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   }
   protected CancelEdit(groupNum: number): void {
     switch (groupNum) {
-      case (1):
+      case 1:
         this.isEditMode = false;
         this.newSkillFormGroup.reset();
         break;
 
-      case (2):
+      case 2:
         this.evaluatedSkill = '';
         break;
     }
@@ -122,16 +122,16 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   protected CanSave(groupNum: number): boolean {
     switch (groupNum) {
-      case (1):
+      case 1:
         return this.newSkillFormGroup.dirty && this.newSkillFormGroup.valid;
 
-      case (2):
+      case 2:
         return this.evaluationControl.dirty && this.evaluationControl.valid;
     }
   }
   protected Save(groupNum: number, skill: SkillViewModel): void {
     switch (groupNum) {
-      case (1):
+      case 1:
         const group = this.newSkillFormGroup;
         if (!group) {
           return;
@@ -155,7 +155,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           .subscribe();
         break;
 
-      case (2):
+      case 2:
         const evaluateControl = this.evaluationControl;
         if (!evaluateControl) {
           return;
@@ -175,7 +175,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
               _ => {
                 this.showMessage(`You rated skill at ${evaluateControl.value} points`);
                 this.evaluatedSkill = '';
-                this.updateSkillsDataSource()
+                this.updateSkillsDataSource();
                 this.detector.markForCheck();
               },
               err => this.showMessage(err)
@@ -239,5 +239,4 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   private showMessage(msg: any): void {
     this.snackBar.open(msg, 'ok');
   }
-
 }

@@ -30,7 +30,8 @@ export class TableComponent implements AfterViewInit {
     private userService: UserService,
     private searchService: SearchPanelService,
     private router: Router,
-    private snackBar: MatSnackBar) { }
+    private snackBar: MatSnackBar
+  ) {}
 
   ngAfterViewInit() {
     // this.sort.sortChange.subscribe(r => this.paginator.pageIndex = 0);

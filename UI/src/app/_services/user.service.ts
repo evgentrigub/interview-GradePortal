@@ -6,15 +6,15 @@ import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { UserViewModel, UserData, UserDataTable } from 'src/app/_models/user-view-model';
 import { Result, ResultMessage } from '../_models/result-model';
+import { CustomErrorResponse } from '../_models/custom-error-response';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-
   private usersUrl = `${environment.apiUrl}/users/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAll(pageNum: number, pageSizeNum: number): Observable<Result<UserDataTable>> {
     const page = pageNum.toString();
@@ -47,30 +47,18 @@ export class UserService {
   }
 
   update(user: UserData): Observable<ResultMessage> {
-    return this.http.put<ResultMessage>(this.usersUrl + `update/${user.id}`, user)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.put<ResultMessage>(this.usersUrl + `update/${user.id}`, user).pipe(catchError(this.handleError));
   }
 
   delete(id: number): Observable<ResultMessage> {
-    return this.http.delete<ResultMessage>(this.usersUrl + `delete/${id}`)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.delete<ResultMessage>(this.usersUrl + `delete/${id}`).pipe(catchError(this.handleError));
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: CustomErrorResponse) {
     let msg: string;
-
-    if (error.error instanceof ErrorEvent) {
-      msg = 'Произошла ошибка:' + error.error.message;
-    } else {
-      msg = `Произошла ошибка: ${error.error}. Код ошибки ${error.status}`;
-    }
+    msg = error.message + ` Status Code: ${error.status}`;
 
     console.error('UserService::handleError() ' + msg);
-
-    return throwError('Произошла ошибка:' + msg);
+    return throwError('Error: ' + msg);
   }
 }

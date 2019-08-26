@@ -7,6 +7,7 @@ import { SearchGroup } from '../_enums/search-group-enum';
 import { ISearchOptions } from '../_models/search-options';
 import { UserData, UserDataTable } from '../_models/user-view-model';
 import { Result } from '../_models/result-model';
+import { CustomErrorResponse } from '../_models/custom-error-response';
 
 const emptySkills: Observable<Array<string>> = of([]);
 
@@ -14,12 +15,11 @@ const emptySkills: Observable<Array<string>> = of([]);
   providedIn: 'root',
 })
 export class SearchPanelService {
-
   private searchUrl = `${environment.apiUrl}/search/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  searchSomething(queryString: string, group: SearchGroup): Observable<Array<string>> {
+  searchAnyParams(queryString: string, group: SearchGroup): Observable<Array<string>> {
     if (!queryString) {
       return emptySkills;
     }
@@ -39,8 +39,8 @@ export class SearchPanelService {
   }
 
   getFilteredUsers(options: ISearchOptions): Observable<Result<UserDataTable>> {
-    return this.http.get<Result<UserDataTable>>(this.searchUrl + `usersSearch/`,
-      { params: new HttpParams({ fromString: options.toQueryString() }) })
+    return this.http
+      .get<Result<UserDataTable>>(this.searchUrl + `usersSearch/`, { params: new HttpParams({ fromString: options.toQueryString() }) })
       .pipe(
         catchError(this.handleError),
         tap(result => {
@@ -51,11 +51,15 @@ export class SearchPanelService {
             user.city = user.city ? user.city : 'No city';
             user.position = user.position ? user.position : 'No position';
           }
-        }));
+        })
+      );
   }
 
-  private handleError(errorMessage: string) {
-    console.error('SearchService::handleError() ' + errorMessage);
-    return throwError(errorMessage);
+  private handleError(error: CustomErrorResponse) {
+    let msg: string;
+    msg = error.message + ` Status Code: ${error.status}`;
+
+    console.error('SearchPanelService::handleError() ' + msg);
+    return throwError('Error: ' + msg);
   }
 }

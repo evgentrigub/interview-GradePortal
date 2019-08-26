@@ -11,7 +11,6 @@ import { Result } from '../_models/result-model';
   providedIn: 'root',
 })
 export class AuthenticationService {
-
   private authUrl = `${environment.apiUrl}/users/`;
 
   public currentUserSubject: BehaviorSubject<UserAuthenticated>;
@@ -27,26 +26,26 @@ export class AuthenticationService {
   }
 
   login(username: string, password: string): Observable<Result<UserAuthenticated>> {
-    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `authenticate`, { username, password })
-      .pipe(
-        map(result => {
-          if (result.isSuccess && result.data.token) {
-            localStorage.setItem('currentUser', JSON.stringify(result.data));
-            this.currentUserSubject.next(result.data);
-          }
-          return result;
-        }),
-        catchError(e => {
-          return this.handleError(e);
-        })
-      );
+    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `authenticate`, { username, password }).pipe(
+      map(result => {
+        if (result.isSuccess && result.data.token) {
+          localStorage.setItem('currentUser', JSON.stringify(result.data));
+          this.currentUserSubject.next(result.data);
+        }
+        return result;
+      }),
+      catchError(e => {
+        return this.handleError(e);
+      })
+    );
   }
 
   register(user: User): Observable<Result<UserAuthenticated>> {
-    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `register`, user)
-      .pipe(
-        // catchError(this.handleError)
-      );
+    return this.http
+      .post<Result<UserAuthenticated>>(this.authUrl + `register`, user)
+      .pipe
+      // catchError(this.handleError)
+      ();
   }
 
   logout() {

@@ -14,10 +14,9 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-user-data',
   templateUrl: './user-data.component.html',
-  styleUrls: ['./user-data.component.css']
+  styleUrls: ['./user-data.component.css'],
 })
 export class UserDataComponent extends EditBaseComponent implements OnInit, OnChanges {
-
   @Input()
   userDataResult: Result<UserData> | null | undefined;
 
@@ -59,11 +58,10 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
     }
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   protected Edit(): void {
-    console.log(this.userDataResult)
+    console.log(this.userDataResult);
     this.editMode = true;
     this.previosUserDataState = this.userFormGroup.value;
   }
@@ -114,8 +112,7 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
 
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.authenticate.currentUserSubject.next(user);
-    this.authenticate.currentUserSubject =
-      new BehaviorSubject<UserAuthenticated>(JSON.parse(localStorage.getItem('currentUser')));
+    this.authenticate.currentUserSubject = new BehaviorSubject<UserAuthenticated>(JSON.parse(localStorage.getItem('currentUser')));
     return user;
   }
 
@@ -133,5 +130,4 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
   private showMessage(msg: any): void {
     this.snackBar.open(msg, 'ok');
   }
-
 }

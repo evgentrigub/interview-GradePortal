@@ -4,9 +4,14 @@
     <mat-card-header>
       <mat-card-title>List of Skills</mat-card-title>
     </mat-card-header>
-    <app-skills-table [userSkillsResult]="userSkills$ | async" [displayedColumns]="displayedColumns"
-      [currentUser]="currentUser" [routeUsername]="routeUsername" [pageOwner]="pageOwner"
-      [userId]="userChild.userDataValue.id">
+    <app-skills-table
+      [userSkillsResult]="userSkills$ | async"
+      [displayedColumns]="displayedColumns"
+      [currentUser]="currentUser"
+      [routeUsername]="routeUsername"
+      [pageOwner]="pageOwner"
+      [userId]="userChild.userDataValue.id"
+    >
     </app-skills-table>
   </div>
 </mat-card>

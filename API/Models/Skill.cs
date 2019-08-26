@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
 
 namespace GradePortalAPI.Models

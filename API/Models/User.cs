@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces;
 
 namespace GradePortalAPI.Models
 {
     public class User : ModelBase, IUser
     {
-        private string _search;
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }

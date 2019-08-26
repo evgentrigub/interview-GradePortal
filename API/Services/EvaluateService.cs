@@ -91,10 +91,17 @@ namespace GradePortalAPI.Services
         {
             try
             {
-                var evaluation = _context.Evaluations.SingleOrDefault(r =>
+                var evaluations = _context.Evaluations.Where(r =>
                     r.User.Id == userId && r.Expert.Id == expertId && r.Skill.Id == skillId);
-                if (evaluation == null)
+
+                if (evaluations.Count() >= 2)
+                    throw new AppException("Evaluations count more 1, found" + evaluations.Count());
+
+                if (!evaluations.Any())
                     return 0;
+                var evaluation = evaluations.FirstOrDefault();
+                if(evaluation == null)
+                    throw new AppException("Evaluation is null");
 
                 return evaluation.Value;
             }

@@ -1,7 +1,7 @@
 ﻿using System;
 using GradePortalAPI.Models.Interfaces;
 
-namespace GradePortalAPI.Models
+namespace GradePortalAPI.Models.Base
 {
     public abstract class ModelBase : IModelBase
     {

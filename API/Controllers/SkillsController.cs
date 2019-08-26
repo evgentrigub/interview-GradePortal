@@ -51,8 +51,11 @@ namespace GradePortalAPI.Controllers
         public async Task<IActionResult> GetSkills(string username, string expertId = null)
         {
             var userResult = await _userService.GetByUserName(username);
+            if (!userResult.IsSuccess)
+                return NotFound(new NotFoundCustomException(userResult.Message));
+
             var skillsResult = await _skillService.GetUserSkills(userResult.Data.Id);
-            if (!userResult.IsSuccess || !skillsResult.IsSuccess)
+            if (!skillsResult.IsSuccess)
                 return NotFound(new NotFoundCustomException(userResult.Message));
 
             try

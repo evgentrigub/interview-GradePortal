@@ -69,7 +69,8 @@ namespace GradePortalAPI.Services
         private async Task<Skill> CreateNew(Skill skill)
         {
             var newSkill = new Skill {Name = skill.Name, Description = skill.Description};
-
+            newSkill.QuickSearch = newSkill.Name.ToUpperInvariant() + newSkill.Description.ToUpperInvariant() +
+                                   newSkill.Name.ToUpperInvariant();
             try
             {
                 _context.Skills.Add(newSkill);

@@ -33,7 +33,8 @@ namespace GradePortalAPI.Services
             var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
 
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                return new Result<User>(message: "Username or password is incorrect. Try login again.", isSuccess: false, data: null);
+                return new Result<User>(message: "Username or password is incorrect. Try login again.",
+                    isSuccess: false, data: null);
 
             return new Result<User>(message: "Authenticate successful!", isSuccess: true, data: user);
         }
@@ -42,14 +43,14 @@ namespace GradePortalAPI.Services
         public async Task<IResult> Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                return new Result(message: "Password is empty!", isSuccess: false);
+                return new Result("Password is empty!", false);
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                return new Result(message: "Username has already created!", isSuccess: false);
+                return new Result("Username has already created!", false);
 
             CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
             if (passwordHash == null || passwordSalt == null)
-                throw new AppException(message: "Can't create password hash");
+                throw new AppException("Can't create password hash");
 
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
@@ -59,8 +60,8 @@ namespace GradePortalAPI.Services
             user.QuickSearchCity = user.City.ToUpperInvariant();
             user.QuickSearchPosition = user.Position.ToUpperInvariant();
 
-            if(user.Id != null)
-                throw new AppException(message: "Error: ID has to be null. ID:"+user.Id);
+            if (user.Id != null)
+                throw new AppException("Error: ID has to be null. ID:" + user.Id);
 
             try
             {
@@ -69,10 +70,10 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException(message: "Add user Error" + e.Message);
+                throw new AppException("Add user Error" + e.Message);
             }
 
-            return new Result(message: "Created successful!", isSuccess: true);
+            return new Result("Created successful!", true);
         }
 
         /// <inheritdoc />
@@ -82,12 +83,11 @@ namespace GradePortalAPI.Services
             {
                 var users = await GetAll().Skip(tableParams.Skip()).Take(tableParams.Take()).ToListAsync();
                 return new Result<IList<User>>(message: "Success", isSuccess: true, data: users);
-
             }
             catch (AppException e)
             {
-                throw new AppException(message: "Internal Error: can't get users with params: " 
-                                                + tableParams.Page + " " + tableParams.PageSize+" .Error"+e.Message);
+                throw new AppException("Internal Error: can't get users with params: "
+                                       + tableParams.Page + " " + tableParams.PageSize + " .Error" + e.Message);
             }
         }
 
@@ -101,11 +101,13 @@ namespace GradePortalAPI.Services
         public async Task<IResult<User>> GetByUserName(string username)
         {
             if (username == null)
-                return new Result<User>(message: "Username is empty. Print username and try again", isSuccess: false, data:null);
+                return new Result<User>(message: "Username is empty. Print username and try again", isSuccess: false,
+                    data: null);
 
             var res = await _context.Users.SingleOrDefaultAsync(r => r.Username == username);
-            if(res == null)
-                return new Result<User>(message: "Can't find user with username: "+username, isSuccess: false, data: null);
+            if (res == null)
+                return new Result<User>(message: "Can't find user with username: " + username, isSuccess: false,
+                    data: null);
 
             return new Result<User>(message: "Success", isSuccess: true, data: res);
         }
@@ -114,7 +116,7 @@ namespace GradePortalAPI.Services
         public IResult Update(string id, User user, string password = null)
         {
             if (id != user.Id)
-                return new Result("User try update another profile! User id: "+id+", profile id:"+user.Id, false);
+                return new Result("User try update another profile! User id: " + id + ", profile id:" + user.Id, false);
 
             var currentUser = _context.Users.Find(user.Id);
 
@@ -131,9 +133,10 @@ namespace GradePortalAPI.Services
             currentUser.Username = user.Username;
             currentUser.City = user.City;
             currentUser.Position = user.Position;
-            
-            currentUser.QuickSearchName = 
-                user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() + user.FirstName.ToUpperInvariant();
+
+            currentUser.QuickSearchName =
+                user.FirstName.ToUpperInvariant() + user.LastName.ToUpperInvariant() +
+                user.FirstName.ToUpperInvariant();
             currentUser.QuickSearchCity = user.City.ToUpperInvariant();
             currentUser.QuickSearchPosition = user.Position.ToUpperInvariant();
 

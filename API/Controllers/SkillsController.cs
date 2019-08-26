@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -71,7 +70,8 @@ namespace GradePortalAPI.Controllers
                         : 0
                 });
 
-                return Ok(new Result<IEnumerable<SkillDto>>(message:skillsResult.Message, isSuccess:skillsResult.IsSuccess, data:skillsDto));
+                return Ok(new Result<IEnumerable<SkillDto>>(message: skillsResult.Message,
+                    isSuccess: skillsResult.IsSuccess, data: skillsDto));
             }
             catch (AppException e)
             {
@@ -98,7 +98,7 @@ namespace GradePortalAPI.Controllers
                 return BadRequest(new BadRequestCustomException(result.Message));
 
             var sk = _mapper.Map<SkillDto>(result.Data);
-            return Ok(new Result<SkillDto>(message: result.Message, isSuccess:result.IsSuccess, data:sk));
+            return Ok(new Result<SkillDto>(message: result.Message, isSuccess: result.IsSuccess, data: sk));
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _skillService.FindById(id);
                 var sk = _mapper.Map<SkillDto>(result);
-                return Ok(new Result<SkillDto>(message:"Success", isSuccess: true, data:sk));
+                return Ok(new Result<SkillDto>(message: "Success", isSuccess: true, data: sk));
             }
             catch (AppException e)
             {

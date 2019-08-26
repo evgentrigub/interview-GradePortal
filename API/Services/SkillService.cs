@@ -28,7 +28,8 @@ namespace GradePortalAPI.Services
         {
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             if (user == null)
-                return new Result<IList<Skill>>(message: "User not found. UserId: "+userId, isSuccess: false, data: null);
+                return new Result<IList<Skill>>(message: "User not found. UserId: " + userId, isSuccess: false,
+                    data: null);
 
             var skills = await _userService.GetAll()
                 .Where(u => u.Id == userId)
@@ -81,9 +82,8 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException("Create skill Error:"+e.Message);
+                throw new AppException("Create skill Error:" + e.Message);
             }
-
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException("Add skill to user. Error: "+e.Message);
+                throw new AppException("Add skill to user. Error: " + e.Message);
             }
         }
     }

@@ -40,7 +40,7 @@ namespace GradePortalAPI.Services
 
             var userSkill = user.UserSkills.Where(r => r.SkillId == skill.Id);
             if (userSkill == null)
-                throw new AppException("Skill not found. Username: " + 
+                throw new AppException("Skill not found. Username: " +
                                        user.Username + ", skill: " + skill.Name);
             var newEvaluate = new Evaluation
             {
@@ -57,10 +57,11 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException("Add evaluate error. Evaluate by "+ 
-                                       newEvaluate.Expert.Username+" to "+newEvaluate.User.Username
-                                       + ". Error: "+e.Message);
+                throw new AppException("Add evaluate error. Evaluate by " +
+                                       newEvaluate.Expert.Username + " to " + newEvaluate.User.Username
+                                       + ". Error: " + e.Message);
             }
+
             return new Result("Success", true);
         }
 
@@ -82,7 +83,7 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException("GetAverageEvaluate Error: "+ e.Message);
+                throw new AppException("GetAverageEvaluate Error: " + e.Message);
             }
         }
 
@@ -100,7 +101,7 @@ namespace GradePortalAPI.Services
                 if (!evaluations.Any())
                     return 0;
                 var evaluation = evaluations.FirstOrDefault();
-                if(evaluation == null)
+                if (evaluation == null)
                     throw new AppException("Evaluation is null");
 
                 return evaluation.Value;

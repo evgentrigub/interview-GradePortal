@@ -47,7 +47,7 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 

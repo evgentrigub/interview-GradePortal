@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace GradePortalAPI.Models.Errors
 {
-    public class BadRequestCustomException: BaseCustomException
+    public class BadRequestCustomException : BaseCustomException
     {
-        public BadRequestCustomException(string message) : base(message, (int)HttpStatusCode.BadRequest)
+        public BadRequestCustomException(string message) : base(message, (int) HttpStatusCode.BadRequest)
         {
         }
     }

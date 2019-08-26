@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using GradePortalAPI.Models.Interfaces.Base;
-using JetBrains.Annotations;
+﻿using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Base
 {
@@ -25,7 +22,7 @@ namespace GradePortalAPI.Models.Base
     public class Result<T> : IResult<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Result{T}"/> class.
+        ///     Initializes a new instance of the <see cref="Result{T}" /> class.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="message">The message.</param>

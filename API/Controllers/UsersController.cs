@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -18,8 +17,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
-using Newtonsoft.Json;
 
 namespace GradePortalAPI.Controllers
 {
@@ -51,7 +48,7 @@ namespace GradePortalAPI.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.Accepted)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Authenticate([FromBody] UserAuthDto userDto)
         {
             try
@@ -79,7 +76,8 @@ namespace GradePortalAPI.Controllers
                 var user = _mapper.Map<UserAuthenticateModel>(res.Data);
                 user.Token = tokenToSend;
 
-                return Accepted(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true, data: user));
+                return Accepted(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true,
+                    data: user));
             }
             catch (AppException exception)
             {
@@ -97,7 +95,7 @@ namespace GradePortalAPI.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.Created)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Register([FromBody] UserDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
@@ -125,7 +123,7 @@ namespace GradePortalAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetUsers([FromQuery] TableParamsDto tableParams)
         {
             try
@@ -143,7 +141,7 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(new {message = e.Message});
             }
         }
 
@@ -157,7 +155,7 @@ namespace GradePortalAPI.Controllers
         [HttpGet("{username}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetUser(string username)
         {
             try
@@ -166,7 +164,8 @@ namespace GradePortalAPI.Controllers
                 if (result.IsSuccess == false)
                     return BadRequest(new BadRequestCustomException(result.Message));
                 var userViewModel = _mapper.Map<UserViewModel>(result.Data);
-                return Ok(new Result<UserViewModel>(message: result.Message, isSuccess:result.IsSuccess, data: userViewModel));
+                return Ok(new Result<UserViewModel>(message: result.Message, isSuccess: result.IsSuccess,
+                    data: userViewModel));
             }
             catch (AppException e)
             {

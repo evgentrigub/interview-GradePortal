@@ -99,10 +99,7 @@ namespace GradePortalAPI
                 .AllowAnyHeader());
 
             app.UseAuthentication();
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             //app.UseMiddleware<ExceptionMiddleware>();
             app.UseMvc();

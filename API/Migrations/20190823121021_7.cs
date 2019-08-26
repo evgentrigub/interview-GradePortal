@@ -7,25 +7,25 @@ namespace GradePortalAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "QuickSearchCity",
-                table: "Users",
+                "QuickSearchCity",
+                "Users",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "QuickSearchPosition",
-                table: "Users",
+                "QuickSearchPosition",
+                "Users",
                 nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "QuickSearchCity",
-                table: "Users");
+                "QuickSearchCity",
+                "Users");
 
             migrationBuilder.DropColumn(
-                name: "QuickSearchPosition",
-                table: "Users");
+                "QuickSearchPosition",
+                "Users");
         }
     }
 }

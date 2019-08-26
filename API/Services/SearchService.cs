@@ -4,8 +4,6 @@ using System.Linq;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
-using GradePortalAPI.Models;
-using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
@@ -35,7 +33,7 @@ namespace GradePortalAPI.Services
         public IQueryable<SkillDto> SkillSearch(string query)
         {
             if (query == null)
-                throw new AppException(message: "Search query is null");
+                throw new AppException("Search query is null");
 
             if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return Empty;
 
@@ -54,7 +52,7 @@ namespace GradePortalAPI.Services
             }
             catch (AppException e)
             {
-                throw new AppException(message: "Skill search. Error"+e.Message);
+                throw new AppException("Skill search. Error" + e.Message);
             }
         }
 
@@ -62,11 +60,11 @@ namespace GradePortalAPI.Services
         public IQueryable<string> ParamSearch(string query, SearchGroup num)
         {
             if (query == null)
-                throw new AppException(message: "Search query or is null");
+                throw new AppException("Search query or is null");
 
             if (string.IsNullOrWhiteSpace(query) || query.Length < 3) return EmptyArr;
 
-            IQueryable<string> res = EmptyArr;
+            var res = EmptyArr;
 
             try
             {
@@ -83,11 +81,12 @@ namespace GradePortalAPI.Services
                         res = _context.Skills.Where(r => EF.Functions.Like(r.Name, $"%{query}%")).Select(r => r.Name);
                         break;
                 }
+
                 return res.Take(10);
             }
             catch (AppException e)
             {
-                throw new AppException(message: "Param search Error" + e.Message);
+                throw new AppException("Param search Error" + e.Message);
             }
         }
 
@@ -141,7 +140,7 @@ namespace GradePortalAPI.Services
             }
             catch (Exception e)
             {
-                throw new AppException(message: "Users search Error" + e.Message);
+                throw new AppException("Users search Error" + e.Message);
             }
         }
 

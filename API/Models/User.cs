@@ -6,9 +6,6 @@ namespace GradePortalAPI.Models
 {
     public class User : ModelBase, IUser
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Username { get; set; }
         public string City { get; set; }
         public string Position { get; set; }
         public ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
@@ -17,6 +14,8 @@ namespace GradePortalAPI.Models
         public string QuickSearchName { get; set; }
         public string QuickSearchCity { get; set; }
         public string QuickSearchPosition { get; set; }
-
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Username { get; set; }
     }
 }

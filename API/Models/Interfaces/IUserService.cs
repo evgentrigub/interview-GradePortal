@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
-using GradePortalAPI.Models.Base;
 using GradePortalAPI.Models.Interfaces.Base;
 
 namespace GradePortalAPI.Models.Interfaces

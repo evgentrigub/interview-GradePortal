@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace GradePortalAPI.Models.Errors
 {
-    public class NotFoundCustomException: BaseCustomException
+    public class NotFoundCustomException : BaseCustomException
     {
-        public NotFoundCustomException(string message) : base(message, (int)HttpStatusCode.NotFound)
+        public NotFoundCustomException(string message) : base(message, (int) HttpStatusCode.NotFound)
         {
         }
     }

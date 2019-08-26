@@ -67,7 +67,8 @@ namespace GradePortalAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> ParamSearch(string query, SearchGroup group, CancellationToken cancellationToken)
+        public async Task<IActionResult> ParamSearch(string query, SearchGroup group,
+            CancellationToken cancellationToken)
         {
             try
             {
@@ -95,7 +96,7 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var data = _searchService.UsersSearch(options.Filters, options.Skip(), options.Take());
-                return Ok(new Result<UserDataTable>(message:"Search successful!", isSuccess: true, data:data));
+                return Ok(new Result<UserDataTable>(message: "Search successful!", isSuccess: true, data: data));
             }
             catch (AppException e)
             {

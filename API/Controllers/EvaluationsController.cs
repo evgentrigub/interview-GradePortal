@@ -6,13 +6,12 @@ using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GradePortalAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class EvaluationsController : ControllerBase

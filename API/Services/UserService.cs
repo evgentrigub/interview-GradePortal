@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,16 +14,23 @@ using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.Interfaces.Base;
 using GradePortalAPI.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GradePortalAPI.Services
 {
     public class UserService : BaseRepository<User>, IUserService
     {
         private readonly DataContext _context;
+        private readonly AppSettings _appSettings;
 
-        public UserService(DataContext context) : base(context)
+        public UserService(
+            DataContext context,
+            IOptions<AppSettings> appSettings
+            ) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
         /// <inheritdoc />
@@ -60,9 +69,6 @@ namespace GradePortalAPI.Services
 
             user.QuickSearchCity = string.IsNullOrWhiteSpace(user.City) ? null : user.City.ToUpperInvariant();
             user.QuickSearchPosition = string.IsNullOrWhiteSpace(user.Position) ? null : user.Position.ToUpperInvariant();
-
-            if (user.Id != null)
-                throw new AppException("Error: ID has to be null. ID:" + user.Id);
 
             try
             {
@@ -114,11 +120,8 @@ namespace GradePortalAPI.Services
         }
 
         /// <inheritdoc />
-        public IResult Update(string id, User user, string password = null)
+        public IResult Update(string id, User user)
         {
-            if (id != user.Id)
-                return new Result("User try update another profile! User id: " + id + ", profile id:" + user.Id, false);
-
             var currentUser = _context.Users.Find(user.Id);
 
             if (currentUser == null)
@@ -126,8 +129,6 @@ namespace GradePortalAPI.Services
 
             if (user.Username != currentUser.Username && _context.Users.Any(x => x.Username == user.Username))
                 return new Result("Username has already existed. Username:", false);
-
-            // проверка полей у user
 
             currentUser.FirstName = user.FirstName;
             currentUser.LastName = user.LastName;
@@ -141,14 +142,14 @@ namespace GradePortalAPI.Services
             currentUser.QuickSearchCity = user.City.ToUpperInvariant();
             currentUser.QuickSearchPosition = user.Position.ToUpperInvariant();
 
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            //if (!string.IsNullOrWhiteSpace(password))
+            //{
+            //    byte[] passwordHash, passwordSalt;
+            //    CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-                currentUser.PasswordHash = passwordHash;
-                currentUser.PasswordSalt = passwordSalt;
-            }
+            //    currentUser.PasswordHash = passwordHash;
+            //    currentUser.PasswordSalt = passwordSalt;
+            //}
 
             _context.Users.Update(currentUser);
             _context.SaveChanges();
@@ -165,6 +166,24 @@ namespace GradePortalAPI.Services
         public IQueryable<User> GetAll()
         {
             return _context.Users.AsQueryable();
+        }
+
+        public string CreateToken(string userId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, userId)
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

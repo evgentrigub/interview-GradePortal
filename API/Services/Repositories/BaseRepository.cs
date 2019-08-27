@@ -20,11 +20,15 @@ namespace GradePortalAPI.Services.Repositories
 
         protected virtual DbSet<TEntity> Set { get; }
 
-        public async Task<TEntity> FindById(string id)
+        public async Task<IResult<TEntity>> FindById(string id)
         {
             try
             {
-                return await Set.FindAsync(id);
+                var entity = await Set.FindAsync(id);
+                if(entity == null) 
+                    return new Result<TEntity>(message:"Can not find entity with id:"+id, isSuccess:false, data:null);
+
+                return new Result<TEntity>(message:"Success!", isSuccess:true, data:entity);
             }
             catch (AppException e)
             {
@@ -36,9 +40,11 @@ namespace GradePortalAPI.Services.Repositories
         {
             try
             {
-                var entity = await FindById(id);
-                Set.Remove(entity);
+                var result = await FindById(id);
+                if(!result.IsSuccess)
+                    return new Result(result.Message, isSuccess:false);
 
+                Set.Remove(result.Data);
                 return new Result("Delete successful", true);
             }
             catch (AppException e)

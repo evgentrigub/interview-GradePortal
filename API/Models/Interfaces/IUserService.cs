@@ -52,7 +52,7 @@ namespace GradePortalAPI.Models.Interfaces
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        IResult Update(string id, User user, string password = null);
+        IResult Update(string id, User user);
 
         /// <summary>
         ///     Get all users in table for future async request
@@ -65,5 +65,7 @@ namespace GradePortalAPI.Models.Interfaces
         /// </summary>
         /// <returns></returns>
         int CountAllUsers();
+
+        string CreateToken(string userId);
     }
 }

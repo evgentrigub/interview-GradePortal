@@ -31,22 +31,22 @@ namespace GradePortalAPI.Services
         /// <inheritdoc />
         public async Task<IResult> Create(EvaluateDto evaluateDto)
         {
-            var expert = await _userService.FindById(evaluateDto.ExpertId);
-            var user = await _userService.FindById(evaluateDto.UserId);
-            var skill = await _skillService.FindById(evaluateDto.SkillId);
+            var expertRes = await _userService.FindById(evaluateDto.ExpertId);
+            var userRes = await _userService.FindById(evaluateDto.UserId);
+            var skillRes = await _skillService.FindById(evaluateDto.SkillId);
 
-            if (expert == null || user == null || skill == null)
+            if (!expertRes.IsSuccess || !userRes.IsSuccess || !skillRes.IsSuccess)
                 return new Result("User, Expert or Skill not found.", false);
 
-            var userSkill = user.UserSkills.Where(r => r.SkillId == skill.Id);
+            var userSkill = userRes.Data.UserSkills.Where(r => r.SkillId == skillRes.Data.Id);
             if (userSkill == null)
                 throw new AppException("Skill not found. Username: " +
-                                       user.Username + ", skill: " + skill.Name);
+                                       userRes.Data.Username + ", skill: " + skillRes.Data.Name);
             var newEvaluate = new Evaluation
             {
-                Expert = expert,
-                Skill = skill,
-                User = user,
+                Expert = expertRes.Data,
+                Skill = skillRes.Data,
+                User = userRes.Data,
                 Value = evaluateDto.Value
             };
 

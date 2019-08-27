@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
@@ -15,8 +12,6 @@ using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GradePortalAPI.Controllers
 {
@@ -24,19 +19,16 @@ namespace GradePortalAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
 
         public UsersController(
             IUserService userService,
-            IMapper mapper,
-            IOptions<AppSettings> appSettings
+            IMapper mapper
         )
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
         /// <summary>
@@ -53,28 +45,13 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                var res = await _userService.Authenticate(userDto.Username, userDto.Password);
-                if (res.IsSuccess == false)
-                    return NotFound(new NotFoundCustomException(res.Message));
+                var result = await _userService.Authenticate(userDto.Username, userDto.Password);
+                if (!result.IsSuccess)
+                    return NotFound(new NotFoundCustomException(result.Message));
 
-                // вынести токен в отдельный метод в сервисе
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                        new Claim(ClaimTypes.Name, res.Data.Id)
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(1),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                var tokenToSend = tokenHandler.WriteToken(token);
-
-                var user = _mapper.Map<UserAuthenticateModel>(res.Data);
-                user.Token = tokenToSend;
+                var token = _userService.CreateToken(result.Data.Id);
+                var user = _mapper.Map<UserAuthenticateModel>(result.Data);
+                user.Token = token;
 
                 return Accepted(new Result<UserAuthenticateModel>(message: "Authenticate successful!", isSuccess: true,
                     data: user));
@@ -84,7 +61,6 @@ namespace GradePortalAPI.Controllers
                 return BadRequest(new {exception.Message});
             }
         }
-
 
         /// <summary>
         /// </summary>
@@ -102,11 +78,11 @@ namespace GradePortalAPI.Controllers
 
             try
             {
-                var res = await _userService.Create(user, userDto.Password);
-                if (res.IsSuccess == false)
-                    return BadRequest(new BadRequestCustomException(res.Message));
+                var result = await _userService.Create(user, userDto.Password);
+                if (!result.IsSuccess)
+                    return BadRequest(new BadRequestCustomException(result.Message));
 
-                return Created("", res);
+                return Created("", result);
             }
             catch (AppException e)
             {
@@ -161,7 +137,7 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var result = await _userService.GetByUserName(username);
-                if (result.IsSuccess == false)
+                if (!result.IsSuccess)
                     return BadRequest(new BadRequestCustomException(result.Message));
                 var userViewModel = _mapper.Map<UserViewModel>(result.Data);
                 return Ok(new Result<UserViewModel>(message: result.Message, isSuccess: result.IsSuccess,
@@ -192,10 +168,10 @@ namespace GradePortalAPI.Controllers
 
             try
             {
-                var res = _userService.Update(id, user, userDto.Password);
-                if (res.IsSuccess == false)
-                    return BadRequest(new BadRequestCustomException(res.Message));
-                return Ok(res);
+                var result = _userService.Update(id, user);
+                if (!result.IsSuccess)
+                    return BadRequest(new BadRequestCustomException(result.Message));
+                return Ok(result);
             }
             catch (AppException e)
             {
@@ -220,6 +196,8 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var result = await _userService.Delete(id);
+                if (!result.IsSuccess)
+                    return BadRequest(new BadRequestCustomException(result.Message));
                 return Ok(result);
             }
             catch (AppException e)

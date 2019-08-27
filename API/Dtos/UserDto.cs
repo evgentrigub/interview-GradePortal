@@ -1,13 +1,22 @@
-﻿namespace GradePortalAPI.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GradePortalAPI.Dtos
 {
     public class UserDto
     {
-        public string Id { get; set; }
+        [Required(ErrorMessage = "First name is required")]
         public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Last name is required")]
         public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Username is required")]
         public string Username { get; set; }
+
         public string City { get; set; }
         public string Position { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
     }
 }

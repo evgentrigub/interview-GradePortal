@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GradePortalAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class SkillsController : ControllerBase
@@ -40,16 +40,17 @@ namespace GradePortalAPI.Controllers
 
         /// <summary>
         /// </summary>
-        /// <param name="username"></param>
+        /// <param name="userId"></param>
         /// <param name="expertId"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [HttpGet("{username}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetSkills(string username, string expertId = null)
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetSkills(string userId, string expertId = null)
         {
-            var userResult = await _userService.GetByUserName(username);
+            var userResult = await _userService.FindById(userId);
             if (!userResult.IsSuccess)
                 return NotFound(new NotFoundCustomException(userResult.Message));
 
@@ -96,7 +97,7 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var result = await _skillService.CreateOrAddSkill(userId, skill);
-                if (result.IsSuccess == false)
+                if (!result.IsSuccess)
                     return BadRequest(new BadRequestCustomException(result.Message));
 
                 var sk = _mapper.Map<SkillDto>(result.Data);
@@ -122,6 +123,9 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var result = await _skillService.FindById(id);
+                if (!result.IsSuccess)
+                    return BadRequest(new BadRequestCustomException(result.Message));
+
                 var sk = _mapper.Map<SkillDto>(result);
                 return Ok(new Result<SkillDto>(message: "Success", isSuccess: true, data: sk));
             }
@@ -144,8 +148,11 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                var res = await _skillService.Delete(id);
-                return Ok(res);
+                var result = await _skillService.Delete(id);
+                if (!result.IsSuccess)
+                    return BadRequest(new BadRequestCustomException(result.Message));
+
+                return Ok(result);
             }
             catch (AppException e)
             {

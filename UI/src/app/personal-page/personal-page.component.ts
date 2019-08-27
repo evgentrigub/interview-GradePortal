@@ -5,8 +5,8 @@ import { AuthenticationService } from '../_services/authentication.service';
 import { UserData } from 'src/app/_models/user-view-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../_services/user.service';
-import { MatTableDataSource, MatSnackBar, MatPaginator, MatSort } from '@angular/material';
-import { tap } from 'rxjs/operators';
+import { MatSnackBar, MatPaginator, MatSort } from '@angular/material';
+import { tap, switchMap } from 'rxjs/operators';
 import { SkillService } from '../_services/skill.service';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { Result } from '../_models/result-model';
@@ -39,12 +39,11 @@ export class PersonalPageComponent implements OnDestroy {
   currentUser: UserAuthenticated | null;
   routeUsername = '';
   isPageOwner = false;
-
-  dataSource: MatTableDataSource<SkillViewModel>;
   displayedColumns: string[] = [];
 
-  userDataSub$: Observable<Result<UserData>>;
+  userData: Result<UserData>;
   userSkills$: Observable<Result<SkillViewModel[]>>;
+  // userSkills: Result<SkillViewModel[]>;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -64,19 +63,30 @@ export class PersonalPageComponent implements OnDestroy {
           this.currentUser = user ? user : null;
 
           if (this.routeUsername) {
+
             this.pageOwner = user && (user.username === this.routeUsername) ? true : false;
             this.displayedColumns = this.getDisplayedColumns(user, this.pageOwner);
 
-            this.userDataSub$ = this.getObservableData('user data');
-            this.userSkills$ = this.getObservableData('user skills', user);
+            const userDataSub$: Observable<Result<UserData>> = this.getObservableData('user data', this.routeUsername);
+            this.userSkills$ = userDataSub$.pipe(
+              switchMap(userDataResult => {
 
-            return forkJoin(this.userDataSub$, this.userSkills$);
+                if (userDataResult.data == null) {
+                  this.userData = null;
+                  return of(null);
+                }
+
+                this.userData = userDataResult;
+                return this.getObservableData('user skills', this.routeUsername, userDataResult.data, user);
+              })
+            );
           } else {
             return of(null);
           }
         })
       )
-      .subscribe(_ => { }, err => this.showMessage(err));
+      .subscribe(_ => { },
+        err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {
@@ -98,17 +108,21 @@ export class PersonalPageComponent implements OnDestroy {
 
   /**
    * Return Observable user data or user skills
-   * @param caseNum 1) user data; 2) user skills
+   * @param type 1) user data; 2) user skills
+   * @param pageOwnerData data of page owner user
    * @param user current authenticated user
    */
-  private getObservableData(type: DataType, user?: UserAuthenticated): Observable<Result<any>> {
+  private getObservableData(
+    type: DataType, routeUsername: string,
+    pageOwnerData?: UserData, user?: UserAuthenticated): Observable<Result<any>> {
+
     switch (type) {
       case 'user data':
-        return this.userService.getByUsername(this.routeUsername) as Observable<Result<UserData>>;
+        return this.userService.getByUsername(routeUsername) as Observable<Result<UserData>>;
       case 'user skills':
         return user
-          ? this.skillService.getUserSkills(this.routeUsername, user.id)
-          : this.skillService.getUserSkills(this.routeUsername) as Observable<Result<SkillViewModel[]>>;
+          ? this.skillService.getUserSkills(pageOwnerData.id, user.id)
+          : this.skillService.getUserSkills(pageOwnerData.id) as Observable<Result<SkillViewModel[]>>;
     }
   }
 

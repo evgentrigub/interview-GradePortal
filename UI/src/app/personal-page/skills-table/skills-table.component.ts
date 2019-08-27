@@ -25,8 +25,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   @Input()
   displayedColumns: string[];
 
-  @Input()
-  routeUsername: string;
+  // @Input()
+  // routeUsername: string;
 
   @Input()
   pageOwner: boolean;
@@ -257,7 +257,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
    * Update skills table datasource.
    */
   updateSkillsDataSource(): void {
-    this.skillService.getUserSkills(this.routeUsername, this.currentUser.id).subscribe(res => {
+    this.skillService.getUserSkills(this.userId, this.currentUser.id).subscribe(res => {
       if (res.isSuccess) {
         this.dataSource.data = res.data;
       }

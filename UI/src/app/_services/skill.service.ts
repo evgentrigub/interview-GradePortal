@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { SkillViewModel } from 'src/app/_models/skill-view-model';
 import { environment } from 'src/environments/environment';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { SkillToSend } from 'src/app/_models/skill-to-send';
 import { EvaluationToSend } from 'src/app/_models/evaluation-to-send';
 import { Result, ResultMessage } from '../_models/result-model';
@@ -19,12 +19,23 @@ export class SkillService {
 
   constructor(private http: HttpClient) { }
 
-  getUserSkills(username: string, expertId?: string): Observable<Result<SkillViewModel[]>> {
+  /**
+   * Return array of user skills
+   * @param userId Id of page owner
+   * @param expertId Id of authenticated user (optional)
+   */
+  getUserSkills(userId: string, expertId?: string): Observable<Result<SkillViewModel[]>> {
     return this.http
-      .get<Result<SkillViewModel[]>>(`${environment.apiUrl}/skills/GetSkills/${username}?expertId=${expertId}`)
+      .get<Result<SkillViewModel[]>>(`${environment.apiUrl}/skills/GetSkills/${userId}?expertId=${expertId}`)
       .pipe(catchError(this.handleError));
   }
 
+  /**
+   * Send user skill and add to user skill collection, if skill existsted.
+   * If skill is new, create skill and then add to user skill collection.
+   * @param userId Id of page owner
+   * @param skill skill model
+   */
   addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
     return this.http.post<SkillViewModel>(this.skillsUrl + `CreateOrAddSkill/${userId}`, skill).pipe(catchError(this.handleError));
   }

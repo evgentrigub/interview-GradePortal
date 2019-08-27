@@ -17,7 +17,7 @@ const emptySkills: Observable<SkillViewModel[]> = of([]);
 export class SkillService {
   private skillsUrl = `${environment.apiUrl}/skills/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Return array of user skills
@@ -68,10 +68,7 @@ export class SkillService {
    * @param evaluation evaluation model
    */
   addEvaluation(evaluation: EvaluationToSend): Observable<ResultMessage> {
-    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.post<ResultMessage>(`${environment.apiUrl}/evaluations/create`, evaluation).pipe(catchError(this.handleError));
   }
 
   private handleError(error: CustomErrorResponse) {

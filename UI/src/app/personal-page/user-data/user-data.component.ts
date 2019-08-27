@@ -58,7 +58,7 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
     }
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   protected Edit(): void {
     this.editMode = true;

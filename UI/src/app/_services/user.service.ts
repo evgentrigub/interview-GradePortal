@@ -13,7 +13,7 @@ import { CustomErrorResponse } from '../_models/custom-error-response';
 export class UserService {
   private usersUrl = `${environment.apiUrl}/users/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Return users for one page in table
@@ -25,19 +25,18 @@ export class UserService {
     const pageSize = pageSizeNum.toString();
     const params = new HttpParams({ fromObject: { page, pageSize } });
 
-    return this.http.get<Result<UserDataTable>>(this.usersUrl + `getUsers`, { params })
-      .pipe(
-        catchError(this.handleError),
-        tap(result => {
-          const data = result.data;
-          for (let i = 0; i < data.items.length; i++) {
-            const user = data.items[i];
-            user.num = i + 1;
-            user.city = user.city ? user.city : 'No city';
-            user.position = user.position ? user.position : 'No position';
-          }
-        })
-      );
+    return this.http.get<Result<UserDataTable>>(this.usersUrl + `getUsers`, { params }).pipe(
+      catchError(this.handleError),
+      tap(result => {
+        const data = result.data;
+        for (let i = 0; i < data.items.length; i++) {
+          const user = data.items[i];
+          user.num = i + 1;
+          user.city = user.city ? user.city : 'No city';
+          user.position = user.position ? user.position : 'No position';
+        }
+      })
+    );
   }
 
   /**
@@ -45,15 +44,14 @@ export class UserService {
    * @param username user login
    */
   getByUsername(username: string): Observable<Result<UserData>> {
-    return this.http.get<Result<UserData>>(this.usersUrl + `GetUser/${username}`)
-      .pipe(
-        tap(result => {
-          const user = result.data;
-          user.city = user.city ? user.city : 'Not Filled';
-          user.position = user.position ? user.position : 'Not Filled';
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.get<Result<UserData>>(this.usersUrl + `GetUser/${username}`).pipe(
+      tap(result => {
+        const user = result.data;
+        user.city = user.city ? user.city : 'Not Filled';
+        user.position = user.position ? user.position : 'Not Filled';
+      }),
+      catchError(this.handleError)
+    );
   }
 
   /**
@@ -61,10 +59,7 @@ export class UserService {
    * @param user user data model
    */
   update(user: UserData): Observable<ResultMessage> {
-    return this.http.put<ResultMessage>(this.usersUrl + `update/${user.id}`, user)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.put<ResultMessage>(this.usersUrl + `update/${user.id}`, user).pipe(catchError(this.handleError));
   }
 
   /**
@@ -72,10 +67,7 @@ export class UserService {
    * @param id user Id
    */
   delete(id: string): Observable<ResultMessage> {
-    return this.http.delete<ResultMessage>(this.usersUrl + `delete/${id}`)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.delete<ResultMessage>(this.usersUrl + `delete/${id}`).pipe(catchError(this.handleError));
   }
 
   private handleError(error: CustomErrorResponse) {

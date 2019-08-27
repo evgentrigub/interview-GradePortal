@@ -5,7 +5,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSnackBarModule, MatProgressSpinnerModule, MatAutocompleteModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule, MatIconModule, MatButtonModule, MatPaginatorModule } from '@angular/material';
+import {
+  MatSnackBarModule,
+  MatProgressSpinnerModule,
+  MatAutocompleteModule,
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatTableModule,
+  MatIconModule,
+  MatButtonModule,
+  MatPaginatorModule,
+} from '@angular/material';
 
 describe('UserDataComponent', () => {
   let component: UserDataComponent;
@@ -30,8 +41,7 @@ describe('UserDataComponent', () => {
         MatButtonModule,
         MatPaginatorModule,
       ],
-    })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -32,17 +32,16 @@ export class AuthenticationService {
    * @param password user password
    */
   login(username: string, password: string): Observable<Result<UserAuthenticated>> {
-    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `authenticate`, { username, password })
-      .pipe(
-        map(result => {
-          if (result.isSuccess && result.data.token) {
-            localStorage.setItem('currentUser', JSON.stringify(result.data));
-            this.currentUserSubject.next(result.data);
-          }
-          return result;
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `authenticate`, { username, password }).pipe(
+      map(result => {
+        if (result.isSuccess && result.data.token) {
+          localStorage.setItem('currentUser', JSON.stringify(result.data));
+          this.currentUserSubject.next(result.data);
+        }
+        return result;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   /**
@@ -51,10 +50,7 @@ export class AuthenticationService {
    * @param user user model
    */
   register(user: User): Observable<Result<UserAuthenticated>> {
-    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `register`, user)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.post<Result<UserAuthenticated>>(this.authUrl + `register`, user).pipe(catchError(this.handleError));
   }
 
   logout() {

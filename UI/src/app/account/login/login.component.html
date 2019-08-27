@@ -6,28 +6,35 @@
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>Login</mat-label>
           <input matInput formControlName="username" />
-          <mat-error *ngIf="loginForm.get('username').hasError('required')">Username is required
-          </mat-error>
-          <mat-error *ngIf="loginForm.get('username').hasError('minlength')">Min length:
+          <mat-error *ngIf="loginForm.get('username').hasError('required')">Username is required </mat-error>
+          <mat-error *ngIf="loginForm.get('username').hasError('minlength')"
+            >Min length:
             {{ loginForm.get('username').getError('minlength').requiredLength }}
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline" style="width:100%">
           <mat-label>Password</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
-          <mat-icon matSuffix (click)="hidePassword = !hidePassword">
-            {{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-          <mat-error *ngIf="loginForm.get('password').hasError('required')">Password is required
-          </mat-error>
+          <mat-icon matSuffix (click)="hidePassword = !hidePassword"> {{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          <mat-error *ngIf="loginForm.get('password').hasError('required')">Password is required </mat-error>
         </mat-form-field>
         <div *ngIf="!isLoading; else loading" style="text-align:center">
-          <button mat-raised-button type="submit" color="accent"
-            style="width:40%; height: 40px; margin-bottom:10px; border-radius: 5px" [disabled]="!canSubmit()">
+          <button
+            mat-raised-button
+            type="submit"
+            color="accent"
+            style="width:40%; height: 40px; margin-bottom:10px; border-radius: 5px"
+            [disabled]="!canSubmit()"
+          >
             Sign in
           </button>
           <br />
-          <button mat-raised-button routerLink="/register" color="primary"
-            style="width:40%; height: 40px; margin-bottom:10p x; border-radius: 5px">
+          <button
+            mat-raised-button
+            routerLink="/register"
+            color="primary"
+            style="width:40%; height: 40px; margin-bottom:10p x; border-radius: 5px"
+          >
             Sign up
           </button>
         </div>
@@ -38,7 +45,6 @@
 
 <ng-template #loading>
   <div *ngIf="isLoading">
-    <mat-progress-spinner style="margin: 0 auto" mode="indeterminate" diameter="80" strokeWidth="9">
-    </mat-progress-spinner>
+    <mat-progress-spinner style="margin: 0 auto" mode="indeterminate" diameter="80" strokeWidth="9"> </mat-progress-spinner>
   </div>
 </ng-template>

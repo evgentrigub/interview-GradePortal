@@ -25,13 +25,7 @@ describe('PersonalPageComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [PersonalPageComponent, SkillsTableComponent, UserDataComponent],
-      imports: [
-        BrowserAnimationsModule,
-        HttpClientTestingModule,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        MaterialModule,
-      ],
+      imports: [BrowserAnimationsModule, HttpClientTestingModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
     }).compileComponents();
   }));
 

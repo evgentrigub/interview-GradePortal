@@ -59,18 +59,15 @@ export class PersonalPageComponent implements OnDestroy {
     this.currentUserSubscription = this.authenticate.currentUser
       .pipe(
         tap(user => {
-
           this.currentUser = user ? user : null;
 
           if (this.routeUsername) {
-
-            this.pageOwner = user && (user.username === this.routeUsername) ? true : false;
+            this.pageOwner = user && user.username === this.routeUsername ? true : false;
             this.displayedColumns = this.getDisplayedColumns(user, this.pageOwner);
 
             const userDataSub$: Observable<Result<UserData>> = this.getObservableData('user data', this.routeUsername);
             this.userSkills$ = userDataSub$.pipe(
               switchMap(userDataResult => {
-
                 if (userDataResult.data == null) {
                   this.userData = null;
                   return of(null);
@@ -85,8 +82,7 @@ export class PersonalPageComponent implements OnDestroy {
           }
         })
       )
-      .subscribe(_ => { },
-        err => this.showMessage(err));
+      .subscribe(_ => {}, err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {
@@ -101,9 +97,7 @@ export class PersonalPageComponent implements OnDestroy {
    * @param pageOwner bool is personal page your own
    */
   private getDisplayedColumns(user: UserAuthenticated, pageOwner: boolean) {
-    return !user || pageOwner
-      ? ['action', 'name', 'description', 'rating']
-      : ['action', 'name', 'description', 'rating', 'expertValue'];
+    return !user || pageOwner ? ['action', 'name', 'description', 'rating'] : ['action', 'name', 'description', 'rating', 'expertValue'];
   }
 
   /**
@@ -113,16 +107,18 @@ export class PersonalPageComponent implements OnDestroy {
    * @param user current authenticated user
    */
   private getObservableData(
-    type: DataType, routeUsername: string,
-    pageOwnerData?: UserData, user?: UserAuthenticated): Observable<Result<any>> {
-
+    type: DataType,
+    routeUsername: string,
+    pageOwnerData?: UserData,
+    user?: UserAuthenticated
+  ): Observable<Result<any>> {
     switch (type) {
       case 'user data':
         return this.userService.getByUsername(routeUsername) as Observable<Result<UserData>>;
       case 'user skills':
         return user
           ? this.skillService.getUserSkills(pageOwnerData.id, user.id)
-          : this.skillService.getUserSkills(pageOwnerData.id) as Observable<Result<SkillViewModel[]>>;
+          : (this.skillService.getUserSkills(pageOwnerData.id) as Observable<Result<SkillViewModel[]>>);
     }
   }
 

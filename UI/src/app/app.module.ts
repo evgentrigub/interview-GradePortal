@@ -32,18 +32,11 @@ import { SkillsTableComponent } from './personal-page/skills-table/skills-table.
     UserDataComponent,
     SkillsTableComponent,
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    appRoutingModule,
-    HttpClientModule,
-  ],
+  imports: [BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, MaterialModule, appRoutingModule, HttpClientModule],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

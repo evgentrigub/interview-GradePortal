@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSnackBarModule, MatProgressSpinnerModule, MatTableModule, MatCardModule, MatPaginatorModule, MatIconModule } from '@angular/material';
 import { UserData } from '../_models/user-view-model';
 import { UserService } from '../_services/user.service';
 import { of } from 'rxjs';
@@ -14,7 +13,6 @@ import { SearchPanelComponent } from './search-panel/search-panel.component';
 
 // tslint:disable: no-use-before-declare
 describe('TableComponent', () => {
-
   function setup() {
     const fixture = TestBed.createComponent(TableComponent);
     const component = fixture.componentInstance;
@@ -27,10 +25,7 @@ describe('TableComponent', () => {
     TestBed.configureTestingModule({
       declarations: [TableComponent, SearchPanelComponent],
       providers: [UserService],
-      imports: [
-        BrowserAnimationsModule, MaterialModule, ReactiveFormsModule,
-        HttpClientTestingModule, MatIconModule,
-        RouterTestingModule]
+      imports: [BrowserAnimationsModule, MaterialModule, ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
     }).compileComponents();
   }));
 
@@ -43,22 +38,22 @@ describe('TableComponent', () => {
 
   it('should display correct data', async () => {
     const { fixture, userService } = setup();
-    spyOn(userService, "getAll").and.returnValue(of(users));
+    spyOn(userService, 'getAll').and.returnValue(of(users));
     fixture.detectChanges();
     fixture.whenStable().then(() => {
-      let tableRows = fixture.nativeElement.querySelectorAll('tr');
-      let headerRow = tableRows[0];
-      let row = tableRows[1];
+      const tableRows = fixture.nativeElement.querySelectorAll('tr');
+      const headerRow = tableRows[0];
+      const row = tableRows[1];
       expect(tableRows.length).toBe(3);
-      expect(headerRow.cells[0].innerHTML).toBe("№");
-      expect(headerRow.cells[1].innerHTML).toBe("Name")
-      expect(headerRow.cells[2].innerHTML).toBe("City")
-      expect(headerRow.cells[3].innerHTML).toBe("Position")
+      expect(headerRow.cells[0].innerHTML).toBe('№');
+      expect(headerRow.cells[1].innerHTML).toBe('Name');
+      expect(headerRow.cells[2].innerHTML).toBe('City');
+      expect(headerRow.cells[3].innerHTML).toBe('Position');
 
-      expect(row.cells[0].innerHTML).toBe("1");
-    })
+      expect(row.cells[0].innerHTML).toBe('1');
+    });
   });
-})
+});
 
 // describe(':', () => { });
 
@@ -89,7 +84,8 @@ const users: UserData[] = [
     username: 'alexeyAndreev',
     city: 'Москва',
     position: 'Инвестор',
-  }]
+  },
+];
 
 const filteredData: UserData[] = [
   {

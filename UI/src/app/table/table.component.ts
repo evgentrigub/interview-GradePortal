@@ -30,7 +30,8 @@ export class TableComponent implements AfterViewInit {
     private userService: UserService,
     private searchService: SearchPanelService,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef) { }
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit(): void {
     this.loadUsersData();

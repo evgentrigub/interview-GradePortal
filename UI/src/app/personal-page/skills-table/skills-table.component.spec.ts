@@ -15,12 +15,8 @@ describe('SkillsTableComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SkillsTableComponent],
-      imports: [
-        BrowserAnimationsModule, MaterialModule, ReactiveFormsModule,
-        HttpClientTestingModule, MatIconModule,
-        RouterTestingModule]
-    })
-      .compileComponents();
+      imports: [BrowserAnimationsModule, MaterialModule, ReactiveFormsModule, HttpClientTestingModule, MatIconModule, RouterTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

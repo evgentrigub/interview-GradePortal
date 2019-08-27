@@ -12,7 +12,6 @@ import { User } from 'src/app/_models/user';
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
-
   readonly registerForm: FormGroup;
   hidePassword = true;
   isLoading = false;
@@ -32,7 +31,7 @@ export class RegisterComponent {
       username: ['', [Validators.required, Validators.minLength(3)]],
       city: [null, [Validators.minLength(3)]],
       position: [null, [Validators.minLength(3)]],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
   }
 

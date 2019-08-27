@@ -14,13 +14,7 @@ describe('SearchPanelComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SearchPanelComponent],
-      imports: [
-        BrowserAnimationsModule,
-        HttpClientTestingModule,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        MaterialModule,
-      ],
+      imports: [BrowserAnimationsModule, HttpClientTestingModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
     }).compileComponents();
   }));
 

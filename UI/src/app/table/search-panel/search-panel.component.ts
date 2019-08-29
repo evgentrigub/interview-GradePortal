@@ -110,8 +110,8 @@ export class SearchPanelComponent {
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {
     return searchControl.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
+      // debounceTime(300),
+      // distinctUntilChanged(),
       switchMap(value => {
         const options = this.filterData(value || '', group);
         return options;
@@ -124,12 +124,13 @@ export class SearchPanelComponent {
       return of([]);
     }
 
-    return this.searchService.getSearchParams(value, group).pipe(
-      map(response =>
-        response.filter(option => {
-          return option.toLowerCase().includes(value.toLowerCase());
-        })
-      )
-    );
+    return this.searchService.getSearchParams(value, group)
+    // .pipe(
+    //   map(response =>
+    //     response.filter(option => {
+    //       return option.toLowerCase().includes(value.toLowerCase());
+    //     })
+    //   )
+    // );
   }
 }

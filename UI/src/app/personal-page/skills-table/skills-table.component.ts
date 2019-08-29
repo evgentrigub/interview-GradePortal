@@ -25,9 +25,6 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   @Input()
   displayedColumns: string[];
 
-  // @Input()
-  // routeUsername: string;
-
   @Input()
   pageOwner: boolean;
 
@@ -163,7 +160,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
                 this.showMessage(`New skill ${newSkill.name} saved successfully!`);
                 this.isEditMode = false;
                 this.newSkillFormGroup.reset();
-                this.updateSkillsDataSource();
+                this.updateSkillsDataSource(this.userId, this.currentUser.id);
                 this.detector.markForCheck();
               },
               err => this.showMessage(err)
@@ -192,7 +189,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
               _ => {
                 this.showMessage(`You rated skill at ${evaluateControl.value} points`);
                 this.evaluatedSkill = '';
-                this.updateSkillsDataSource();
+                this.updateSkillsDataSource(this.userId, this.currentUser.id);
                 this.detector.markForCheck();
               },
               err => this.showMessage(err)
@@ -256,8 +253,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
   /**
    * Update skills table datasource.
    */
-  updateSkillsDataSource(): void {
-    this.skillService.getUserSkills(this.userId, this.currentUser.id).subscribe(res => {
+  private updateSkillsDataSource(userId: string, currentUserId: string): void {
+    this.skillService.getUserSkills(userId, currentUserId).subscribe(res => {
       if (res.isSuccess) {
         this.dataSource.data = res.data;
       }

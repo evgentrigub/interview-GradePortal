@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input, OnChanges, Output } from '@angular/core';
+import { Component, ChangeDetectorRef, Input, OnChanges } from '@angular/core';
 import { EditBaseComponent } from 'src/app/edit-base/edit-base-component';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserData } from 'src/app/_models/user-view-model';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
   templateUrl: './user-data.component.html',
   styleUrls: ['./user-data.component.css'],
 })
-export class UserDataComponent extends EditBaseComponent implements OnInit, OnChanges {
+export class UserDataComponent extends EditBaseComponent implements OnChanges {
   @Input()
   userDataResult: Result<UserData> | null | undefined;
 
@@ -58,19 +58,20 @@ export class UserDataComponent extends EditBaseComponent implements OnInit, OnCh
     }
   }
 
-  ngOnInit() {}
-
   protected Edit(): void {
     this.editMode = true;
     this.previosUserDataState = this.userFormGroup.value;
   }
+
   protected CancelEdit(): void {
     this.userFormGroup.setValue(this.previosUserDataState);
     this.editMode = false;
   }
+
   protected CanSave(): boolean {
     return this.userFormGroup.dirty && this.userFormGroup.valid;
   }
+
   protected Save(): void {
     const group = this.userFormGroup;
     if (!group) {

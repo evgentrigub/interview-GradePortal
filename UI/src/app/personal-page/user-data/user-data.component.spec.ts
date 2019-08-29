@@ -17,6 +17,8 @@ import {
   MatButtonModule,
   MatPaginatorModule,
 } from '@angular/material';
+import { Result } from 'src/app/_models/result-model';
+import { UserData } from 'src/app/_models/user-view-model';
 
 describe('UserDataComponent', () => {
   let component: UserDataComponent;
@@ -47,10 +49,47 @@ describe('UserDataComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UserDataComponent);
     component = fixture.componentInstance;
+    component.userDataResult = USER_DATA_RESULT;
+    component.pageOwner = true;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should show user data', () => {
+
+  });
+
+  // it('should change view to edit mode', () => {
+
+  // });
+
+  // it('should cancel all changes in edit mode', () => {
+
+  // });
+
+  // it('should check validation for updating user data', () => {
+
+  // });
+
+  // it('should cancel all changes in edit mode', () => {
+
+  // });
+
 });
+
+const USER_DATA_RESULT: Result<UserData> = {
+  message: '',
+  isSuccess: true,
+  data: {
+    num: 0,
+    id: 'id',
+    firstName: 'Eugene',
+    lastName: 'Trigubov',
+    username: 'evgentrigub',
+    city: 'NY',
+    position: 'dev'
+  }
+};

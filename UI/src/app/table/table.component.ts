@@ -1,6 +1,5 @@
-import { Component, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { UserService } from '../_services/user.service';
-import { Router } from '@angular/router';
 import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular/material';
 import { UserData } from '../_models/user-view-model';
 import { merge, of } from 'rxjs';
@@ -14,6 +13,7 @@ import { SearchPanelService } from '../_services/search-panel.service';
   styleUrls: ['./table.component.css'],
 })
 export class TableComponent implements AfterViewInit {
+
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
@@ -21,21 +21,21 @@ export class TableComponent implements AfterViewInit {
 
   users: UserData[] = [];
   displayedColumns: string[] = ['num', 'name', 'city', 'position'];
-  dataSource: MatTableDataSource<UserData>;
+  dataSource: MatTableDataSource<UserData> = new MatTableDataSource<UserData>();
   resultsLength = 0;
 
-  isLoading = true;
+  isLoading: boolean;
 
   constructor(
     private userService: UserService,
     private searchService: SearchPanelService,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private detector: ChangeDetectorRef
+  ) { }
 
   ngAfterViewInit(): void {
     this.loadUsersData();
-    this.cdr.detectChanges();
+    this.detector.detectChanges();
   }
 
   /**
@@ -51,33 +51,29 @@ export class TableComponent implements AfterViewInit {
    * Update user table after each change in paginator or search panel
    */
   private loadUsersData(): void {
-    merge(this.paginator.page)
+    this.paginator.page
       .pipe(
         startWith({}),
         switchMap(() => {
           this.isLoading = true;
           if (!this.searchParams || this.searchParams.filter.length === 0) {
             return this.userService.getUsersWithParams(this.paginator.pageIndex, this.paginator.pageSize);
-          } else {
-            this.searchParams.pageIndex = this.paginator.pageIndex;
-            this.searchParams.pageSize = this.paginator.pageSize;
-            return this.searchService.getFilteredUsers(this.searchParams);
           }
+          this.searchParams.pageIndex = this.paginator.pageIndex;
+          this.searchParams.pageSize = this.paginator.pageSize;
+          return this.searchService.getFilteredUsers(this.searchParams);
         }),
         map(result => {
-          if (result) {
-            const data = result.data;
+          if (result.isSuccess) {
             this.isLoading = false;
+            const data = result.data;
+            this.users = data.items;
+
             this.resultsLength = data.totalCount;
             return data.items;
           }
           return [];
         }),
-        catchError(e => {
-          this.showMessage(e);
-          this.isLoading = false;
-          return of([]);
-        })
       )
       .subscribe(data => {
         this.users = data;

@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -14,6 +14,9 @@ import { PersonalPageComponent } from './personal-page.component';
 import { SkillsTableComponent } from './skills-table/skills-table.component';
 import { UserDataComponent } from './user-data/user-data.component';
 import { MaterialModule } from '../material-module';
+import { ThrowStmt } from '@angular/compiler';
+import { UserAuthenticated } from '../_models/user';
+import { Result } from '../_models/result-model';
 
 // tslint:disable: no-use-before-declare
 describe('PersonalPageComponent', () => {
@@ -32,7 +35,6 @@ describe('PersonalPageComponent', () => {
   beforeEach(() => {
     userService = TestBed.get(UserService);
     skillService = TestBed.get(SkillService);
-    spyOn(userService, 'getByUsername').and.returnValue(of(USER_DATA));
     spyOn(skillService, 'getUserSkills').and.returnValue(of(USER_SKILLS));
 
     fixture = TestBed.createComponent(PersonalPageComponent);
@@ -43,16 +45,38 @@ describe('PersonalPageComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should return user data', (done) => {
+    // arrange
+    component.currentUser = USER_AUTH;
+    component.routeUsername = USER_AUTH.username;
+
+    spyOn(userService, 'getByUsername').and.returnValue(of(USER_DATA_RESULT)).and.callThrough();
+
+    fixture.detectChanges();
+
+    setTimeout(() => {
+      console.log('userdata', component.userData)
+
+      expect(component.userData).toEqual(USER_DATA_RESULT)
+      done();
+    }, 1000);
+  });
+
 });
 
-const USER_DATA: UserData = {
-  num: 0,
-  id: '1',
-  firstName: 'Evgen',
-  lastName: 'Trigubov',
-  username: 'evgentrigub',
-  city: 'Zelek',
-  position: 'Dev',
+const USER_DATA_RESULT: Result<UserData> = {
+  message: '',
+  isSuccess: true,
+  data: {
+    num: 0,
+    id: 'id',
+    firstName: 'Eugene',
+    lastName: 'Trigubov',
+    username: 'evgentrigub',
+    city: 'NY',
+    position: 'dev'
+  }
 };
 
 const USER_SKILLS: SkillViewModel[] = [
@@ -64,3 +88,15 @@ const USER_SKILLS: SkillViewModel[] = [
     expertEvaluate: 0,
   },
 ];
+
+const USER_AUTH: UserAuthenticated = {
+  num: 0,
+  id: 'id',
+  firstName: 'Eugene',
+  lastName: 'Trigubov',
+  username: 'evgentrigub',
+  city: 'NY',
+  position: 'dev',
+  token: 'aaaaaaaaaaaaaa'
+};
+

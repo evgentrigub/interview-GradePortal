@@ -41,9 +41,21 @@ export class PersonalPageComponent implements OnDestroy {
   isPageOwner = false;
   displayedColumns: string[] = [];
 
-  userData: Result<UserData>;
+  userData: Result<UserData> =
+    {
+      message: '',
+      isSuccess: true,
+      data: {
+        num: 0,
+        id: '',
+        firstName: '',
+        lastName: '',
+        username: '',
+        city: '',
+        position: ''
+      }
+    };
   userSkills$: Observable<Result<SkillViewModel[]>>;
-  // userSkills: Result<SkillViewModel[]>;
 
   constructor(
     private authenticate: AuthenticationService,
@@ -60,12 +72,12 @@ export class PersonalPageComponent implements OnDestroy {
       .pipe(
         tap(user => {
           this.currentUser = user ? user : null;
-
           if (this.routeUsername) {
             this.pageOwner = user && user.username === this.routeUsername ? true : false;
             this.displayedColumns = this.getDisplayedColumns(user, this.pageOwner);
 
             const userDataSub$: Observable<Result<UserData>> = this.getObservableData('user data', this.routeUsername);
+
             this.userSkills$ = userDataSub$.pipe(
               switchMap(userDataResult => {
                 if (userDataResult.data == null) {

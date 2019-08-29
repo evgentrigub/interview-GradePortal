@@ -125,12 +125,12 @@ export class SearchPanelComponent {
     }
 
     return this.searchService.getSearchParams(value, group)
-    // .pipe(
-    //   map(response =>
-    //     response.filter(option => {
-    //       return option.toLowerCase().includes(value.toLowerCase());
-    //     })
-    //   )
-    // );
+      .pipe(
+        map(response =>
+          response.filter(option => {
+            return option.toLowerCase().includes(value.toLowerCase());
+          })
+        )
+      );
   }
 }

@@ -11,6 +11,8 @@ import { SearchOptions } from 'src/app/_models/search-options';
 import { SearchPanelService } from 'src/app/_services/search-panel.service';
 import { of } from 'rxjs';
 
+// tslint:disable: no-use-before-declare
+
 describe('SearchPanelComponent', () => {
   let component: SearchPanelComponent;
   let fixture: ComponentFixture<SearchPanelComponent>;
@@ -62,33 +64,38 @@ describe('SearchPanelComponent', () => {
     fixture.detectChanges();
 
     // assert
-    expect(component.outParams.emit).toHaveBeenCalledWith(searchOptions)
+    expect(component.outParams.emit).toHaveBeenCalledWith(searchOptions);
   });
 
-  // it('should show autocomplete with possible options in search inputs', (done) => {
-  //   // arrange
-  //   spyOn(service, 'getSearchParams').and.returnValues(of(SEARCH_RESULT)).and.callThrough();
-  //   const inputs = fixture.debugElement.queryAll(By.css('input'));
+  it('should show autocomplete with possible options in search inputs', (done) => {
+    // arrange
+    spyOn(service, 'getSearchParams').and.returnValues(of(SEARCH_RESULT), of(SEARCH_RESULT), of(SEARCH_RESULT), of(SEARCH_RESULT));
+    const panel = fixture.debugElement.query(By.css('mat-expansion-panel')).nativeElement;
+    panel.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
 
-  //   // act
+    const inputs = fixture.debugElement.queryAll(By.css('input'));
 
-  //   for (const el of inputs) {
-  //     console.log(el);
-  //     const element = el.nativeElement as HTMLInputElement;
-  //     element.value = 'aaaa';
-  //     element.dispatchEvent(new Event('input'));
-  //   }
-  //   fixture.detectChanges();
+    // act
+    for (const el of inputs) {
+      const element = el.nativeElement as HTMLInputElement;
+      element.dispatchEvent(new Event('focusin'));
+      element.value = 'aaaa';
+      element.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    }
 
-  //   component.cityOptions.subscribe(el => {
-  //     fixture.detectChanges();
+    // assert
+    setTimeout(() => {
+      fixture.detectChanges();
+      const boxes = fixture.debugElement.queryAll(By.css('mat-option'));
+      for (const el of boxes) {
+        expect(el).toBeTruthy();
+      }
+      done();
+    }, 1000);
 
-  //     console.log(el);
-  //   })
-
-  //   // assert
-  //   done();
-  // });
+  });
 
 });
 

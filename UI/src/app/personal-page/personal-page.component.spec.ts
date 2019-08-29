@@ -17,6 +17,7 @@ import { MaterialModule } from '../material-module';
 import { ThrowStmt } from '@angular/compiler';
 import { UserAuthenticated } from '../_models/user';
 import { Result } from '../_models/result-model';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 // tslint:disable: no-use-before-declare
 describe('PersonalPageComponent', () => {
@@ -27,8 +28,28 @@ describe('PersonalPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PersonalPageComponent, SkillsTableComponent, UserDataComponent],
-      imports: [BrowserAnimationsModule, HttpClientTestingModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
+      declarations: [
+        PersonalPageComponent,
+        SkillsTableComponent,
+        UserDataComponent
+      ],
+      imports: [
+        BrowserAnimationsModule,
+        HttpClientTestingModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
+        MaterialModule
+      ],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: convertToParamMap({ username: 'aaaa' })
+            }
+          }
+        }
+      ]
     }).compileComponents();
   }));
 
@@ -36,7 +57,7 @@ describe('PersonalPageComponent', () => {
     userService = TestBed.get(UserService);
     skillService = TestBed.get(SkillService);
     spyOn(skillService, 'getUserSkills').and.returnValue(of(USER_SKILLS));
-
+    spyOn(userService, 'getByUsername').and.returnValue(of(USER_DATA_RESULT));
     fixture = TestBed.createComponent(PersonalPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -46,22 +67,11 @@ describe('PersonalPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should return user data', (done) => {
-    // arrange
-    component.currentUser = USER_AUTH;
-    component.routeUsername = USER_AUTH.username;
-
-    spyOn(userService, 'getByUsername').and.returnValue(of(USER_DATA_RESULT)).and.callThrough();
-
-    fixture.detectChanges();
-
-    setTimeout(() => {
-      console.log('userdata', component.userData)
-
-      expect(component.userData).toEqual(USER_DATA_RESULT)
-      done();
-    }, 1000);
-  });
+  it('should return user data and Observable user skills', fakeAsync(() => {
+    // assert
+    tick();
+    expect(component.userData).toEqual(USER_DATA_RESULT);
+  }));
 
 });
 
@@ -83,20 +93,9 @@ const USER_SKILLS: SkillViewModel[] = [
   {
     id: '1',
     name: 'My skill',
-    description: "Very long skill's descriptions",
+    description: 'Very long skill\'s descriptions',
     averageEvaluate: 0,
     expertEvaluate: 0,
   },
 ];
-
-const USER_AUTH: UserAuthenticated = {
-  num: 0,
-  id: 'id',
-  firstName: 'Eugene',
-  lastName: 'Trigubov',
-  username: 'evgentrigub',
-  city: 'NY',
-  position: 'dev',
-  token: 'aaaaaaaaaaaaaa'
-};
 

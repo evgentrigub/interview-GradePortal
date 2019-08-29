@@ -26,10 +26,10 @@ export class UserDataComponent extends EditBaseComponent implements OnChanges {
   public get userDataValue(): UserData {
     return this.userFormGroup.value;
   }
+  private currentUser$: Observable<UserAuthenticated>;
 
   userFormGroup: FormGroup;
-  private previosUserDataState: UserData;
-  private currentUser$: Observable<UserAuthenticated>;
+  previosUserDataState: UserData;
 
   isLoading = true;
 

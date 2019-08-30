@@ -41,20 +41,19 @@ export class PersonalPageComponent implements OnDestroy {
   isPageOwner = false;
   displayedColumns: string[] = [];
 
-  userData: Result<UserData> =
-    {
-      message: '',
-      isSuccess: true,
-      data: {
-        num: 0,
-        id: '',
-        firstName: '',
-        lastName: '',
-        username: '',
-        city: '',
-        position: ''
-      }
-    };
+  userData: Result<UserData> = {
+    message: '',
+    isSuccess: true,
+    data: {
+      num: 0,
+      id: '',
+      firstName: '',
+      lastName: '',
+      username: '',
+      city: '',
+      position: '',
+    },
+  };
   userSkills$: Observable<Result<SkillViewModel[]>>;
 
   constructor(
@@ -94,7 +93,7 @@ export class PersonalPageComponent implements OnDestroy {
           }
         })
       )
-      .subscribe(_ => { }, err => this.showMessage(err));
+      .subscribe(_ => {}, err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {

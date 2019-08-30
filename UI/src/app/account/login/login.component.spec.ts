@@ -94,5 +94,4 @@ describe('LoginComponent', () => {
     expect(usernameControl).toBeTruthy();
     expect(passwordControl).toBeTruthy();
   });
-
 });

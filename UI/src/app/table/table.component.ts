@@ -13,7 +13,6 @@ import { SearchPanelService } from '../_services/search-panel.service';
   styleUrls: ['./table.component.css'],
 })
 export class TableComponent implements AfterViewInit {
-
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
@@ -31,7 +30,7 @@ export class TableComponent implements AfterViewInit {
     private searchService: SearchPanelService,
     private snackBar: MatSnackBar,
     private detector: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngAfterViewInit(): void {
     this.loadUsersData();
@@ -73,7 +72,7 @@ export class TableComponent implements AfterViewInit {
             return data.items;
           }
           return [];
-        }),
+        })
       )
       .subscribe(data => {
         this.users = data;

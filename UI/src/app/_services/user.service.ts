@@ -13,7 +13,7 @@ import { CustomErrorResponse } from '../_models/custom-error-response';
 export class UserService {
   private usersUrl = `${environment.apiUrl}/users/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Return users for one page in table

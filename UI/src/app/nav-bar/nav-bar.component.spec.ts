@@ -21,23 +21,16 @@ describe('NavBarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        NavBarComponent,
-        LoginComponent,
-        PersonalPageComponent,
-        UserDataComponent,
-        SkillsTableComponent
-      ],
+      declarations: [NavBarComponent, LoginComponent, PersonalPageComponent, UserDataComponent, SkillsTableComponent],
       imports: [
         MaterialModule,
         ReactiveFormsModule,
         HttpClientTestingModule,
-        RouterTestingModule.withRoutes(
-          [
-            { path: 'login', component: LoginComponent },
-            { path: ':username', component: PersonalPageComponent }
-          ]
-        )]
+        RouterTestingModule.withRoutes([
+          { path: 'login', component: LoginComponent },
+          { path: ':username', component: PersonalPageComponent },
+        ]),
+      ],
     }).compileComponents();
   }));
 
@@ -100,7 +93,6 @@ describe('NavBarComponent', () => {
     // assert
     expect(location.path()).toBe('/login');
   }));
-
 });
 
 const userAuth: UserAuthenticated = {
@@ -111,5 +103,5 @@ const userAuth: UserAuthenticated = {
   username: 'evgentrigub',
   city: 'NY',
   position: 'dev',
-  token: 'aaaaaaaaaaaaaa'
+  token: 'aaaaaaaaaaaaaa',
 };

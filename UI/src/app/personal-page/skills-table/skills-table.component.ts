@@ -75,6 +75,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   ngOnInit() {
     this.nameSkillOptions = this.getAutocompleteSkills();
+    // this.nameSkillOptions.subscribe(r => console.log(r))
   }
 
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
@@ -156,12 +157,14 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           .addOrCreateSkill(this.currentUser.id, skillToSave)
           .pipe(
             tap(
-              newSkill => {
-                this.showMessage(`New skill ${newSkill.name} saved successfully!`);
-                this.isEditMode = false;
-                this.newSkillFormGroup.reset();
-                this.updateSkillsDataSource(this.userId, this.currentUser.id);
-                this.detector.markForCheck();
+              result => {
+                if (result.isSuccess) {
+                  this.showMessage(result.message);
+                  this.isEditMode = false;
+                  this.newSkillFormGroup.reset();
+                  this.updateSkillsDataSource(this.userId, this.currentUser.id);
+                  this.detector.markForCheck();
+                }
               },
               err => this.showMessage(err)
             )
@@ -182,20 +185,18 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
           value: evaluateControl.value,
         };
 
-        this.skillService
-          .addEvaluation(evaluation)
-          .pipe(
-            tap(
-              _ => {
-                this.showMessage(`You rated skill at ${evaluateControl.value} points`);
-                this.evaluatedSkill = '';
-                this.updateSkillsDataSource(this.userId, this.currentUser.id);
-                this.detector.markForCheck();
-              },
-              err => this.showMessage(err)
-            )
+        const a = this.skillService.addEvaluation(evaluation);
+        a.pipe(
+          tap(
+            _ => {
+              this.showMessage(`You rated skill at ${evaluateControl.value} points`);
+              this.evaluatedSkill = '';
+              this.updateSkillsDataSource(this.userId, this.currentUser.id);
+              this.detector.markForCheck();
+            },
+            err => this.showMessage(err)
           )
-          .subscribe();
+        ).subscribe();
         break;
     }
   }
@@ -223,7 +224,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
    * Return autocomplete options after each change in skill name input.
    */
   private getAutocompleteSkills(): Observable<SkillViewModel[]> {
-    return this.newSkillNameControl.valueChanges.pipe(
+    const a = this.newSkillNameControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
       distinctUntilChanged(),
@@ -232,6 +233,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
         return options;
       })
     );
+
+    return a;
   }
 
   private filterData(value: any): Observable<SkillViewModel[]> {
@@ -243,8 +246,6 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
       map(response =>
         response.filter((option: SkillViewModel) => {
           return option.name.toLowerCase().includes(value.toLowerCase());
-          // return option.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
-          // return option.name;
         })
       )
     );

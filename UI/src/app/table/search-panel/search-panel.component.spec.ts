@@ -48,7 +48,7 @@ describe('SearchPanelComponent', () => {
       { key: 'name', value: 'a' },
       { key: 'city', value: 'a' },
       { key: 'pos', value: 'a' },
-      { key: 'skill', value: 'a' }
+      { key: 'skill', value: 'a' },
     ];
 
     // act
@@ -67,7 +67,7 @@ describe('SearchPanelComponent', () => {
     expect(component.outParams.emit).toHaveBeenCalledWith(searchOptions);
   });
 
-  it('should show autocomplete with possible options in search inputs', (done) => {
+  it('should show autocomplete with possible options in search inputs', done => {
     // arrange
     spyOn(service, 'getSearchParams').and.returnValues(of(SEARCH_RESULT), of(SEARCH_RESULT), of(SEARCH_RESULT), of(SEARCH_RESULT));
     const panel = fixture.debugElement.query(By.css('mat-expansion-panel')).nativeElement;
@@ -94,9 +94,7 @@ describe('SearchPanelComponent', () => {
       }
       done();
     }, 1000);
-
   });
-
 });
 
 const SEARCH_RESULT = ['aaaaaa', 'bbbbbbb'];

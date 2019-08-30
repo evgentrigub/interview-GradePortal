@@ -1,12 +1,12 @@
 import { SkillViewModel } from '../_models/skill-view-model';
 import { Input } from '@angular/core';
-import { User } from '../_models/user';
+import { User, UserAuthenticated } from '../_models/user';
 
 export type ActionType = 'create skill' | 'add evaluation';
 
 export abstract class EditBaseComponent {
   @Input()
-  currentUser: User;
+  currentUser: UserAuthenticated;
 
   public isEditMode: boolean;
 

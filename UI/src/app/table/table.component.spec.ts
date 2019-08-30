@@ -30,13 +30,7 @@ describe('TableComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TableComponent,
-        SearchPanelComponent,
-        PersonalPageComponent,
-        UserDataComponent,
-        SkillsTableComponent
-      ],
+      declarations: [TableComponent, SearchPanelComponent, PersonalPageComponent, UserDataComponent, SkillsTableComponent],
       providers: [UserService, SearchPanelService],
       imports: [
         BrowserAnimationsModule,
@@ -45,9 +39,10 @@ describe('TableComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule.withRoutes([
           {
-            path: 'dmitry', component: PersonalPageComponent
-          }
-        ])
+            path: 'dmitry',
+            component: PersonalPageComponent,
+          },
+        ]),
       ],
     }).compileComponents();
   }));
@@ -60,7 +55,6 @@ describe('TableComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -79,7 +73,6 @@ describe('TableComponent', () => {
     expect(headerRow.cells[2].innerHTML).toBe('City');
     expect(headerRow.cells[3].innerHTML).toBe('Position');
     expect(row.cells[0].innerHTML).toBe('1');
-
   }));
 
   it('should return new page after click paginator', () => {
@@ -123,14 +116,14 @@ describe('TableComponent', () => {
     spyOn(searchService, 'getFilteredUsers').and.returnValues(of(filteredData));
 
     const searchOptions: SearchOptions = new SearchOptions();
-    searchOptions.pageIndex = 0,
-      searchOptions.pageSize = 3,
-      searchOptions.filter = [
+    (searchOptions.pageIndex = 0),
+      (searchOptions.pageSize = 3),
+      (searchOptions.filter = [
         { key: 'name', value: 'evgen' },
         { key: 'city', value: '' },
         { key: 'pos', value: '' },
-        { key: 'skill', value: '' }
-      ];
+        { key: 'skill', value: '' },
+      ]);
 
     // act
     component.setFilteredUsers(searchOptions);
@@ -140,98 +133,97 @@ describe('TableComponent', () => {
     // assert
     expect(row.cells[0].innerHTML).toBe('1');
   });
-
 });
 
 const users: Result<UserDataTable> = {
   message: '',
   isSuccess: true,
   data: {
-    items:
-      [
-        {
-          num: 1,
-          id: '7283243a-8866-41fe-98d6-635e5ac81709',
-          firstName: 'Дмитрий',
-          lastName: 'Никитин',
-          username: 'dmitry',
-          city: 'Москва',
-          position: 'Ведущий разработчик',
-        },
-        {
-          num: 2,
-          id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
-          firstName: 'Николай',
-          lastName: 'Петров',
-          username: 'petrov',
-          city: 'Нижний Новгород',
-          position: 'Менеджер по продажам',
-        },
-        {
-          num: 3,
-          id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
-          firstName: 'Алексей',
-          lastName: 'Андреев',
-          username: 'alexeyAndreev',
-          city: 'Москва',
-          position: 'Инвестор',
-        },
-      ], totalCount: 6
-  }
+    items: [
+      {
+        num: 1,
+        id: '7283243a-8866-41fe-98d6-635e5ac81709',
+        firstName: 'Дмитрий',
+        lastName: 'Никитин',
+        username: 'dmitry',
+        city: 'Москва',
+        position: 'Ведущий разработчик',
+      },
+      {
+        num: 2,
+        id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
+        firstName: 'Николай',
+        lastName: 'Петров',
+        username: 'petrov',
+        city: 'Нижний Новгород',
+        position: 'Менеджер по продажам',
+      },
+      {
+        num: 3,
+        id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
+        firstName: 'Алексей',
+        lastName: 'Андреев',
+        username: 'alexeyAndreev',
+        city: 'Москва',
+        position: 'Инвестор',
+      },
+    ],
+    totalCount: 6,
+  },
 };
 
 const nextUsers: Result<UserDataTable> = {
   message: '',
   isSuccess: true,
   data: {
-    items:
-      [
-        {
-          num: 4,
-          id: '7283243a-8866-41fe-98d6-635e5ac81709',
-          firstName: 'Дмитрий',
-          lastName: 'Никитин',
-          username: 'dmitry',
-          city: 'Москва',
-          position: 'Ведущий разработчик',
-        },
-        {
-          num: 5,
-          id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
-          firstName: 'Николай',
-          lastName: 'Петров',
-          username: 'petrov',
-          city: 'Нижний Новгород',
-          position: 'Менеджер по продажам',
-        },
-        {
-          num: 6,
-          id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
-          firstName: 'Алексей',
-          lastName: 'Андреев',
-          username: 'alexeyAndreev',
-          city: 'Москва',
-          position: 'Инвестор',
-        },
-      ], totalCount: 6
-  }
+    items: [
+      {
+        num: 4,
+        id: '7283243a-8866-41fe-98d6-635e5ac81709',
+        firstName: 'Дмитрий',
+        lastName: 'Никитин',
+        username: 'dmitry',
+        city: 'Москва',
+        position: 'Ведущий разработчик',
+      },
+      {
+        num: 5,
+        id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
+        firstName: 'Николай',
+        lastName: 'Петров',
+        username: 'petrov',
+        city: 'Нижний Новгород',
+        position: 'Менеджер по продажам',
+      },
+      {
+        num: 6,
+        id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
+        firstName: 'Алексей',
+        lastName: 'Андреев',
+        username: 'alexeyAndreev',
+        city: 'Москва',
+        position: 'Инвестор',
+      },
+    ],
+    totalCount: 6,
+  },
 };
 
 const filteredData: Result<UserDataTable> = {
   message: '',
   isSuccess: true,
   data: {
-    items:
-      [
-        {
-          num: 1,
-          id: '1',
-          firstName: 'Evgen',
-          lastName: 'Trigubov',
-          username: 'evgentrigub',
-          city: 'Zelek',
-          position: 'Dev',
-        },
-      ], totalCount: 1
-  }
+    items: [
+      {
+        num: 1,
+        id: '1',
+        firstName: 'Evgen',
+        lastName: 'Trigubov',
+        username: 'evgentrigub',
+        city: 'Zelek',
+        position: 'Dev',
+      },
+    ],
+    totalCount: 1,
+  },
 };

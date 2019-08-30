@@ -53,5 +53,4 @@ describe('RegisterComponent', () => {
   // it('should check validation for sending register form', () => {
 
   // });
-
 });

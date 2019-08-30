@@ -19,13 +19,7 @@ describe('UserDataComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [UserDataComponent],
-      imports: [
-        BrowserAnimationsModule,
-        HttpClientTestingModule,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        MaterialModule
-      ],
+      imports: [BrowserAnimationsModule, HttpClientTestingModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
     }).compileComponents();
   }));
 
@@ -43,8 +37,8 @@ describe('UserDataComponent', () => {
         firstChange: true,
         isFirstChange() {
           return true;
-        }
-      }
+        },
+      },
     });
   });
 
@@ -108,7 +102,6 @@ describe('UserDataComponent', () => {
           return r === input.value;
         });
         expect(res).toBe(input.value);
-
       }
       expect(component.editMode).toBeTruthy();
       component.previosUserDataState.num = USER_DATA_RESULT.data.num;
@@ -180,7 +173,6 @@ describe('UserDataComponent', () => {
       done();
     }, 0);
   });
-
 });
 
 const USER_DATA_RESULT: Result<UserData> = {
@@ -193,6 +185,6 @@ const USER_DATA_RESULT: Result<UserData> = {
     lastName: 'Trigubov',
     username: 'evgentrigub',
     city: 'NY',
-    position: 'dev'
-  }
+    position: 'dev',
+  },
 };

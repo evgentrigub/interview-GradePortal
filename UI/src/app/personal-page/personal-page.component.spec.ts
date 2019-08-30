@@ -28,28 +28,18 @@ describe('PersonalPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        PersonalPageComponent,
-        SkillsTableComponent,
-        UserDataComponent
-      ],
-      imports: [
-        BrowserAnimationsModule,
-        HttpClientTestingModule,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        MaterialModule
-      ],
+      declarations: [PersonalPageComponent, SkillsTableComponent, UserDataComponent],
+      imports: [BrowserAnimationsModule, HttpClientTestingModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
       providers: [
         {
           provide: ActivatedRoute,
           useValue: {
             snapshot: {
-              paramMap: convertToParamMap({ username: 'aaaa' })
-            }
-          }
-        }
-      ]
+              paramMap: convertToParamMap({ username: 'aaaa' }),
+            },
+          },
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -72,7 +62,6 @@ describe('PersonalPageComponent', () => {
     tick();
     expect(component.userData).toEqual(USER_DATA_RESULT);
   }));
-
 });
 
 const USER_DATA_RESULT: Result<UserData> = {
@@ -85,17 +74,16 @@ const USER_DATA_RESULT: Result<UserData> = {
     lastName: 'Trigubov',
     username: 'evgentrigub',
     city: 'NY',
-    position: 'dev'
-  }
+    position: 'dev',
+  },
 };
 
 const USER_SKILLS: SkillViewModel[] = [
   {
     id: '1',
     name: 'My skill',
-    description: 'Very long skill\'s descriptions',
+    description: "Very long skill's descriptions",
     averageEvaluate: 0,
     expertEvaluate: 0,
   },
 ];
-

@@ -17,7 +17,7 @@ const emptySkills: Observable<Array<string>> = of([]);
 export class SearchPanelService {
   private searchUrl = `${environment.apiUrl}/search/`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Return possible search options in search panel
@@ -56,7 +56,6 @@ export class SearchPanelService {
           const data = result.data;
           for (let i = 0; i < data.items.length; i++) {
             const user = data.items[i];
-            user.num = i + 1;
             user.city = user.city ? user.city : 'No city';
             user.position = user.position ? user.position : 'No position';
           }

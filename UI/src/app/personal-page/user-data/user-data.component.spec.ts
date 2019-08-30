@@ -104,7 +104,7 @@ describe('UserDataComponent', () => {
         expect(res).toBe(input.value);
       }
       expect(component.editMode).toBeTruthy();
-      component.previosUserDataState.num = USER_DATA_RESULT.data.num;
+      component.previosUserDataState.id = USER_DATA_RESULT.data.id;
       expect(component.previosUserDataState).toEqual(USER_DATA_RESULT.data);
       expect(inputs.length).toBe(5);
 
@@ -179,7 +179,6 @@ const USER_DATA_RESULT: Result<UserData> = {
   message: '',
   isSuccess: true,
   data: {
-    num: 0,
     id: 'id',
     firstName: 'Eugene',
     lastName: 'Trigubov',

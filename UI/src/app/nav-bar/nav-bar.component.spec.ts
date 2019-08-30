@@ -96,7 +96,6 @@ describe('NavBarComponent', () => {
 });
 
 const userAuth: UserAuthenticated = {
-  num: 0,
   id: 'id',
   firstName: 'Eugene',
   lastName: 'Trigubov',

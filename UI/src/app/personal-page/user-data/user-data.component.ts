@@ -97,7 +97,10 @@ export class UserDataComponent extends EditBaseComponent implements OnChanges {
               });
             }
           },
-          err => this.showMessage(err)
+          err => {
+            this.userFormGroup.enable();
+            this.showMessage(err);
+          }
         )
       )
       .subscribe();

@@ -19,7 +19,7 @@ export class TableComponent implements AfterViewInit {
   private searchParams: ISearchOptions;
 
   users: UserData[] = [];
-  displayedColumns: string[] = ['num', 'name', 'city', 'position'];
+  displayedColumns: string[] = ['name', 'city', 'position'];
   dataSource: MatTableDataSource<UserData> = new MatTableDataSource<UserData>();
   resultsLength = 0;
 
@@ -30,7 +30,7 @@ export class TableComponent implements AfterViewInit {
     private searchService: SearchPanelService,
     private snackBar: MatSnackBar,
     private detector: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     this.loadUsersData();

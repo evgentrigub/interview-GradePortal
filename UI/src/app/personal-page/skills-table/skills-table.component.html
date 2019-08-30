@@ -1,7 +1,7 @@
 <form [formGroup]="newSkillFormGroup">
   <mat-card-content>
     <div class="mat-elevation-z8" style="width: 70rem">
-      <table *ngIf="dataSource; else loading" mat-table [dataSource]="dataSource" matSort>
+      <table *ngIf="dataSource; else loading" mat-table [dataSource]="dataSource">
         <ng-container matColumnDef="action">
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let skill"></td>
@@ -10,18 +10,20 @@
               <button mat-icon-button class="cancel" color="primary" (click)="CancelEdit('create skill')">
                 <mat-icon>undo</mat-icon>
               </button>
-              <button mat-icon-button class="save" color="primary" (click)="Save('create skill')" [disabled]="!CanSave('create skill')">
+              <button mat-icon-button class="save" color="primary" (click)="Save('create skill')"
+                [disabled]="!CanSave('create skill')">
                 <mat-icon>check</mat-icon>
               </button>
             </div>
-            <button *ngIf="!editMode && pageOwner" mat-icon-button class="add" color="primary" (click)="Edit('create skill')">
+            <button *ngIf="!editMode && pageOwner" mat-icon-button class="add" color="primary"
+              (click)="Edit('create skill')">
               <mat-icon>add_box</mat-icon>
             </button>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let skill">
             {{ skill.name }}
           </td>
@@ -38,19 +40,20 @@
         </ng-container>
 
         <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+          <th mat-header-cell *matHeaderCellDef>Description</th>
           <td mat-cell *matCellDef="let skill">
             {{ skill.description }}
           </td>
           <td mat-cell *matFooterCellDef>
             <mat-form-field *ngIf="editMode">
-              <input matInput placeholder="Description" formControlName="description" [attr.disabled]="isSkillExisted || null" />
+              <input matInput placeholder="Description" formControlName="description"
+                [attr.disabled]="isSkillExisted || null" />
             </mat-form-field>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="rating">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Rating</th>
+          <th mat-header-cell *matHeaderCellDef>Rating</th>
           <td mat-cell *matCellDef="let skill">
             {{ skill.averageEvaluate }}
           </td>
@@ -58,17 +61,12 @@
         </ng-container>
 
         <ng-container matColumnDef="expertValue">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>My Value</th>
+          <th mat-header-cell *matHeaderCellDef>My Value</th>
           <td mat-cell *matCellDef="let skill">
             <div *ngIf="evaluatedSkill != skill.id">
               {{ skill.expertEvaluate }}
-              <button
-                *ngIf="skill.expertEvaluate == 0"
-                class="add-eval"
-                mat-icon-button
-                color="accent"
-                (click)="Edit('add evaluation', skill)"
-              >
+              <button *ngIf="skill.expertEvaluate == 0" class="add-eval" mat-icon-button color="accent"
+                (click)="Edit('add evaluation', skill)">
                 <mat-icon>add</mat-icon>
               </button>
               <button *ngIf="skill.expertEvaluate != 0" mat-icon-button color="accent" disabled="true">
@@ -82,13 +80,8 @@
               <button class="cancel-eval" mat-icon-button color="warn" (click)="CancelEdit('add evaluation')">
                 <mat-icon>undo</mat-icon>
               </button>
-              <button
-                class="save-eval"
-                mat-icon-button
-                color="primary"
-                (click)="Save('add evaluation', skill)"
-                [disabled]="!CanSave('add evaluation')"
-              >
+              <button class="save-eval" mat-icon-button color="primary" (click)="Save('add evaluation', skill)"
+                [disabled]="!CanSave('add evaluation')">
                 <mat-icon>check</mat-icon>
               </button>
             </div>

@@ -45,7 +45,6 @@ export class PersonalPageComponent implements OnDestroy {
     message: '',
     isSuccess: true,
     data: {
-      num: 0,
       id: '',
       firstName: '',
       lastName: '',
@@ -93,7 +92,7 @@ export class PersonalPageComponent implements OnDestroy {
           }
         })
       )
-      .subscribe(_ => {}, err => this.showMessage(err));
+      .subscribe(_ => { }, err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {

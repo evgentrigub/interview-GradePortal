@@ -122,7 +122,7 @@ namespace GradePortalAPI.Services
         /// <inheritdoc />
         public IResult Update(string id, User user)
         {
-            var currentUser = _context.Users.Find(user.Id);
+            var currentUser = _context.Users.Find(id);
 
             if (currentUser == null)
                 return new Result("User not found", false);

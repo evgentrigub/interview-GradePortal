@@ -110,8 +110,8 @@ export class SearchPanelComponent {
   private getAutocompleteOptions(searchControl: AbstractControl, group: SearchGroup): Observable<Array<string>> {
     return searchControl.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
+      // debounceTime(300),
+      // distinctUntilChanged(),
       switchMap(value => {
         const options = this.filterData(value || '', group);
         return options;

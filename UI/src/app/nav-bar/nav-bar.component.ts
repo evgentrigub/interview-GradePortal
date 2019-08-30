@@ -14,7 +14,7 @@ export class NavBarComponent implements OnDestroy {
   currentUser: UserAuthenticated | null;
   currentUserSubscription: Subscription;
 
-  constructor(private router: Router, private authenticationService: AuthenticationService) {
+  constructor(public router: Router, private authenticationService: AuthenticationService) {
     this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
       this.currentUser = user ? user : null;
     });

@@ -1,10 +1,10 @@
 <div style="display: flex; justify-content: space-around;">
   <img style="min-width: 300px; min-height: 300px;" mat-card-avatar src="/assets/user.png" class="avatar" />
   <form [formGroup]="userFormGroup">
-    <button mat-button *ngIf="pageOwner && !editMode" (click)="Edit()">Edit</button>
+    <button mat-button class="edit" *ngIf="pageOwner && !editMode" (click)="Edit()">Edit</button>
     <div *ngIf="editMode">
-      <button mat-button (click)="Save()" [disabled]="!CanSave()">Save</button>
-      <button mat-button (click)="CancelEdit()">Cancel</button>
+      <button mat-button class="save" (click)="Save()" [disabled]="!CanSave()">Save</button>
+      <button mat-button class="cancel" (click)="CancelEdit()">Cancel</button>
     </div>
     <div *ngIf="!isLoading; else loading">
       <mat-card-header *ngIf="!editMode">

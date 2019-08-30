@@ -36,8 +36,8 @@ export class SkillService {
    * @param userId Id of page owner
    * @param skill skill model
    */
-  addOrCreateSkill(userId: string, skill: SkillToSend): Observable<SkillViewModel> {
-    return this.http.post<SkillViewModel>(this.skillsUrl + `CreateOrAddSkill/${userId}`, skill).pipe(catchError(this.handleError));
+  addOrCreateSkill(userId: string, skill: SkillToSend): Observable<ResultMessage> {
+    return this.http.post<ResultMessage>(this.skillsUrl + `CreateOrAddSkill/${userId}`, skill).pipe(catchError(this.handleError));
   }
 
   /**

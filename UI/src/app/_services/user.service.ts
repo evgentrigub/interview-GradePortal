@@ -24,7 +24,7 @@ export class UserService {
     const page = pageNum.toString();
     const pageSize = pageSizeNum.toString();
     const params = new HttpParams({ fromObject: { page, pageSize } });
-
+    console.log(page, pageSize, params);
     return this.http.get<Result<UserDataTable>>(this.usersUrl + `getUsers`, { params }).pipe(
       catchError(this.handleError),
       tap(result => {

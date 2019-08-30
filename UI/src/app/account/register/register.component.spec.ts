@@ -45,4 +45,12 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  // it('should get and send register form', () => {
+
+  // });
+
+  // it('should check validation for sending register form', () => {
+
+  // });
 });

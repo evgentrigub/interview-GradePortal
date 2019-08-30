@@ -7,14 +7,14 @@
           <td mat-cell *matCellDef="let skill"></td>
           <td mat-cell *matFooterCellDef="let skill">
             <div *ngIf="editMode">
-              <button mat-icon-button color="primary" (click)="CancelEdit('create skill')">
+              <button mat-icon-button class="cancel" color="primary" (click)="CancelEdit('create skill')">
                 <mat-icon>undo</mat-icon>
               </button>
-              <button mat-icon-button color="primary" (click)="Save('create skill')" [disabled]="!CanSave('create skill')">
+              <button mat-icon-button class="save" color="primary" (click)="Save('create skill')" [disabled]="!CanSave('create skill')">
                 <mat-icon>check</mat-icon>
               </button>
             </div>
-            <button *ngIf="!editMode && pageOwner" mat-icon-button color="primary" (click)="Edit('create skill')">
+            <button *ngIf="!editMode && pageOwner" mat-icon-button class="add" color="primary" (click)="Edit('create skill')">
               <mat-icon>add_box</mat-icon>
             </button>
           </td>
@@ -62,7 +62,13 @@
           <td mat-cell *matCellDef="let skill">
             <div *ngIf="evaluatedSkill != skill.id">
               {{ skill.expertEvaluate }}
-              <button *ngIf="skill.expertEvaluate == 0" mat-icon-button color="accent" (click)="Edit('add evaluation', skill)">
+              <button
+                *ngIf="skill.expertEvaluate == 0"
+                class="add-eval"
+                mat-icon-button
+                color="accent"
+                (click)="Edit('add evaluation', skill)"
+              >
                 <mat-icon>add</mat-icon>
               </button>
               <button *ngIf="skill.expertEvaluate != 0" mat-icon-button color="accent" disabled="true">
@@ -73,10 +79,16 @@
               <mat-form-field>
                 <input matInput placeholder="Value" [formControl]="evaluationControl" type="number" />
               </mat-form-field>
-              <button mat-icon-button color="warn" (click)="CancelEdit('add evaluation')">
+              <button class="cancel-eval" mat-icon-button color="warn" (click)="CancelEdit('add evaluation')">
                 <mat-icon>undo</mat-icon>
               </button>
-              <button mat-icon-button color="primary" (click)="Save('add evaluation', skill)" [disabled]="!CanSave('add evaluation')">
+              <button
+                class="save-eval"
+                mat-icon-button
+                color="primary"
+                (click)="Save('add evaluation', skill)"
+                [disabled]="!CanSave('add evaluation')"
+              >
                 <mat-icon>check</mat-icon>
               </button>
             </div>

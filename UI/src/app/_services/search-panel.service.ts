@@ -38,9 +38,7 @@ export class SearchPanelService {
     const params: HttpParams = new HttpParams({ fromObject: { query, group: group.toString() } });
 
     return this.http.get<Array<string>>(this.searchUrl + `paramSearch`, { params }).pipe(
-      catchError(this.handleError),
-      tap(x => console.log('autocompleSkill result:', x))
-    );
+      catchError(this.handleError));
   }
 
   /**

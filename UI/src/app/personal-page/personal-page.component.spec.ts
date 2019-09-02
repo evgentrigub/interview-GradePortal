@@ -80,6 +80,7 @@ const USER_DATA_RESULT: Result<UserData> = {
 
 const USER_SKILLS: SkillViewModel[] = [
   {
+    num: 0,
     id: '1',
     name: 'My skill',
     description: "Very long skill's descriptions",

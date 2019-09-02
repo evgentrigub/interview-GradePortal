@@ -386,6 +386,7 @@ const USER_SKILLS_RESULT: Result<SkillViewModel[]> = {
   isSuccess: true,
   data: [
     {
+      num: 0,
       id: 'id1',
       name: 'Skill one',
       description: 'Description one',
@@ -393,6 +394,7 @@ const USER_SKILLS_RESULT: Result<SkillViewModel[]> = {
       expertEvaluate: 4,
     },
     {
+      num: 1,
       id: 'id2',
       name: 'Skill two',
       description: 'Description two',
@@ -400,6 +402,7 @@ const USER_SKILLS_RESULT: Result<SkillViewModel[]> = {
       expertEvaluate: 5,
     },
     {
+      num: 2,
       id: 'id3',
       name: 'Skill three',
       description: 'Description three',
@@ -416,6 +419,7 @@ const RESULT_MESSAGE: ResultMessage = {
 
 const SEARCH_RESULT: SkillViewModel[] = [
   {
+    num: 0,
     id: '1',
     name: 'aaaaaaaa',
     description: "Very long skill's descriptions",
@@ -423,6 +427,7 @@ const SEARCH_RESULT: SkillViewModel[] = [
     expertEvaluate: 0,
   },
   {
+    num: 1,
     id: '1',
     name: 'aaaaabbbb',
     description: "Very long skill's descriptions",

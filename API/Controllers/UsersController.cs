@@ -7,7 +7,6 @@ using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
-using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using GradePortalAPI.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +46,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _userService.Authenticate(userDto.Username, userDto.Password);
                 if (!result.IsSuccess)
-                    return NotFound(new NotFoundCustomException(result.Message));
+                    return NotFound(result.Message);
 
                 var token = _userService.CreateToken(result.Data.Id);
                 var user = _mapper.Map<UserAuthenticateModel>(result.Data);
@@ -58,7 +57,7 @@ namespace GradePortalAPI.Controllers
             }
             catch (AppException exception)
             {
-                return BadRequest(new {exception.Message});
+                return BadRequest(new {message = exception.Message});
             }
         }
 
@@ -80,7 +79,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _userService.Create(user, userDto.Password);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
 
                 return Created("", result);
             }
@@ -138,7 +137,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _userService.GetByUserName(username);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
                 var userViewModel = _mapper.Map<UserViewModel>(result.Data);
                 return Ok(new Result<UserViewModel>(message: result.Message, isSuccess: result.IsSuccess,
                     data: userViewModel));
@@ -170,7 +169,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = _userService.Update(id, user);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
                 return Ok(result);
             }
             catch (AppException e)
@@ -197,7 +196,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _userService.Delete(id);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
                 return Ok(result);
             }
             catch (AppException e)

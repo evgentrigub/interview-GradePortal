@@ -8,7 +8,6 @@ using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
 using GradePortalAPI.Models;
 using GradePortalAPI.Models.Base;
-using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,11 +51,11 @@ namespace GradePortalAPI.Controllers
         {
             var userResult = await _userService.FindById(userId);
             if (!userResult.IsSuccess)
-                return NotFound(new NotFoundCustomException(userResult.Message));
+                return NotFound(userResult.Message);
 
             var skillsResult = await _skillService.GetUserSkills(userResult.Data.Id);
             if (!skillsResult.IsSuccess)
-                return NotFound(new NotFoundCustomException(userResult.Message));
+                return NotFound(userResult.Message);
 
             try
             {
@@ -98,7 +97,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _skillService.CreateOrAddSkill(userId, skill);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
 
                 var sk = _mapper.Map<SkillDto>(result.Data);
                 return Ok(new Result<SkillDto>(message: result.Message, isSuccess: result.IsSuccess, data: sk));
@@ -124,7 +123,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _skillService.FindById(id);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
 
                 var sk = _mapper.Map<SkillDto>(result);
                 return Ok(new Result<SkillDto>(message: "Success", isSuccess: true, data: sk));
@@ -150,7 +149,7 @@ namespace GradePortalAPI.Controllers
             {
                 var result = await _skillService.Delete(id);
                 if (!result.IsSuccess)
-                    return BadRequest(new BadRequestCustomException(result.Message));
+                    return BadRequest(result.Message);
 
                 return Ok(result);
             }

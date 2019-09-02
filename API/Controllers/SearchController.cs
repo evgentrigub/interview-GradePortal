@@ -95,7 +95,7 @@ namespace GradePortalAPI.Controllers
         {
             try
             {
-                var data = _searchService.UsersSearch(options.Filters, options.Skip(), options.Take());
+                var data = await _searchService.UsersSearch(options.Filters, options.Skip(), options.Take());
                 return Ok(new Result<UserDataTable>(message: "Search successful!", isSuccess: true, data: data));
             }
             catch (AppException e)

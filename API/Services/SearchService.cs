@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
@@ -91,7 +92,7 @@ namespace GradePortalAPI.Services
         }
 
         /// <inheritdoc />
-        public UserDataTable UsersSearch(Dictionary<string, string> options, int skip, int take)
+        public async Task<UserDataTable> UsersSearch(Dictionary<string, string> options, int skip, int take)
         {
             var res = _context.Users.Include(r => r.UserSkills).ThenInclude(r => r.Skill).AsQueryable();
 
@@ -126,7 +127,7 @@ namespace GradePortalAPI.Services
                         u.UserSkills.Select(c => c.Skill).Any(s => s.QuickSearch.Contains(skill)));
                 }
 
-                var cutRes = res.Skip(skip).Take(take);
+                var cutRes = await res.Skip(skip).Take(take).ToListAsync();
 
                 var usersView = _mapper.Map<IEnumerable<UserViewModel>>(cutRes);
 

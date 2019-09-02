@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Models.Enums;
 using GradePortalAPI.Models.ViewModels;
@@ -33,6 +34,6 @@ namespace GradePortalAPI.Models.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        UserDataTable UsersSearch(Dictionary<string, string> options, int skip, int take);
+        Task<UserDataTable> UsersSearch(Dictionary<string, string> options, int skip, int take);
     }
 }

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GradePortalAPI.Dtos;
 using GradePortalAPI.Helpers;
-using GradePortalAPI.Models.Errors;
 using GradePortalAPI.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,8 +39,8 @@ namespace GradePortalAPI.Controllers
             try
             {
                 var res = await _evaluateService.Create(evaluation);
-                if (res.IsSuccess == false)
-                    return NotFound(new NotFoundCustomException(res.Message));
+                if (!res.IsSuccess)
+                    return NotFound(res.Message);
                 return Ok(res);
             }
             catch (AppException e)
@@ -59,10 +58,17 @@ namespace GradePortalAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult DeleteEvaluation(string id)
+        public async Task<IActionResult> DeleteEvaluation(string id)
         {
-            var res = _evaluateService.Delete(id);
-            return Ok(res);
+            try
+            {
+                var res = await _evaluateService.Delete(id);
+                return Ok(res);
+            }
+            catch (AppException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
     }
 }

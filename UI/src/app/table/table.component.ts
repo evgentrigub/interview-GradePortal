@@ -1,9 +1,8 @@
-import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../_services/user.service';
 import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular/material';
 import { UserData } from '../_models/user-view-model';
-import { merge, of } from 'rxjs';
-import { startWith, switchMap, map, catchError } from 'rxjs/operators';
+import { startWith, switchMap, map } from 'rxjs/operators';
 import { ISearchOptions } from '../_models/search-options';
 import { SearchPanelService } from '../_services/search-panel.service';
 
@@ -19,7 +18,7 @@ export class TableComponent implements AfterViewInit {
   private searchParams: ISearchOptions;
 
   users: UserData[] = [];
-  displayedColumns: string[] = ['name', 'city', 'position'];
+  displayedColumns: string[] = ['num', 'name', 'city', 'position'];
   dataSource: MatTableDataSource<UserData> = new MatTableDataSource<UserData>();
   resultsLength = 0;
 

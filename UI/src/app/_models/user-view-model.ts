@@ -6,6 +6,7 @@ export interface UserViewModel {
 }
 
 export interface UserData {
+  num: number;
   id: string;
   firstName: string;
   lastName: string;

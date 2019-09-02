@@ -24,13 +24,13 @@ export class UserService {
     const page = pageNum.toString();
     const pageSize = pageSizeNum.toString();
     const params = new HttpParams({ fromObject: { page, pageSize } });
-    console.log(page, pageSize, params);
     return this.http.get<Result<UserDataTable>>(this.usersUrl + `getUsers`, { params }).pipe(
       catchError(this.handleError),
       tap(result => {
         const data = result.data;
         for (let i = 0; i < data.items.length; i++) {
           const user = data.items[i];
+          user.num = (i + 1) + pageNum * pageSizeNum;
           user.city = user.city ? user.city : 'No city';
           user.position = user.position ? user.position : 'No position';
         }

@@ -45,6 +45,7 @@ export class PersonalPageComponent implements OnDestroy {
     message: '',
     isSuccess: true,
     data: {
+      num: 0,
       id: '',
       firstName: '',
       lastName: '',

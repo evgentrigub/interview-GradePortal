@@ -371,6 +371,7 @@ describe('SkillsTableComponent', () => {
 });
 
 const USER_AUTH: UserAuthenticated = {
+  num: 0,
   id: 'id',
   firstName: 'Eugene',
   lastName: 'Trigubov',

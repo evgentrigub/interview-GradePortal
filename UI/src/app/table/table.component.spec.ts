@@ -68,10 +68,11 @@ describe('TableComponent', () => {
     const headerRow = tableRows[0];
     const row = tableRows[1];
     expect(tableRows.length).toBe(4);
-    expect(headerRow.cells[0].innerHTML).toBe('Name');
-    expect(headerRow.cells[1].innerHTML).toBe('City');
-    expect(headerRow.cells[2].innerHTML).toBe('Position');
-    expect(row.cells[0].innerHTML).toBe('Дмитрий Никитин');
+    expect(headerRow.cells[0].innerHTML).toBe('№');
+    expect(headerRow.cells[1].innerHTML).toBe('Name');
+    expect(headerRow.cells[2].innerHTML).toBe('City');
+    expect(headerRow.cells[3].innerHTML).toBe('Position');
+    expect(row.cells[1].innerHTML).toBe('Дмитрий Никитин');
   }));
 
   it('should return new page after click paginator', () => {
@@ -83,7 +84,7 @@ describe('TableComponent', () => {
     fixture.detectChanges();
 
     // assert
-    const numbers: Array<string> = ['Дмитрий Никитин', 'Николай Петров', 'Алексей Андреев'];
+    const numbers: Array<string> = ['4', '5', '6'];
     const tableRows = fixture.nativeElement.querySelectorAll('tr.table-row');
     for (const element of tableRows) {
       const num = element.cells[0].innerHTML;
@@ -130,7 +131,8 @@ describe('TableComponent', () => {
     const row = fixture.nativeElement.querySelector('tr.table-row');
 
     // assert
-    expect(row.cells[0].innerHTML).toBe('Evgen Trigubov');
+    expect(row.cells[0].innerHTML).toBe('1');
+    expect(row.cells[1].innerHTML).toBe('Evgen Trigubov');
   });
 });
 
@@ -140,6 +142,7 @@ const users: Result<UserDataTable> = {
   data: {
     items: [
       {
+        num: 1,
         id: '7283243a-8866-41fe-98d6-635e5ac81709',
         firstName: 'Дмитрий',
         lastName: 'Никитин',
@@ -148,6 +151,7 @@ const users: Result<UserDataTable> = {
         position: 'Ведущий разработчик',
       },
       {
+        num: 2,
         id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
         firstName: 'Николай',
         lastName: 'Петров',
@@ -156,6 +160,7 @@ const users: Result<UserDataTable> = {
         position: 'Менеджер по продажам',
       },
       {
+        num: 1,
         id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
         firstName: 'Алексей',
         lastName: 'Андреев',
@@ -174,6 +179,7 @@ const nextUsers: Result<UserDataTable> = {
   data: {
     items: [
       {
+        num: 4,
         id: '7283243a-8866-41fe-98d6-635e5ac81709',
         firstName: 'Дмитрий',
         lastName: 'Никитин',
@@ -182,6 +188,7 @@ const nextUsers: Result<UserDataTable> = {
         position: 'Ведущий разработчик',
       },
       {
+        num: 5,
         id: '28f86d27-d6de-4315-8a37-cf45bc90e870',
         firstName: 'Николай',
         lastName: 'Петров',
@@ -190,6 +197,7 @@ const nextUsers: Result<UserDataTable> = {
         position: 'Менеджер по продажам',
       },
       {
+        num: 6,
         id: 'c5da8998-a1df-4e21-84bf-4ecbe9303adb',
         firstName: 'Алексей',
         lastName: 'Андреев',
@@ -208,6 +216,7 @@ const filteredData: Result<UserDataTable> = {
   data: {
     items: [
       {
+        num: 1,
         id: '1',
         firstName: 'Evgen',
         lastName: 'Trigubov',

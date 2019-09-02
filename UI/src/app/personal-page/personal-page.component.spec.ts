@@ -68,6 +68,7 @@ const USER_DATA_RESULT: Result<UserData> = {
   message: '',
   isSuccess: true,
   data: {
+    num: 0,
     id: 'id',
     firstName: 'Eugene',
     lastName: 'Trigubov',

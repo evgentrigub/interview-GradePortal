@@ -70,9 +70,7 @@ export class UserService {
   }
 
   private handleError(error: CustomErrorResponse) {
-    let msg: string;
-    msg = error.message + ` Status Code: ${error.status}`;
-
+    const msg = error.message + ` Status Code: ${error.status}`;
     console.error('UserService::handleError() ' + msg);
     return throwError('Error: ' + msg);
   }

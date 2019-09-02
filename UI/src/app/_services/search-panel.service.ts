@@ -56,6 +56,7 @@ export class SearchPanelService {
           const data = result.data;
           for (let i = 0; i < data.items.length; i++) {
             const user = data.items[i];
+            user.num = (i + 1) + options.pageIndex * options.pageSize;
             user.city = user.city ? user.city : 'No city';
             user.position = user.position ? user.position : 'No position';
           }

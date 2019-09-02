@@ -73,6 +73,6 @@ export class LoginComponent {
   }
 
   private showMessage(message: any) {
-    this.snackbar.open(message, 'OK', { duration: 3000 });
+    this.snackbar.open(message, 'OK', { duration: 5000 });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input, OnChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, OnChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { EditBaseComponent, ActionType } from 'src/app/edit-base/edit-base-component';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { SkillService } from 'src/app/_services/skill.service';
@@ -16,6 +16,7 @@ import { Result } from 'src/app/_models/result-model';
   styleUrls: ['./skills-table.component.css'],
 })
 export class SkillsTableComponent extends EditBaseComponent implements OnInit, OnChanges {
+
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -35,8 +36,8 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
     if (!this.newSkillNameControl) {
       return false;
     }
-    const skillName = this.newSkillNameControl.value;
-    return this.lastAutoCompleteValue === skillName ? true : false;
+    const skillName = this.newSkillNameControl.value as string;
+    return this.lastAutoCompleteValue === skillName.trim() ? true : false;
   }
 
   get evaluatedSkill(): string {
@@ -75,7 +76,6 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
 
   ngOnInit() {
     this.nameSkillOptions = this.getAutocompleteSkills();
-    // this.nameSkillOptions.subscribe(r => console.log(r))
   }
 
   ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
@@ -86,9 +86,14 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
       if (!result) {
         return;
       }
+
       this.dataSource = new MatTableDataSource(result.data);
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
+      for (let i = 0; i < this.dataSource.data.length; i++) {
+        const el = this.dataSource.data[i];
+        el.num = (i + 1) + this.paginator.pageIndex * this.paginator.pageSize;
+      }
       this.detector.markForCheck();
       this.isLoading = false;
     }

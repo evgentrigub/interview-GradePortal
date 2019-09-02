@@ -19,7 +19,7 @@ export class SkillService {
   private searchUrl = `${environment.apiUrl}/search/`;
   private evaluationsUrl = `${environment.apiUrl}/evaluations/`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Return array of user skills
@@ -29,9 +29,7 @@ export class SkillService {
   getUserSkills(userId: string, expertId?: string): Observable<Result<SkillViewModel[]>> {
     return this.http
       .get<Result<SkillViewModel[]>>(this.skillsUrl + `GetSkills/${userId}?expertId=${expertId}`)
-      .pipe(
-        catchError(this.handleError)
-      );
+      .pipe(catchError(this.handleError));
   }
 
   /**

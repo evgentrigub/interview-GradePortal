@@ -47,8 +47,8 @@ describe('SkillService', () => {
     const skill: SkillToSend = {
       id: 'id1',
       name: 'aaaa',
-      description: 'bbbb'
-    }
+      description: 'bbbb',
+    };
     const URL = skillsUrl + `CreateOrAddSkill/${userId}`;
 
     // act
@@ -67,7 +67,7 @@ describe('SkillService', () => {
     const URL = searchUrl + `searchSkills?query=${query}&limit=${limit}`;
 
     // act
-    service.getAutocompleteSkills(query).subscribe()
+    service.getAutocompleteSkills(query).subscribe();
 
     // assert
     const req = httpMock.expectOne(URL);
@@ -80,8 +80,8 @@ describe('SkillService', () => {
       userId: 'id1',
       expertId: 'id2',
       skillId: 'id3',
-      value: 5
-    }
+      value: 5,
+    };
     const URL = evaluationsUrl + `create`;
 
     // act
@@ -90,7 +90,5 @@ describe('SkillService', () => {
     // assert
     const req = httpMock.expectOne(URL);
     expect(req.request.method).toBe('POST');
-
   });
-
 });

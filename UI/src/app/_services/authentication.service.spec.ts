@@ -73,7 +73,6 @@ describe('AuthenticationService', () => {
     const item = localStorage.getItem(key);
     expect(item).toBeNull();
   });
-
 });
 
 const USER: User = {

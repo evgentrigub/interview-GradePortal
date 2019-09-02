@@ -49,5 +49,4 @@ describe('SearchPanelService', () => {
   //   // assert
 
   // });
-
 });

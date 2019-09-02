@@ -81,7 +81,6 @@ describe('UserService', () => {
     const req = httpMock.expectOne(URL);
     expect(req.request.method).toBe('DELETE');
   });
-
 });
 
 const USER: UserData = {

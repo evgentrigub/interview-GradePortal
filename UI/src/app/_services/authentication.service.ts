@@ -53,7 +53,7 @@ export class AuthenticationService {
     return this.http.post<Result<UserAuthenticated>>(this.authUrl + `register`, user).pipe(catchError(this.handleError));
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }

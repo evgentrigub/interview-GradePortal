@@ -93,7 +93,7 @@ export class PersonalPageComponent implements OnDestroy {
           }
         })
       )
-      .subscribe(_ => { }, err => this.showMessage(err));
+      .subscribe(_ => {}, err => this.showMessage(err));
   }
 
   ngOnDestroy(): void {

@@ -16,7 +16,6 @@ import { Result } from 'src/app/_models/result-model';
   styleUrls: ['./skills-table.component.css'],
 })
 export class SkillsTableComponent extends EditBaseComponent implements OnInit, OnChanges {
-
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -92,7 +91,7 @@ export class SkillsTableComponent extends EditBaseComponent implements OnInit, O
       this.dataSource.paginator = this.paginator;
       for (let i = 0; i < this.dataSource.data.length; i++) {
         const el = this.dataSource.data[i];
-        el.num = (i + 1) + this.paginator.pageIndex * this.paginator.pageSize;
+        el.num = i + 1 + this.paginator.pageIndex * this.paginator.pageSize;
       }
       this.detector.markForCheck();
       this.isLoading = false;

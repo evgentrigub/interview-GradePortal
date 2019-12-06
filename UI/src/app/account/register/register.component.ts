@@ -15,6 +15,7 @@ export class RegisterComponent {
   readonly registerForm: FormGroup;
   hidePassword = true;
   isLoading = false;
+  valueLogin: string;
 
   constructor(
     private formBuilder: FormBuilder,
